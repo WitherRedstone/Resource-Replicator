@@ -1,0 +1,86 @@
+package com.chinaex123.resource_replicator.block;
+
+import com.chinaex123.resource_replicator.ResourceReplicator;
+import com.chinaex123.resource_replicator.item.ModItems;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
+
+public class ModBlocks {
+    // 创建方块注册器实例
+    public static final DeferredRegister.Blocks BLOCK_REGISTER =
+            DeferredRegister.createBlocks(ResourceReplicator.MOD_ID);
+
+    // ======================= 物品资源复制机 =======================
+    public static final DeferredBlock<ResourceReplicatorBlock> ITEM_REPLICATOR_Tier1 =
+            registerBlocks("item_replicator_tier1", () -> new ResourceReplicatorBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(2.5f, 6.0f)
+                    .noOcclusion().requiresCorrectToolForDrops(), 1), Rarity.COMMON);
+    public static final DeferredBlock<ResourceReplicatorBlock> ITEM_REPLICATOR_Tier2 =
+            registerBlocks("item_replicator_tier2", () -> new ResourceReplicatorBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(2.5f, 6.0f)
+                    .noOcclusion().requiresCorrectToolForDrops(), 2), Rarity.COMMON);
+    public static final DeferredBlock<ResourceReplicatorBlock> ITEM_REPLICATOR_Tier3 =
+            registerBlocks("item_replicator_tier3", () -> new ResourceReplicatorBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(2.5f, 6.0f)
+                    .noOcclusion().requiresCorrectToolForDrops(), 3), Rarity.UNCOMMON);
+    public static final DeferredBlock<ResourceReplicatorBlock> ITEM_REPLICATOR_Tier4 =
+            registerBlocks("item_replicator_tier4", () -> new ResourceReplicatorBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(2.5f, 6.0f)
+                    .noOcclusion().requiresCorrectToolForDrops(), 4), Rarity.RARE);
+    public static final DeferredBlock<ResourceReplicatorBlock> ITEM_REPLICATOR_Tier5 =
+            registerBlocks("item_replicator_tier5", () -> new ResourceReplicatorBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(2.5f, 6.0f)
+                    .noOcclusion().requiresCorrectToolForDrops(), 5), Rarity.EPIC);
+
+    /**
+     * 为指定方块注册对应的物品形式
+     *
+     * @param <T> 方块类型参数
+     * @param name 方块名称，用于物品注册
+     * @param block 延迟方块对象
+     * @param rarity 物品稀有度
+     */
+    private static <T extends Block> void registerBlockItems(String name, DeferredBlock<T> block, Rarity rarity) {
+        ModItems.ITEMS_REGISTER.register(name, () -> new BlockItem(block.get(), new Item.Properties().rarity(rarity)));
+    }
+
+    // 为不需要特殊稀有度的方块保留原有方法
+    private static <T extends Block> void registerBlockItems(String name, DeferredBlock<T> block) {
+        registerBlockItems(name, block, Rarity.COMMON); // 默认普通稀有度
+    }
+
+    /**
+     * 注册方块及其对应的物品形式（带稀有度）
+     *
+     * @param <T> 方块类型参数
+     * @param name 方块的注册名称
+     * @param block 方块供应器
+     * @param rarity 物品稀有度
+     * @return 注册的延迟方块对象
+     */
+    private static <T extends Block> DeferredBlock<T> registerBlocks(String name, Supplier<T> block, Rarity rarity) {
+        DeferredBlock<T> blocks = BLOCK_REGISTER.register(name, block);
+        registerBlockItems(name, blocks, rarity);
+        return blocks;
+    }
+
+    // 为普通方块保留原有方法
+    private static <T extends Block> DeferredBlock<T> registerBlocks(String name, Supplier<T> block) {
+        return registerBlocks(name, block, Rarity.COMMON);
+    }
+
+    // 向指定事件总线注册所有物品
+    public static void register(IEventBus eventBus) {
+        BLOCK_REGISTER.register(eventBus);
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "itemGroup.resource_replicator_tab": "Resource Replicator",
+
+  "block.resource_replicator.item_replicator_tier1": "Item Replicator T1",
+  "block.resource_replicator.item_replicator_tier2": "Item Replicator T2",
+  "block.resource_replicator.item_replicator_tier3": "Item Replicator T3",
+  "block.resource_replicator.item_replicator_tier4": "Item Replicator T4",
+  "block.resource_replicator.item_replicator_tier5": "Item Replicator T5",
+
+  "message.resource_replicator.empty": "It is empty inside.",
+  "message.resource_replicator.contains": "There are items inside."
+}

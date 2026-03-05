@@ -1,0 +1,12 @@
+{
+  "itemGroup.resource_replicator_tab": "资源复制器",
+
+  "block.resource_replicator.item_replicator_tier1": "物品资源复制器T1",
+  "block.resource_replicator.item_replicator_tier2": "物品资源复制器T2",
+  "block.resource_replicator.item_replicator_tier3": "物品资源复制器T3",
+  "block.resource_replicator.item_replicator_tier4": "物品资源复制器T4",
+  "block.resource_replicator.item_replicator_tier5": "物品资源复制器T5",
+
+  "message.resource_replicator.empty": "里面是空的",
+  "message.resource_replicator.contains": "里面有物品"
+}
