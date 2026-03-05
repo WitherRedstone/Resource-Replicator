@@ -5,11 +5,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,7 +18,7 @@ import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 
-public class ResourceReplicatorBlockEntity extends BlockEntity implements MenuProvider {
+public class ItemReplicatorBlockEntity extends BlockEntity {
     private static final int INPUT_SLOT = 0;
     private static final int TOTAL_SLOTS = 1;
 
@@ -28,8 +26,8 @@ public class ResourceReplicatorBlockEntity extends BlockEntity implements MenuPr
     private int tickCounter = 0;
     private ReplicatorTier tier = ReplicatorTier.TIER_1;
 
-    public ResourceReplicatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.RESOURCE_REPLICATOR.get(), pos, state);
+    public ItemReplicatorBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.ITEM_REPLICATOR.get(), pos, state);
         for (int i = 0; i < items.length; i++) {
             items[i] = ItemStack.EMPTY;
         }
@@ -69,11 +67,34 @@ public class ResourceReplicatorBlockEntity extends BlockEntity implements MenuPr
         }
     }
 
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("tickCounter", tickCounter);
+        tag.putInt("tier", tier.getId());
+
+        CompoundTag itemsTag = new CompoundTag();
+        for (int i = 0; i < items.length; i++) {
+            if (!items[i].isEmpty()) {
+                itemsTag.put("item" + i, items[i].save(registries));
+            }
+        }
+        tag.put("items", itemsTag);
+
+        return tag;
+    }
+
     public void setTier(int tierId) {
         this.tier = ReplicatorTier.fromId(tierId);
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, ResourceReplicatorBlockEntity blockEntity) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, ItemReplicatorBlockEntity blockEntity) {
         blockEntity.tickCounter++;
 
         if (blockEntity.tickCounter >= blockEntity.tier.getProcessSpeed()) {
@@ -140,31 +161,37 @@ public class ResourceReplicatorBlockEntity extends BlockEntity implements MenuPr
     public boolean addItem(ItemStack stack) {
         if (items[INPUT_SLOT].isEmpty()) {
             items[INPUT_SLOT] = stack.copy();
-            setChanged();
+            markUpdated();
             return true;
         } else if (ItemStack.isSameItemSameComponents(items[INPUT_SLOT], stack)) {
             int canAdd = stack.getMaxStackSize() - items[INPUT_SLOT].getCount();
             if (canAdd > 0) {
                 items[INPUT_SLOT].grow(Math.min(canAdd, stack.getCount()));
-                setChanged();
+                markUpdated();
                 return true;
             }
         }
         return false;
     }
 
+    public ItemStack extractItem() {
+        if (!items[INPUT_SLOT].isEmpty()) {
+            ItemStack extracted = items[INPUT_SLOT].copy();
+            items[INPUT_SLOT] = ItemStack.EMPTY;
+            markUpdated();
+            return extracted;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private void markUpdated() {
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
+
     public ItemStack getDisplayedItem() {
         return items[INPUT_SLOT];
-    }
-
-    @Override
-    public Component getDisplayName() {
-        return Component.translatable("container.resource_replicator.resource_replicator");
-    }
-
-    @Nullable
-    @Override
-    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        return null;
     }
 }

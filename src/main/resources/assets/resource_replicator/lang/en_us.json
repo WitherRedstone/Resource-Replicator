@@ -8,5 +8,7 @@
   "block.resource_replicator.item_replicator_tier5": "Item Replicator T5",
 
   "message.resource_replicator.empty": "It is empty inside.",
-  "message.resource_replicator.contains": "There are items inside."
+  "message.resource_replicator.contains": "There are items inside.",
+  "message.resource_replicator.inserted": "Inserted: %s",
+  "message.resource_replicator.extracted": "Extracted: %s"
 }
