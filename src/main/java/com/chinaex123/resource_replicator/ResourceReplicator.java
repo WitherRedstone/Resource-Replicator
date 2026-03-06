@@ -4,10 +4,14 @@ import com.chinaex123.resource_replicator.block.ModBlocks;
 import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.ModBlockEntities;
+import com.chinaex123.resource_replicator.block.enumTier.FluidReplicatorTier;
+import com.chinaex123.resource_replicator.block.enumTier.ItemReplicatorTier;
+import com.chinaex123.resource_replicator.config.ServerConfig;
 import com.chinaex123.resource_replicator.item.ModItems;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
@@ -17,6 +21,7 @@ public class ResourceReplicator {
 
     public ResourceReplicator(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::registerCapabilities); // 能力注册事件
+        modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.CONFIG_SPEC);
 
         ModCreativeTabs.register(modEventBus); // 注册自定义创造模式物品栏
         ModBlocks.register(modEventBus); // 注册方块

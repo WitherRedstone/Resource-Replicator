@@ -1,20 +1,47 @@
 package com.chinaex123.resource_replicator.block.enumTier;
 
+import com.chinaex123.resource_replicator.config.ServerConfig;
+
 public enum ItemReplicatorTier {
-    ITEM_TIER_1(1, 20, 4),
-    ITEM_TIER_2(2, 15, 16),
-    ITEM_TIER_3(3, 10, 32),
-    ITEM_TIER_4(4, 5, 64),
-    ITEM_TIER_5(5, 1, 128);
+    ITEM_TIER_1(1),
+    ITEM_TIER_2(2),
+    ITEM_TIER_3(3),
+    ITEM_TIER_4(4),
+    ITEM_TIER_5(5);
 
     private final int id;
-    private final int processSpeed;
-    private final int outputAmount;
+    private int processSpeed;
+    private int outputAmount;
 
-    ItemReplicatorTier(int id, int processSpeed, int outputAmount) {
+    ItemReplicatorTier(int id) {
         this.id = id;
-        this.processSpeed = processSpeed;
-        this.outputAmount = outputAmount;
+        updateFromConfig();
+    }
+
+    // 从配置更新参数
+    public void updateFromConfig() {
+        switch (this) {
+            case ITEM_TIER_1:
+                this.processSpeed = ServerConfig.getItemTier1OutputTime();
+                this.outputAmount = ServerConfig.getItemTier1OutputAmount();
+                break;
+            case ITEM_TIER_2:
+                this.processSpeed = ServerConfig.getItemTier2OutputTime();
+                this.outputAmount = ServerConfig.getItemTier2OutputAmount();
+                break;
+            case ITEM_TIER_3:
+                this.processSpeed = ServerConfig.getItemTier3OutputTime();
+                this.outputAmount = ServerConfig.getItemTier3OutputAmount();
+                break;
+            case ITEM_TIER_4:
+                this.processSpeed = ServerConfig.getItemTier4OutputTime();
+                this.outputAmount = ServerConfig.getItemTier4OutputAmount();
+                break;
+            case ITEM_TIER_5:
+                this.processSpeed = ServerConfig.getItemTier5OutputTime();
+                this.outputAmount = ServerConfig.getItemTier5OutputAmount();
+                break;
+        }
     }
 
     public int getId() {
@@ -36,5 +63,12 @@ public enum ItemReplicatorTier {
             }
         }
         return ITEM_TIER_1;
+    }
+
+    // 当配置更改时重新加载
+    public static void reloadAllFromConfig() {
+        for (ItemReplicatorTier tier : values()) {
+            tier.updateFromConfig();
+        }
     }
 }

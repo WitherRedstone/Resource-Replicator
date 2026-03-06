@@ -1,6 +1,7 @@
 package com.chinaex123.resource_replicator.block.entity;
 
 import com.chinaex123.resource_replicator.block.enumTier.ItemReplicatorTier;
+import com.chinaex123.resource_replicator.config.ServerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -20,9 +21,13 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 
 public class ItemReplicatorBlockEntity extends BlockEntity {
-    private static final int INPUT_SLOT = 0;      // 输入槽 - 存放待复制的物品
-    private static final int OUTPUT_SLOT = 1;     // 输出槽 - 存放复制的产物
-    private static final int TOTAL_SLOTS = 2;
+    private static final int INPUT_SLOT = 0;
+    private static final int OUTPUT_SLOT_START = 1;
+    private static final int TOTAL_SLOTS;
+
+    static {
+        TOTAL_SLOTS = 1 + ServerConfig.getItemReplicatorOutputSlots();
+    }
 
     public final ItemStack[] items = new ItemStack[TOTAL_SLOTS];
     private int tickCounter = 0;
@@ -39,11 +44,9 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         @Override
         public ItemStack getStackInSlot(int slot) {
             if (slot == INPUT_SLOT) {
-                // 输入槽可见但不可抽取
                 return items[INPUT_SLOT];
-            } else if (slot == OUTPUT_SLOT) {
-                // 输出槽可见且可抽取
-                return items[OUTPUT_SLOT];
+            } else if (slot >= OUTPUT_SLOT_START && slot < TOTAL_SLOTS) {
+                return items[slot];
             }
             return ItemStack.EMPTY;
         }
@@ -51,7 +54,6 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         @Nonnull
         @Override
         public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            // 禁止所有输入
             return stack;
         }
 
@@ -59,16 +61,14 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             if (slot == INPUT_SLOT) {
-                // 输入槽不可抽取
                 return ItemStack.EMPTY;
-            } else if (slot == OUTPUT_SLOT) {
-                // 输出槽可以抽取
-                if (items[OUTPUT_SLOT].isEmpty()) {
+            } else if (slot >= OUTPUT_SLOT_START && slot < TOTAL_SLOTS) {
+                if (items[slot].isEmpty()) {
                     return ItemStack.EMPTY;
                 }
 
-                int extractAmount = Math.min(amount, items[OUTPUT_SLOT].getCount());
-                ItemStack result = items[OUTPUT_SLOT].split(extractAmount);
+                int extractAmount = Math.min(amount, items[slot].getCount());
+                ItemStack result = items[slot].split(extractAmount);
 
                 if (!simulate) {
                     markUpdated();
@@ -86,7 +86,6 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            // 禁止所有输入
             return false;
         }
     };
@@ -170,7 +169,6 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 int remainingOutput = blockEntity.tier.getOutputAmount();
                 boolean hasUpdated = false;
 
-                // 方式 1：主动输出到周围的容器
                 Direction[] directions = Direction.values();
                 for (Direction dir : directions) {
                     if (remainingOutput <= 0) break;
@@ -191,30 +189,30 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                     }
                 }
 
-                // 方式 2：将剩余的输出存入输出槽，供管道抽取
                 if (remainingOutput > 0) {
-                    ItemStack currentOutput = blockEntity.items[OUTPUT_SLOT];
+                    for (int slot = OUTPUT_SLOT_START; slot < TOTAL_SLOTS && remainingOutput > 0; slot++) {
+                        ItemStack currentOutput = blockEntity.items[slot];
 
-                    if (currentOutput.isEmpty()) {
-                        // 输出槽为空，创建新的物品堆
-                        ItemStack newOutput = inputStack.copy();
-                        newOutput.setCount(Math.min(remainingOutput, inputStack.getMaxStackSize()));
-                        blockEntity.items[OUTPUT_SLOT] = newOutput;
-                        hasUpdated = true;
-                    } else if (ItemStack.isSameItemSameComponents(currentOutput, inputStack)) {
-                        // 输出槽已有相同物品，尝试堆叠
-                        int canAdd = Math.min(
-                                inputStack.getMaxStackSize() - currentOutput.getCount(),
-                                remainingOutput
-                        );
-                        if (canAdd > 0) {
-                            currentOutput.grow(canAdd);
+                        if (currentOutput.isEmpty()) {
+                            ItemStack newOutput = inputStack.copy();
+                            newOutput.setCount(Math.min(remainingOutput, inputStack.getMaxStackSize()));
+                            blockEntity.items[slot] = newOutput;
+                            remainingOutput -= newOutput.getCount();
                             hasUpdated = true;
+                        } else if (ItemStack.isSameItemSameComponents(currentOutput, inputStack)) {
+                            int canAdd = Math.min(
+                                    inputStack.getMaxStackSize() - currentOutput.getCount(),
+                                    remainingOutput
+                            );
+                            if (canAdd > 0) {
+                                currentOutput.grow(canAdd);
+                                remainingOutput -= canAdd;
+                                hasUpdated = true;
+                            }
                         }
                     }
                 }
 
-                // 如果有更新，通知客户端
                 if (hasUpdated) {
                     blockEntity.markUpdated();
                 }
@@ -259,7 +257,6 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         return items[INPUT_SLOT];
     }
 
-    // 获取物品处理器（用于 NeoForge 能力系统）
     @Nullable
     public IItemHandler getItemHandler(@Nullable Direction side) {
         return itemHandler;
