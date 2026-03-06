@@ -86,7 +86,7 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
                         // 否则将物品掉落到地上
                         player.drop(extractedItem, false);
                     }
-                    player.displayClientMessage(Component.translatable("message.resource_replicator.extracted",
+                    player.displayClientMessage(Component.translatable("message.item_replicator.extracted",
                             extractedItem.getHoverName()), true);
                     return InteractionResult.CONSUME;
                 } else {
@@ -111,7 +111,7 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
             if (replicator.getDisplayedItem().isEmpty()) {
                 player.displayClientMessage(Component.translatable("message.resource_replicator.empty"), true);
             } else {
-                player.displayClientMessage(Component.translatable("message.resource_replicator.contains",
+                player.displayClientMessage(Component.translatable("message.item_replicator.contains",
                         replicator.getDisplayedItem().getHoverName()), true);
             }
         }

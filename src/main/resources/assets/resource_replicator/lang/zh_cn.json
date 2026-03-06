@@ -6,9 +6,18 @@
   "block.resource_replicator.item_replicator_tier3": "物品复制器T3",
   "block.resource_replicator.item_replicator_tier4": "物品复制器T4",
   "block.resource_replicator.item_replicator_tier5": "物品复制器T5",
+  "block.resource_replicator.fluid_replicator_tier1": "流体复制器T1",
+  "block.resource_replicator.fluid_replicator_tier2": "流体复制器T2",
+  "block.resource_replicator.fluid_replicator_tier3": "流体复制器T3",
+  "block.resource_replicator.fluid_replicator_tier4": "流体复制器T4",
+  "block.resource_replicator.fluid_replicator_tier5": "流体复制器T5",
 
   "message.resource_replicator.empty": "里面是空的。",
-  "message.resource_replicator.contains": "里面有物品：%s",
   "message.resource_replicator.inserted": "已放入：%s",
-  "message.resource_replicator.extracted": "已取出：%s"
+
+  "message.item_replicator.contains": "里面有物品：%s",
+  "message.item_replicator.extracted": "已取出：%s",
+
+  "message.fluid_replicator.contains": "里面有流体：%s",
+  "message.fluid_replicator.cleared": "已清除所有流体"
 }

@@ -20,11 +20,19 @@ public class ModCreativeTabs {
                     .title(Component.translatable("itemGroup.resource_replicator_tab"))
                     .displayItems((parameters, output) -> {
 
+                        // ======================= 物品资源复制机 =======================
                         output.accept(ModBlocks.ITEM_REPLICATOR_Tier1.get());
                         output.accept(ModBlocks.ITEM_REPLICATOR_Tier2.get());
                         output.accept(ModBlocks.ITEM_REPLICATOR_Tier3.get());
                         output.accept(ModBlocks.ITEM_REPLICATOR_Tier4.get());
                         output.accept(ModBlocks.ITEM_REPLICATOR_Tier5.get());
+
+                        // ======================= 流体资源复制机 =======================
+                        output.accept(ModBlocks.FLUID_REPLICATOR_Tier1.get());
+                        output.accept(ModBlocks.FLUID_REPLICATOR_Tier2.get());
+                        output.accept(ModBlocks.FLUID_REPLICATOR_Tier3.get());
+                        output.accept(ModBlocks.FLUID_REPLICATOR_Tier4.get());
+                        output.accept(ModBlocks.FLUID_REPLICATOR_Tier5.get());
 
                     })
                     .build());

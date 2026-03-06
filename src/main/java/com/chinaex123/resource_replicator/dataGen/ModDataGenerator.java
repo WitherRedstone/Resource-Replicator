@@ -44,6 +44,6 @@ public class ModDataGenerator {
         generator.addProvider(event.includeServer(), blockTagsProvider);
 
         // 注册方块状态生成器
-        generator.addProvider(event.includeClient(), new ModBlockStatesProvider(packOutput, existingFileHelper));
+//        generator.addProvider(event.includeClient(), new ModBlockStatesProvider(packOutput, existingFileHelper));
     }
 }

@@ -6,9 +6,18 @@
   "block.resource_replicator.item_replicator_tier3": "Item Replicator T3",
   "block.resource_replicator.item_replicator_tier4": "Item Replicator T4",
   "block.resource_replicator.item_replicator_tier5": "Item Replicator T5",
+  "block.resource_replicator.fluid_replicator_tier1": "Fluid Replicator T5",
+  "block.resource_replicator.fluid_replicator_tier2": "Fluid Replicator T2",
+  "block.resource_replicator.fluid_replicator_tier3": "Fluid Replicator T3",
+  "block.resource_replicator.fluid_replicator_tier4": "Fluid Replicator T4",
+  "block.resource_replicator.fluid_replicator_tier5": "Fluid Replicator T5",
 
   "message.resource_replicator.empty": "It is empty inside.",
-  "message.resource_replicator.contains": "There are items inside.",
   "message.resource_replicator.inserted": "Inserted: %s",
-  "message.resource_replicator.extracted": "Extracted: %s"
+
+  "message.item_replicator.contains": "There are items inside: %s",
+  "message.item_replicator.extracted": "Extracted: %s",
+
+  "message.fluid_replicator.contains": "There are fluids inside：%s",
+  "message.fluid_replicator.cleared": "All fluids cleared"
 }

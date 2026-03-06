@@ -23,11 +23,20 @@ public class ModBlockLootTablesProvider extends BlockLootSubProvider {
      */
     @Override
     protected void generate() {
+
+        // ======================= 物品资源复制机 =======================
         dropSelf(ModBlocks.ITEM_REPLICATOR_Tier1.get());
         dropSelf(ModBlocks.ITEM_REPLICATOR_Tier2.get());
         dropSelf(ModBlocks.ITEM_REPLICATOR_Tier3.get());
         dropSelf(ModBlocks.ITEM_REPLICATOR_Tier4.get());
         dropSelf(ModBlocks.ITEM_REPLICATOR_Tier5.get());
+
+        // ======================= 流体资源复制机 =======================
+        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier1.get());
+        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier2.get());
+        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier3.get());
+        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier4.get());
+        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier5.get());
     }
 
 

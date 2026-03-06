@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.block.entity;
 
-import com.chinaex123.resource_replicator.block.ReplicatorTier;
+import com.chinaex123.resource_replicator.block.ItemReplicatorTier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -26,7 +26,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
     public final ItemStack[] items = new ItemStack[TOTAL_SLOTS];
     private int tickCounter = 0;
-    private ReplicatorTier tier = ReplicatorTier.TIER_1;
+    private ItemReplicatorTier tier = ItemReplicatorTier.ITEM_TIER_1;
 
     // 物品处理器 - 分离输入和输出
     private final IItemHandler itemHandler = new IItemHandler() {
@@ -118,7 +118,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         super.loadAdditional(tag, registries);
         tickCounter = tag.getInt("tickCounter");
         if (tag.contains("tier")) {
-            this.tier = ReplicatorTier.fromId(tag.getInt("tier"));
+            this.tier = ItemReplicatorTier.fromId(tag.getInt("tier"));
         }
 
         CompoundTag itemsTag = tag.getCompound("items");
@@ -156,7 +156,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     }
 
     public void setTier(int tierId) {
-        this.tier = ReplicatorTier.fromId(tierId);
+        this.tier = ItemReplicatorTier.fromId(tierId);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, ItemReplicatorBlockEntity blockEntity) {
