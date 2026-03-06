@@ -19,8 +19,8 @@ public class ItemReplicatorRenderer implements BlockEntityRenderer<ItemReplicato
     public ItemReplicatorRenderer(BlockEntityRendererProvider.Context context) {}
 
     // 为不同物品类型定义不同的偏移量
-    private static final float ITEM_Z_OFFSET = 0.02f; // 物品的偏移
-    private static final float BLOCK_Z_OFFSET = -0.15f; // 方块的偏移
+    private static final float ITEM_Z_OFFSET = -0.02f; // 物品的偏移
+    private static final float BLOCK_Z_OFFSET = -0.20f; // 方块的偏移
 
     // 为不同物品类型定义不同的缩放
     private static final float ITEM_SCALE = 0.6f;

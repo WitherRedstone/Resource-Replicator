@@ -1,8 +1,7 @@
-package com.chinaex123.resource_replicator.block;
+package com.chinaex123.resource_replicator.block.enumTier;
 
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 // 参数：（id, 普通处理速度, 普通处理输出量, 水处理速度, 水处理输出量, 岩浆处理速度, 岩浆处理输出量）
 public enum FluidReplicatorTier {

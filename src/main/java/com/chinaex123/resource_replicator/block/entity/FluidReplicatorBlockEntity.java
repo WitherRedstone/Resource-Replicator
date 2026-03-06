@@ -1,7 +1,7 @@
 package com.chinaex123.resource_replicator.block.entity;
 
 import com.chinaex123.resource_replicator.block.FluidReplicatorBlock;
-import com.chinaex123.resource_replicator.block.FluidReplicatorTier;
+import com.chinaex123.resource_replicator.block.enumTier.FluidReplicatorTier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;

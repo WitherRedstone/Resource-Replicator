@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.block.entity;
 
-import com.chinaex123.resource_replicator.block.ItemReplicatorTier;
+import com.chinaex123.resource_replicator.block.enumTier.ItemReplicatorTier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;

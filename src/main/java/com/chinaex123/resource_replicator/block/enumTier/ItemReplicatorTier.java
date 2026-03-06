@@ -1,4 +1,4 @@
-package com.chinaex123.resource_replicator.block;
+package com.chinaex123.resource_replicator.block.enumTier;
 
 public enum ItemReplicatorTier {
     ITEM_TIER_1(1, 20, 4),
