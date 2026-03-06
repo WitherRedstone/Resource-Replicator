@@ -125,9 +125,15 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         CompoundTag tanksTag = tag.getCompound("tanks");
         if (tanksTag.contains("inputTank")) {
             inputTank.readFromNBT(registries, tanksTag.getCompound("inputTank"));
+        } else {
+            // 如果没有 inputTank 标签，清空流体
+            inputTank.setFluid(FluidStack.EMPTY);
         }
         if (tanksTag.contains("outputTank")) {
             outputTank.readFromNBT(registries, tanksTag.getCompound("outputTank"));
+        } else {
+            // 如果没有 outputTank 标签，清空流体
+            outputTank.setFluid(FluidStack.EMPTY);
         }
     }
 
@@ -257,22 +263,51 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     public void clearInputFluid() {
         inputTank.setFluid(FluidStack.EMPTY);
         markUpdated();
+        // 强制在客户端立即刷新渲染
+        if (level != null && level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
     }
 
     public void clearAllFluids() {
         inputTank.setFluid(FluidStack.EMPTY);
         outputTank.setFluid(FluidStack.EMPTY);
         markUpdated();
-    }
-
-    private void markUpdated() {
-        setChanged();
-        if (level != null && !level.isClientSide) {
+        // 强制在客户端立即刷新渲染
+        if (level != null && level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
     }
 
+    private void markUpdated() {
+        setChanged();
+        if (level != null) {
+            // 强制通知客户端更新 - 同时更新 BlockState 和 BlockEntity 数据
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+
+            // 如果是服务端，需要手动同步 BlockEntity 数据到客户端
+            if (!level.isClientSide) {
+                // 请求重新同步 BlockEntity 数据
+                var packet = ClientboundBlockEntityDataPacket.create(this);
+                // 发送给所有追踪这个方块的玩家
+                var players = level.players();
+                for (var player : players) {
+                    if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                        double distance = Math.abs(serverPlayer.getX() - getBlockPos().getX()) +
+                                Math.abs(serverPlayer.getY() - getBlockPos().getY()) +
+                                Math.abs(serverPlayer.getZ() - getBlockPos().getZ());
+                        if (distance < 64) { // 只在一定范围内发送
+                            serverPlayer.connection.send(packet);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public FluidStack getInputFluid() {
+        // 无论客户端还是服务端都返回 inputTank 的真实数据
+        // 客户端的数据会通过 BlockEntity 同步机制更新
         return inputTank.getFluid();
     }
 
