@@ -2,12 +2,19 @@ package com.chinaex123.resource_replicator.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.List;
+
 public class ServerConfig {
     public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
     public static final ModConfigSpec CONFIG_SPEC;
 
     // ======================= 物品复制机配置 =======================
     private static final ModConfigSpec.IntValue ITEM_REPLICATOR_OUTPUT_SLOTS;
+
+    // 黑白名单配置
+    private static final ModConfigSpec.BooleanValue BLACKLIST_MODE;
+    private static final ModConfigSpec.ConfigValue<List<?>> BLACKLIST_ITEMS;
+    private static final ModConfigSpec.ConfigValue<List<?>> WHITELIST_ITEMS;
 
     // T1-T5 物品复制机配置
     private static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_AMOUNT;
@@ -53,6 +60,28 @@ public class ServerConfig {
         ITEM_REPLICATOR_OUTPUT_SLOTS = BUILDER
                 .comment("物品复制机的输出槽数量（默认：1）")
                 .defineInRange("outputSlots", 1, 1, 9);
+        BUILDER.pop();
+
+        BUILDER.push("黑白名单设置");
+        BLACKLIST_MODE = BUILDER
+                .comment("是否使用黑名单模式（true=黑名单，false=白名单）")
+                .define("blacklistMode", true);
+        BLACKLIST_ITEMS = BUILDER
+                .comment("""
+                        黑名单物品列表。支持以下格式：
+                        - 物品 ID: "minecraft:diamond"
+                        - 模组 ID: "@mekanism" (禁止整个模组的物品)
+                        - 物品标签："#c:ingots/iron"
+                        - 模组标签："@c:ingots" (禁止整个标签下的物品)
+                        示例：["minecraft:bedrock", "@evilmod", "#c:ores/diamond"]""")
+                .defineList("blacklistItems", List::of, obj -> obj instanceof String);
+
+        WHITELIST_ITEMS = BUILDER
+                .comment("""
+                        白名单物品列表。格式同黑名单。
+                        只在 blacklistMode=false 时生效。
+                        示例：["minecraft:cobblestone", "minecraft:sand", "#minecraft:planks"]""")
+                .defineList("whitelistItems", List::of, obj -> obj instanceof String);
         BUILDER.pop();
 
         BUILDER.push("等级设置");
@@ -200,6 +229,22 @@ public class ServerConfig {
     // ======================= 物品复制机配置获取方法 =======================
     public static int getItemReplicatorOutputSlots() {
         return ITEM_REPLICATOR_OUTPUT_SLOTS.get();
+    }
+
+    public static boolean isBlacklistMode() {
+        return BLACKLIST_MODE.get();
+    }
+
+    public static List<String> getBlacklistItems() {
+        return BLACKLIST_ITEMS.get().stream()
+                .map(obj -> (String) obj)
+                .toList();
+    }
+
+    public static List<String> getWhitelistItems() {
+        return WHITELIST_ITEMS.get().stream()
+                .map(obj -> (String) obj)
+                .toList();
     }
 
     // Tier 1

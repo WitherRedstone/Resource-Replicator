@@ -2,6 +2,7 @@ package com.chinaex123.resource_replicator.block.entity;
 
 import com.chinaex123.resource_replicator.block.enumTier.ItemReplicatorTier;
 import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.util.ReplicatorFilter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -32,6 +33,18 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     public final ItemStack[] items = new ItemStack[TOTAL_SLOTS];
     private int tickCounter = 0;
     private ItemReplicatorTier tier = ItemReplicatorTier.ITEM_TIER_1;
+
+    // 固定的管理员物品（不会被复制）
+    private static final String[] ADMIN_ITEMS = {
+            "minecraft:bedrock",
+            "minecraft:command_block",
+            "minecraft:repeating_command_block",
+            "minecraft:chain_command_block",
+            "minecraft:structure_block",
+            "minecraft:jigsaw",
+            "minecraft:barrier",
+            "minecraft:light"
+    };
 
     // 物品处理器 - 分离输入和输出
     private final IItemHandler itemHandler = new IItemHandler() {
@@ -221,6 +234,10 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     }
 
     public boolean addItem(ItemStack stack) {
+        if (!ReplicatorFilter.canInsertItem(stack)) {
+            return false;
+        }
+
         if (items[INPUT_SLOT].isEmpty()) {
             items[INPUT_SLOT] = stack.copy();
             markUpdated();
