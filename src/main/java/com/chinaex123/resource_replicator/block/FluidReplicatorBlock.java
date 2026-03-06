@@ -118,7 +118,10 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
                 var result = FluidUtil.tryEmptyContainer(stack, handler, Integer.MAX_VALUE, player, true);
                 if (result.isSuccess()) {
                     // 成功放入流体，更新玩家手中的物品为倒出流体后的容器
-                    player.setItemInHand(hand, result.getResult());
+                    // 创造模式不消耗流体桶
+                    if (!player.isCreative()) {
+                        player.setItemInHand(hand, result.getResult());
+                    }
 
                     // 显示提示
                     player.displayClientMessage(Component.translatable("message.resource_replicator.inserted",

@@ -1,5 +1,6 @@
 package com.chinaex123.resource_replicator.block.entity;
 
+import com.chinaex123.resource_replicator.block.FluidReplicatorBlock;
 import com.chinaex123.resource_replicator.block.FluidReplicatorTier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -193,6 +194,13 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     if (remainingOutput <= 0) break;
 
                     BlockPos neighborPos = pos.relative(dir);
+
+                    // 检查邻居是否是流体复制器，如果是则跳过
+                    BlockState neighborState = level.getBlockState(neighborPos);
+                    if (neighborState.getBlock() instanceof FluidReplicatorBlock) {
+                        continue;
+                    }
+
                     IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, neighborPos, dir.getOpposite());
 
                     if (handler != null) {
