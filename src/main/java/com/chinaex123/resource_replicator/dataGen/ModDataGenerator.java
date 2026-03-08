@@ -33,7 +33,7 @@ public class ModDataGenerator {
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
         // 注册配方生成器
-        //generator.addProvider(event.includeServer(), new ModRecipesProvider(packOutput, lookupProvider));
+        generator.addProvider(event.includeServer(), new ModRecipesProvider(packOutput, lookupProvider));
 
         // 注册战利品表生成器
         generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(),

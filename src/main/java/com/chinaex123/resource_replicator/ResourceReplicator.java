@@ -9,7 +9,6 @@ import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import com.chinaex123.resource_replicator.config.ServerConfig;
 import com.chinaex123.resource_replicator.item.ModItems;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -35,7 +34,7 @@ public class ResourceReplicator {
 
         // 模组兼容 - 通用机械
         if (ModList.get().isLoaded("mekanism")) {
-            LOGGER.info("Mekanism mod detected, registering compatibility...");
+            LOGGER.info("检测到Mekanism模组，正在注册兼容性...");
             CompatMekBlocks.register(modEventBus);
         }
     }
@@ -52,7 +51,7 @@ public class ResourceReplicator {
                 FluidReplicatorBlockEntity::getFluidHandler);
 
         // Mekanism 化学品复制机（仅当 Mekanism 加载时）
-        if (net.neoforged.fml.ModList.get().isLoaded("mekanism")) {
+        if (ModList.get().isLoaded("mekanism")) {
             try {
                 // 通过反射获取 Mekanism 的能力类
                 Class<?> mekCapabilitiesClass = Class.forName("mekanism.common.capabilities.Capabilities");
@@ -68,7 +67,7 @@ public class ResourceReplicator {
 
                 var blockEntityType = ModBlockEntities.CHEMICAL_REPLICATOR.get();
                 if (blockEntityType == null) {
-                    LOGGER.warn("Chemical replicator block entity type is null, skipping capability registration");
+                    LOGGER.warn("化学复制器方块实体类型为空，跳过能力注册");
                     return;
                 }
 

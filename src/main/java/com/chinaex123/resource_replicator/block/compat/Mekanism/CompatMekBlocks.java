@@ -22,7 +22,7 @@ public class CompatMekBlocks {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(net.minecraft.core.registries.BuiltInRegistries.ITEM, ResourceReplicator.MOD_ID);
 
-    // 化学品复制机
+    // ======================= 化学品资源复制机 =======================
     public static final Supplier<ChemicalReplicatorBlock> CHEMICAL_REPLICATOR_Tier1 =
             registerChemicalReplicator("chemical_replicator_tier1", 1, Rarity.COMMON);
     public static final Supplier<ChemicalReplicatorBlock> CHEMICAL_REPLICATOR_Tier2 =
