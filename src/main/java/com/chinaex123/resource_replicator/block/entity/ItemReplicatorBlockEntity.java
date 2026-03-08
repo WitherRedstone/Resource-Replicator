@@ -373,33 +373,39 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 // 标记是否有更新
                 boolean hasUpdated = false;
 
-                // 获取六个方向的数组
-                Direction[] directions = Direction.values();
-                // 遍历六个方向尝试向相邻容器输出物品
-                for (Direction dir : directions) {
-                    // 如果剩余输出量已为 0，跳出循环
-                    if (remainingOutput <= 0) break;
+                // 检查是否启用了自动输出功能
+                boolean autoOutputEnabled = ServerConfig.isItemReplicatorAutoOutputEnabled();
 
-                    // 获取相邻方块的坐标
-                    BlockPos neighborPos = pos.relative(dir);
-                    // 获取相邻方块的物品处理器（从相反方向访问）
-                    IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
+                // 如果启用了自动输出，尝试向周围相邻容器输出物品
+                if (autoOutputEnabled) {
+                    // 获取六个方向的数组
+                    Direction[] directions = Direction.values();
+                    // 遍历六个方向尝试向相邻容器输出物品
+                    for (Direction dir : directions) {
+                        // 如果剩余输出量已为 0，跳出循环
+                        if (remainingOutput <= 0) break;
 
-                    // 如果相邻方块有物品处理器
-                    if (handler != null) {
-                        // 创建要输出的物品堆（每次输出 1 个）
-                        ItemStack outputStack = inputStack.copy();
-                        outputStack.setCount(1);
+                        // 获取相邻方块的坐标
+                        BlockPos neighborPos = pos.relative(dir);
+                        // 获取相邻方块的物品处理器（从相反方向访问）
+                        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
 
-                        // 尝试将物品插入到相邻容器的处理器中
-                        ItemStack remainder = ItemHandlerHelper.insertItem(handler, outputStack, false);
+                        // 如果相邻方块有物品处理器
+                        if (handler != null) {
+                            // 创建要输出的物品堆（每次输出 1 个）
+                            ItemStack outputStack = inputStack.copy();
+                            outputStack.setCount(1);
 
-                        // 如果全部插入成功（remainder 为空）
-                        if (remainder.isEmpty()) {
-                            // 减少剩余输出量
-                            remainingOutput--;
-                            // 标记已更新
-                            hasUpdated = true;
+                            // 尝试将物品插入到相邻容器的处理器中
+                            ItemStack remainder = ItemHandlerHelper.insertItem(handler, outputStack, false);
+
+                            // 如果全部插入成功（remainder 为空）
+                            if (remainder.isEmpty()) {
+                                // 减少剩余输出量
+                                remainingOutput--;
+                                // 标记已更新
+                                hasUpdated = true;
+                            }
                         }
                     }
                 }

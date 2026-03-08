@@ -377,46 +377,47 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         FluidStack inputFluid = blockEntity.inputTank.getFluid();
         if (!inputFluid.isEmpty()) {
-            // 检查当前等级的复制机是否可以复制该流体
             if (!blockEntity.tier.canReplicateFluid(inputFluid)) {
                 return;
             }
 
-            // 获取当前等级的实际处理速度（tick 数）
             int actualSpeed = blockEntity.tier.getActualProcessSpeed(inputFluid);
 
-            // 如果刻计数器达到处理速度，执行复制操作
             if (blockEntity.tickCounter >= actualSpeed) {
                 blockEntity.tickCounter = 0;
-
-                // 获取当前等级的实际输出量
                 int actualOutput = blockEntity.tier.getActualOutputAmount(inputFluid);
 
-                // 尝试向周围六个方向输出流体
-                Direction[] directions = Direction.values();
+                // 检查是否启用了自动输出功能
+                boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
+
                 int remainingOutput = actualOutput;
                 boolean hasUpdated = false;
 
-                for (Direction dir : directions) {
-                    if (remainingOutput <= 0) break;
+                // 如果启用了自动输出，尝试向周围六个方向输出流体
+                if (autoOutputEnabled) {
+                    Direction[] directions = Direction.values();
 
-                    BlockPos neighborPos = pos.relative(dir);
+                    for (Direction dir : directions) {
+                        if (remainingOutput <= 0) break;
 
-                    BlockState neighborState = level.getBlockState(neighborPos);
-                    // 跳过其他流体复制机，避免循环输出
-                    if (neighborState.getBlock() instanceof FluidReplicatorBlock) {
-                        continue;
-                    }
+                        BlockPos neighborPos = pos.relative(dir);
 
-                    IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, neighborPos, dir.getOpposite());
+                        BlockState neighborState = level.getBlockState(neighborPos);
+                        // 跳过其他流体复制机，避免循环输出
+                        if (neighborState.getBlock() instanceof FluidReplicatorBlock) {
+                            continue;
+                        }
 
-                    if (handler != null) {
-                        FluidStack outputStack = new FluidStack(inputFluid.getFluid(), remainingOutput);
-                        int filled = handler.fill(outputStack, IFluidHandler.FluidAction.EXECUTE);
+                        IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, neighborPos, dir.getOpposite());
 
-                        if (filled > 0) {
-                            remainingOutput -= filled;
-                            hasUpdated = true;
+                        if (handler != null) {
+                            FluidStack outputStack = new FluidStack(inputFluid.getFluid(), remainingOutput);
+                            int filled = handler.fill(outputStack, IFluidHandler.FluidAction.EXECUTE);
+
+                            if (filled > 0) {
+                                remainingOutput -= filled;
+                                hasUpdated = true;
+                            }
                         }
                     }
                 }

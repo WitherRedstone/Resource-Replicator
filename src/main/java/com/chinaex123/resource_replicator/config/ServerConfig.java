@@ -11,6 +11,7 @@ public class ServerConfig {
     // ======================= 物品复制机配置 =======================
     private static final ModConfigSpec.IntValue ITEM_REPLICATOR_OUTPUT_SLOTS;
     private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_ENABLE_DESTROY;
+    private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_AUTO_OUTPUT;
 
     // 黑白名单配置
     private static final ModConfigSpec.BooleanValue BLACKLIST_MODE;
@@ -32,6 +33,7 @@ public class ServerConfig {
     // ======================= 流体复制机配置 =======================
     private static final ModConfigSpec.IntValue FLUID_REPLICATOR_OUTPUT_TANK_SIZE;
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_ENABLE_DESTROY;
+    private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_AUTO_OUTPUT;
 
     // 流体黑白名单配置
     private static final ModConfigSpec.BooleanValue FLUID_BLACKLIST_MODE;
@@ -92,6 +94,12 @@ public class ServerConfig {
         ITEM_REPLICATOR_ENABLE_DESTROY = BUILDER
                 .comment("是否启用物品复制机的销毁功能（默认：false）。启用后，通过管道输入到输入槽的物品会被销毁。")
                 .define("enableDestroy", false);
+        BUILDER.pop();
+
+        BUILDER.push("自动输出功能设置");
+        ITEM_REPLICATOR_AUTO_OUTPUT = BUILDER
+                .comment("是否启用物品复制机的自动输出功能（默认：true）。启用后，复制机会自动向周围相邻的容器输出物品。")
+                .define("autoOutput", true);
         BUILDER.pop();
 
         BUILDER.push("黑白名单设置");
@@ -178,6 +186,12 @@ public class ServerConfig {
         FLUID_REPLICATOR_ENABLE_DESTROY = BUILDER
                 .comment("是否启用流体复制机的销毁功能（默认：false）。启用后，通过管道输入的流体会被销毁。")
                 .define("enableDestroy", false);
+        BUILDER.pop();
+
+        BUILDER.push("自动输出功能设置");
+        FLUID_REPLICATOR_AUTO_OUTPUT = BUILDER
+                .comment("是否启用流体复制机的自动输出功能（默认：true）。启用后，复制机会自动向周围相邻的容器输出流体。")
+                .define("autoOutput", true);
         BUILDER.pop();
 
         BUILDER.push("黑白名单模式");
@@ -375,6 +389,9 @@ public class ServerConfig {
 
     public static boolean isItemReplicatorDestroyEnabled() {return ITEM_REPLICATOR_ENABLE_DESTROY.get();}
 
+    // 检查物品复制机的自动输出功能是否启用
+    public static boolean isItemReplicatorAutoOutputEnabled() {return ITEM_REPLICATOR_AUTO_OUTPUT.get();}
+
     public static boolean isBlacklistMode() {
         return BLACKLIST_MODE.get();
     }
@@ -441,6 +458,9 @@ public class ServerConfig {
         return FLUID_REPLICATOR_OUTPUT_TANK_SIZE.get();
     }
     public static boolean isFluidReplicatorDestroyEnabled() {return FLUID_REPLICATOR_ENABLE_DESTROY.get();}
+
+    // 检查流体复制机的自动输出功能是否启用
+    public static boolean isFluidReplicatorAutoOutputEnabled() {return FLUID_REPLICATOR_AUTO_OUTPUT.get();}
 
     public static boolean isFluidBlacklistMode() {
         return FLUID_BLACKLIST_MODE.get();
