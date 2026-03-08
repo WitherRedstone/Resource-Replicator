@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.client.renderer;
 
-import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
+import com.chinaex123.resource_replicator.block.compat.Mekanism.ChemicalReplicatorBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -13,30 +13,28 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
 
-public class FluidReplicatorRenderer implements BlockEntityRenderer<FluidReplicatorBlockEntity> {
+public class ChemicalReplicatorRenderer implements BlockEntityRenderer<ChemicalReplicatorBlockEntity> {
 
-    public FluidReplicatorRenderer(BlockEntityRendererProvider.Context context) {
+    public ChemicalReplicatorRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     /**
-     * 渲染流体复制机中的流体
+     * 渲染化学品复制机中的化学品
      * <p>
-     * 此方法在客户端每帧被调用，用于在流体复制机方块内部渲染一个半透明的彩色立方体来表示流体。
+     * 此方法在客户端每帧被调用，用于在化学品复制机方块内部渲染一个半透明的彩色立方体来表示化学品。
      * 渲染流程如下：
      * </p>
      * <ul>
      *     <li><strong>环境检查</strong>：确保在客户端且世界和方块已加载</li>
-     *     <li><strong>获取流体</strong>：从输入罐获取流体堆，检查是否为空或数量是否大于 0</li>
-     *     <li><strong>获取纹理</strong>：根据流体类型获取对应的纹理图集精灵</li>
-     *     <li><strong>提取颜色</strong>：通过 IClientFluidTypeExtensions 获取流体的颜色值（支持动态着色）</li>
+     *     <li><strong>获取化学品</strong>：通过反射获取输入槽的化学品堆，避免编译时依赖 Mekanism API</li>
+     *     <li><strong>有效性验证</strong>：检查化学品是否为空、数量是否大于 0</li>
+     *     <li><strong>颜色提取</strong>：尝试从化学品中获取颜色表示（通过 getChemicalColorRepresentation 方法），失败则使用默认蓝色</li>
      *     <li><strong>坐标变换</strong>：将立方体缩小到 60% 并居中显示在方块内部</li>
-     *     <li><strong>渲染立方体</strong>：使用半透明渲染类型和流体纹理渲染实心立方体</li>
+     *     <li><strong>渲染立方体</strong>：使用白色混凝土纹理和提取的颜色渲染半透明立方体</li>
      * </ul>
      * 
-     * @param entity 流体复制机方块实体，包含要渲染的流体数据
+     * @param entity 化学品复制机方块实体，包含要渲染的化学品数据
      * @param partialTick 部分刻时间，用于平滑动画插值（目前未使用）
      * @param poseStack 姿态栈，用于管理模型视图矩阵的变换
      * @param bufferSource 缓冲区源，提供渲染顶点数据的缓冲对象
@@ -44,7 +42,7 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<FluidReplica
      * @param packedOverlay 打包的覆盖层值，用于处理叠加纹理（目前未使用）
      */
     @Override
-    public void render(FluidReplicatorBlockEntity entity, float partialTick, PoseStack poseStack,
+    public void render(ChemicalReplicatorBlockEntity entity, float partialTick, PoseStack poseStack,
                        MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         Level level = entity.getLevel();
         if (level == null || !level.isClientSide) {
@@ -56,64 +54,77 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<FluidReplica
             return;
         }
 
-        // 先尝试获取输入槽的流体
-        FluidStack fluidStack = entity.getInputFluid();
+        // 先尝试获取输入槽的化学品
+        Object chemicalStack = entity.getInputChemical();
 
-        // 如果输入槽为空，尝试其他方法获取流体
-        if (fluidStack == null || fluidStack.isEmpty()) {
+        // 如果输入槽为空，尝试其他方法获取化学品
+        if (chemicalStack == null) {
             return;
         }
 
-        if (fluidStack.getAmount() <= 0) {
+        // 使用反射检查化学品是否为空并获取颜色
+        float red = 0.2F;
+        float green = 0.6F;
+        float blue = 1.0F;
+
+        try {
+            var isEmptyMethod = chemicalStack.getClass().getMethod("isEmpty");
+            Boolean isEmpty = (Boolean) isEmptyMethod.invoke(chemicalStack);
+            if (isEmpty) {
+                return;
+            }
+
+            var getAmountMethod = chemicalStack.getClass().getMethod("getAmount");
+            Long amount = (Long) getAmountMethod.invoke(chemicalStack);
+            if (amount <= 0) {
+                return;
+            }
+
+            // 尝试获取化学品的颜色
+            try {
+                // 直接在 ChemicalStack 上调用 getChemicalColorRepresentation()
+                var getColorMethod = chemicalStack.getClass().getMethod("getChemicalColorRepresentation");
+                Integer color = (Integer) getColorMethod.invoke(chemicalStack);
+
+                if (color != null && color != 0) {
+                    // 直接使用低 24 位作为 RGB 值（忽略 Alpha）
+                    int r = (color >> 16) & 0xFF;
+                    int g = (color >> 8) & 0xFF;
+                    int b = color & 0xFF;
+
+                    red = (float)r / 255.0F;
+                    green = (float)g / 255.0F;
+                    blue = (float)b / 255.0F;
+                }
+            } catch (Exception e) {
+                // 获取颜色失败，使用默认蓝色
+            }
+        } catch (Exception e) {
             return;
         }
 
-        var fluid = fluidStack.getFluid();
-
-        // 获取流体纹理
-        TextureAtlasSprite sprite = getFluidTexture(fluidStack);
-        if (sprite == null) {
-            return;
-        }
-
-        // 获取流体颜色
-        int color = IClientFluidTypeExtensions.of(fluid).getTintColor(fluidStack);
-        float alpha = 0.8F; // 稍微透明一点看起来更好
-        float red = (float)(color >> 16 & 255) / 255.0F;
-        float green = (float)(color >> 8 & 255) / 255.0F;
-        float blue = (float)(color & 255) / 255.0F;
+        float alpha = 0.5F;
 
         poseStack.pushPose();
 
-        // 移动到方块中心并缩小 - 让流体显示在方块内部
+        // 移动到方块中心并缩小 - 让化学品显示在方块内部
         poseStack.translate(0.5, 0.5, 0.5);
         poseStack.scale(0.6F, 0.6F, 0.6F);
         poseStack.translate(-0.5, -0.5, -0.5);
 
-        // 使用半透明渲染类型
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucent());
+        // 获取白色方块纹理
+        TextureAtlasSprite whiteSprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(net.minecraft.resources.ResourceLocation.withDefaultNamespace("block/white_concrete"));
 
-        // 渲染一个完整的立方体
-        renderSolidCube(poseStack, buffer, sprite, red, green, blue, alpha, packedLight);
+        if (whiteSprite != null) {
+            // 使用半透明渲染类型
+            VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucent());
+
+            // 使用纹理渲染
+            renderSolidCubeWithTexture(poseStack, buffer, whiteSprite, red, green, blue, alpha, 0xF000F0);
+        }
 
         poseStack.popPose();
-    }
-
-    /**
-     * 获取流体的纹理图集精灵
-     * <p>
-     * 此方法用于从流体堆中提取流体的静态纹理，并将其转换为可用于渲染的 TextureAtlasSprite 对象。
-     * 通过 IClientFluidTypeExtensions 接口获取流体的 stillTexture（静态纹理），然后从 Minecraft 的方块纹理图集中应用该纹理。
-     * </p>
-     * 
-     * @param fluidStack 包含流体信息的流体堆对象
-     * @return TextureAtlasSprite 流体的纹理图集精灵，如果纹理不存在则返回 null
-     */
-    private TextureAtlasSprite getFluidTexture(FluidStack fluidStack) {
-        var fluid = fluidStack.getFluid();
-        var stillTexture = IClientFluidTypeExtensions.of(fluid).getStillTexture(fluidStack);
-
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(stillTexture);
     }
 
     /**
@@ -132,9 +143,6 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<FluidReplica
      *     <li><strong>光照</strong>：打包的光照值，包含天空光和方块光亮度</li>
      *     <li><strong>法线</strong>：面的法向量，用于光照计算（指向外侧）</li>
      * </ul>
-     * <p>
-     * 所有面都使用逆时针顶点顺序，这是 OpenGL 的默认正面朝向约定。
-     * </p>
      * 
      * @param poseStack 姿态栈，提供模型视图矩阵的变换信息
      * @param buffer 顶点缓冲区，用于收集待渲染的顶点数据
@@ -145,9 +153,9 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<FluidReplica
      * @param alpha 透明度分量（0.0-1.0），0.0 为完全透明，1.0 为完全不透明
      * @param light 打包的光照值，低 16 位为 U 方向光照，高 16 位为 V 方向光照
      */
-    private void renderSolidCube(PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer buffer,
-                                 TextureAtlasSprite sprite, float red, float green, float blue, float alpha,
-                                 int light) {
+    private void renderSolidCubeWithTexture(PoseStack poseStack, VertexConsumer buffer,
+                                            TextureAtlasSprite sprite, float red, float green, float blue,
+                                            float alpha, int light) {
         var matrix = poseStack.last().pose();
 
         // 定义单位立方体的八个顶点坐标

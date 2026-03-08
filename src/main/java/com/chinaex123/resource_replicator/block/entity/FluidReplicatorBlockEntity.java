@@ -3,6 +3,7 @@ package com.chinaex123.resource_replicator.block.entity;
 import com.chinaex123.resource_replicator.block.FluidReplicatorBlock;
 import com.chinaex123.resource_replicator.block.enumTier.FluidReplicatorTier;
 import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.util.ReplicatorFilter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -29,26 +30,82 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         OUTPUT_TANK_CAPACITY = ServerConfig.getFluidReplicatorOutputTankSize();
     }
 
+    /**
+     * 输入流体储罐
+     * <p>
+     * 此储罐用于存储待复制的原料流体，容量由 INPUT_TANK_CAPACITY 定义。
+     * 当罐内流体发生变化时会自动标记方块为已更新状态以同步到客户端。
+     * 只允许通过黑白名单过滤的流体才能存入此罐。
+     * </p>
+     */
     private final FluidTank inputTank = new FluidTank(INPUT_TANK_CAPACITY) {
+        /**
+         * 内容物变化时的回调方法
+         * <p>
+         * 当流体被加入或取出时自动调用，用于触发方块数据同步。
+         * </p>
+         */
         @Override
         protected void onContentsChanged() {
             markUpdated();
         }
+
+        /**
+         * 检查流体是否有效（可放入）
+         * <p>
+         * 此方法在流体尝试进入储罐时被调用，会委托给 ReplicatorFilter 进行黑白名单检查。
+         * 只有在白名单中或被黑名单允许的流体才能存入。
+         * </p>
+         *
+         * @param stack 待检查的流体堆
+         * @return boolean 如果该流体可以存入则返回 true，否则返回 false
+         */
+        @Override
+        public boolean isFluidValid(FluidStack stack) {
+            return ReplicatorFilter.canInsertFluid(stack);
+        }
     };
 
+    /**
+     * 输出流体储罐
+     * <p>
+     * 此储罐用于存储复制完成的产物流体，容量由 OUTPUT_TANK_CAPACITY 定义。
+     * 当罐内流体发生变化时会自动标记方块为已更新状态以同步到客户端。
+     * </p>
+     */
     private final FluidTank outputTank = new FluidTank(OUTPUT_TANK_CAPACITY) {
+
+        // 当流体被加入或取出时自动调用，用于触发方块数据同步。
         @Override
         protected void onContentsChanged() {
             markUpdated();
         }
     };
 
+    /**
+     * 流体处理器接口实现
+     * <p>
+     * 此接口用于处理流体的输入输出操作，实现了 Mekanism 和其他模组的流体交互。
+     * 包含两个储罐：输入罐（tank 0）和输出罐（tank 1）。
+     * </p>
+     */
     private final IFluidHandler fluidHandler = new IFluidHandler() {
+        /**
+         * 获取可用储罐的总数量
+         * 
+         * @return int 固定返回 2（输入罐 + 输出罐）
+         */
         @Override
         public int getTanks() {
             return 2;
         }
 
+        /**
+         * 获取指定储罐中的流体
+         * 
+         * @param tank 储罐索引（0 = 输入罐，1 = 输出罐）
+         * @return FluidStack 指定储罐中的流体堆，如果索引无效或为空则返回 EMPTY
+         */
         @Nonnull
         @Override
         public FluidStack getFluidInTank(int tank) {
@@ -60,21 +117,79 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             return FluidStack.EMPTY;
         }
 
+        /**
+         * 获取指定储罐的最大容量
+         * 
+         * @param tank 储罐索引（0 = 输入罐，1 = 输出罐）
+         * @return int 指定储罐的最大容量（单位：mB）
+         */
         @Override
         public int getTankCapacity(int tank) {
             return tank == 0 ? INPUT_TANK_CAPACITY : OUTPUT_TANK_CAPACITY;
         }
 
+        /**
+         * 检查流体是否可以放入指定储罐
+         * 
+         * @param tank 储罐索引（0 = 输入罐，1 = 输出罐）
+         * @param stack 待检查的流体堆
+         * @return boolean 只允许向输入罐（tank 0）放入流体，输出罐不允许直接插入
+         */
         @Override
         public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
             return tank == 0;
         }
 
+        /**
+         * 向储罐注入流体
+         * <p>
+         * 此方法处理流体的输入逻辑，支持配置控制的管道销毁功能：
+         * </p>
+         * <ul>
+         *     <li><strong>黑名单过滤</strong>：首先检查流体是否在黑名单中，如果是则拒绝</li>
+         *     <li><strong>销毁功能开启</strong>：管道输入的流体会被瞬间销毁（返回实际数量）</li>
+         *     <li><strong>销毁功能关闭</strong>：拒绝管道输入（返回 0）</li>
+         *     <li><strong>玩家操作</strong>：正常存入输入罐</li>
+         * </ul>
+         * 
+         * @param resource 要注入的流体堆
+         * @param action 执行模式（EXECUTE = 实际执行，SIMULATE = 仅模拟）
+         * @return int 实际注入的流体数量（mB），如果无法注入则返回 0
+         */
         @Override
         public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
+            if (!ReplicatorFilter.canInsertFluid(resource)) {
+                return 0;
+            }
+
+            // 检查是否是通过管道（非玩家操作）插入到输入槽的流体
+            boolean isPipeInsertion = !isPlayerInsertion();
+
+            // 如果是管道插入到输入槽
+            if (isPipeInsertion) {
+                if (ServerConfig.isFluidReplicatorDestroyEnabled()) {
+                    // 启用销毁功能：瞬间销毁，返回实际数量表示全部"消耗"掉了
+                    return resource.getAmount();
+                } else {
+                    // 未启用销毁功能：拒绝输入，返回 0 表示不接受任何流体
+                    return 0;
+                }
+            }
+
+            // 玩家操作：正常存入输入罐
             return inputTank.fill(resource, action);
         }
 
+        /**
+         * 从储罐抽取指定类型的流体
+         * <p>
+         * 只能从输出罐（tank 1）抽取与指定流体类型相同的流体。
+         * </p>
+         * 
+         * @param resource 要抽取的流体类型和数量
+         * @param action 执行模式（EXECUTE = 实际执行，SIMULATE = 仅模拟）
+         * @return FluidStack 实际抽取到的流体堆，如果无法抽取则返回 EMPTY
+         */
         @Nonnull
         @Override
         public FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action) {
@@ -85,12 +200,37 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             return FluidStack.EMPTY;
         }
 
+        /**
+         * 从储罐抽取最大指定数量的流体
+         * <p>
+         * 只能从输出罐（tank 1）抽取流体，不限制流体类型。
+         * </p>
+         * 
+         * @param maxDrain 最大可抽取的流体数量（单位：mB）
+         * @param action 执行模式（EXECUTE = 实际执行，SIMULATE = 仅模拟）
+         * @return FluidStack 实际抽取到的流体堆，如果输出罐为空则返回 EMPTY
+         */
         @Nonnull
         @Override
         public FluidStack drain(int maxDrain, IFluidHandler.FluidAction action) {
             return outputTank.drain(maxDrain, action);
         }
     };
+
+    // 判断是否是玩家插入（通过检查调用栈）
+    private boolean isPlayerInsertion() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+        // 检查调用栈中是否包含 FluidReplicatorBlock 的 useItemOn 方法
+        for (StackTraceElement element : stackTrace) {
+            if (element.getClassName().contains("FluidReplicatorBlock") &&
+                    element.getMethodName().contains("useItemOn")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private int tickCounter = 0;
     private FluidReplicatorTier tier = FluidReplicatorTier.FLUID_TIER_1;
@@ -99,12 +239,25 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         super(ModBlockEntities.FLUID_REPLICATOR.get(), pos, state);
     }
 
+    /**
+     * 保存方块实体的额外数据到 NBT 标签
+     * <p>
+     * 此方法在方块实体数据需要持久化时被调用（如世界保存、区块卸载等）。
+     * 它会将当前 tick 计数器、机器等级以及输入/输出罐中的流体数据写入 NBT 标签，
+     * 确保方块状态在重启世界后能够正确恢复。
+     * </p>
+     * 
+     * @param tag 用于存储数据的 CompoundTag 对象
+     * @param registries 注册表查找提供器，用于序列化流体的注册表信息
+     */
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        // 保存刻计数器和机器等级
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
 
+        // 创建流体罐数据标签并保存输入和输出罐的流体
         CompoundTag tanksTag = new CompoundTag();
         if (!inputTank.isEmpty()) {
             tanksTag.put("inputTank", inputTank.writeToNBT(registries, new CompoundTag()));
@@ -115,14 +268,29 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         tag.put("tanks", tanksTag);
     }
 
+    /**
+     * 从 NBT 标签加载方块实体的数据
+     * <p>
+     * 此方法在方块实体数据需要从持久化存储中恢复时被调用（如世界加载、区块加载等）。
+     * 它会从 NBT 标签中读取刻计数器、机器等级以及输入/输出罐中的流体数据，
+     * 确保方块状态能够正确恢复到保存时的状态。如果标签中不存在 tier 字段，
+     * 则保持默认等级；如果不存在流体罐数据，则将对应罐清空。
+     * </p>
+     * 
+     * @param tag 包含方块实体数据的 CompoundTag 对象
+     * @param registries 注册表查找提供器，用于反序列化流体的注册表信息
+     */
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        // 读取刻计数器
         tickCounter = tag.getInt("tickCounter");
+        // 读取机器等级（如果存在）
         if (tag.contains("tier")) {
             this.tier = FluidReplicatorTier.fromId(tag.getInt("tier"));
         }
 
+        // 从 "tanks" 嵌套标签中读取流体罐数据
         CompoundTag tanksTag = tag.getCompound("tanks");
         if (tanksTag.contains("inputTank")) {
             inputTank.readFromNBT(registries, tanksTag.getCompound("inputTank"));
@@ -136,12 +304,33 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
 
+    /**
+     * 获取用于同步方块实体数据到客户端的网络数据包
+     * <p>
+     * 此方法在服务器需要向客户端发送方块实体更新信息时被调用。
+     * 它会创建一个客户端边界方块实体数据包，将当前的流体状态、刻计数器等信息
+     * 同步给客户端，确保客户端渲染与服务端状态一致。
+     * </p>
+     * 
+     * @return Packet<ClientGamePacketListener> 包含方块实体数据的网络包，用于客户端同步
+     */
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    /**
+     * 获取用于同步方块实体数据到客户端的更新标签
+     * <p>
+     * 此方法在服务器需要向客户端发送方块实体更新信息时被调用。
+     * 它会创建一个包含当前流体状态、刻计数器、机器等级等数据的 CompoundTag，
+     * 用于通过网络同步到客户端，确保客户端显示与服务端一致。
+     * </p>
+     * 
+     * @param registries 注册表查找提供器，用于序列化流体的注册表信息
+     * @return CompoundTag 包含方块实体更新数据的复合标签
+     */
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
@@ -164,22 +353,46 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         this.tier = FluidReplicatorTier.fromId(tierId);
     }
 
+    /**
+     * 服务器端刻更新逻辑
+     * <p>
+     * 此方法每刻在服务器端被调用一次，负责处理流体复制机的核心工作逻辑：
+     * </p>
+     * <ul>
+     *     <li><strong>进度累加</strong>：每刻增加 tickCounter，达到处理速度时执行复制</li>
+     *     <li><strong>输入检查</strong>：检查输入罐是否有流体，以及该流体是否可被当前等级复制</li>
+     *     <li><strong>流体复制</strong>：根据等级配置的产量和速度，将输入流体复制到输出罐或相邻容器</li>
+     *     <li><strong>自动输出</strong>：优先向周围六个方向的相邻容器输出产物流体</li>
+     *     <li><strong>空间检查</strong>：检查输出罐和相邻容器的剩余空间</li>
+     *     <li><strong>数据同步</strong>：复制完成后标记方块为已更新，同步状态到客户端</li>
+     * </ul>
+     * 
+     * @param level 当前世界实例
+     * @param pos 方块在世界中的坐标位置
+     * @param state 方块的当前状态
+     * @param blockEntity 流体复制机方块实体实例
+     */
     public static void serverTick(Level level, BlockPos pos, BlockState state, FluidReplicatorBlockEntity blockEntity) {
         blockEntity.tickCounter++;
 
         FluidStack inputFluid = blockEntity.inputTank.getFluid();
         if (!inputFluid.isEmpty()) {
+            // 检查当前等级的复制机是否可以复制该流体
             if (!blockEntity.tier.canReplicateFluid(inputFluid)) {
                 return;
             }
 
+            // 获取当前等级的实际处理速度（tick 数）
             int actualSpeed = blockEntity.tier.getActualProcessSpeed(inputFluid);
 
+            // 如果刻计数器达到处理速度，执行复制操作
             if (blockEntity.tickCounter >= actualSpeed) {
                 blockEntity.tickCounter = 0;
 
+                // 获取当前等级的实际输出量
                 int actualOutput = blockEntity.tier.getActualOutputAmount(inputFluid);
 
+                // 尝试向周围六个方向输出流体
                 Direction[] directions = Direction.values();
                 int remainingOutput = actualOutput;
                 boolean hasUpdated = false;
@@ -190,6 +403,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     BlockPos neighborPos = pos.relative(dir);
 
                     BlockState neighborState = level.getBlockState(neighborPos);
+                    // 跳过其他流体复制机，避免循环输出
                     if (neighborState.getBlock() instanceof FluidReplicatorBlock) {
                         continue;
                     }
@@ -207,14 +421,17 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     }
                 }
 
+                // 如果还有剩余的输出量，存入输出罐
                 if (remainingOutput > 0) {
                     FluidStack currentOutput = blockEntity.outputTank.getFluid();
 
                     if (currentOutput.isEmpty()) {
+                        // 输出罐为空，创建新的流体堆
                         FluidStack newOutput = new FluidStack(inputFluid.getFluid(), remainingOutput);
                         blockEntity.outputTank.setFluid(newOutput);
                         hasUpdated = true;
                     } else if (currentOutput.getFluidHolder().equals(inputFluid.getFluidHolder())) {
+                        // 输出罐不为空且流体种类相同，累加数量
                         int spaceAvailable = blockEntity.outputTank.getCapacity() - currentOutput.getAmount();
                         int toAdd = Math.min(spaceAvailable, remainingOutput);
 
@@ -225,6 +442,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     }
                 }
 
+                // 如果有更新，标记方块并同步到客户端
                 if (hasUpdated) {
                     blockEntity.markUpdated();
                 }
@@ -232,42 +450,65 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
 
-    public boolean addFluid(FluidStack stack) {
-        if (inputTank.isEmpty()) {
-            inputTank.fill(stack, IFluidHandler.FluidAction.EXECUTE);
-            markUpdated();
-            return true;
-        } else if (inputTank.getFluid().getFluidHolder().equals(stack.getFluidHolder())) {
-            int canAdd = inputTank.getCapacity() - inputTank.getFluidAmount();
-            if (canAdd > 0) {
-                int added = inputTank.fill(new FluidStack(stack.getFluid(), Math.min(canAdd, stack.getAmount())), IFluidHandler.FluidAction.EXECUTE);
-                markUpdated();
-                return added > 0;
-            }
-        }
-        return false;
-    }
+//    public boolean addFluid(FluidStack stack) {
+//        if (inputTank.isEmpty()) {
+//            inputTank.fill(stack, IFluidHandler.FluidAction.EXECUTE);
+//            markUpdated();
+//            return true;
+//        } else if (inputTank.getFluid().getFluidHolder().equals(stack.getFluidHolder())) {
+//            int canAdd = inputTank.getCapacity() - inputTank.getFluidAmount();
+//            if (canAdd > 0) {
+//                int added = inputTank.fill(new FluidStack(stack.getFluid(), Math.min(canAdd, stack.getAmount())), IFluidHandler.FluidAction.EXECUTE);
+//                markUpdated();
+//                return added > 0;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    public FluidStack extractFluid(int amount) {
+//        if (!inputTank.isEmpty()) {
+//            FluidStack extracted = inputTank.drain(amount, IFluidHandler.FluidAction.EXECUTE);
+//            markUpdated();
+//            return extracted;
+//        }
+//        return FluidStack.EMPTY;
+//    }
+//
+//    public void clearInputFluid() {
+//        inputTank.setFluid(FluidStack.EMPTY);
+//        markUpdated();
+//    }
 
-    public FluidStack extractFluid(int amount) {
-        if (!inputTank.isEmpty()) {
-            FluidStack extracted = inputTank.drain(amount, IFluidHandler.FluidAction.EXECUTE);
-            markUpdated();
-            return extracted;
-        }
-        return FluidStack.EMPTY;
-    }
-
-    public void clearInputFluid() {
-        inputTank.setFluid(FluidStack.EMPTY);
-        markUpdated();
-    }
-
+    /**
+     * 清空所有流体
+     * <p>
+     * 此方法用于清除复制机输入罐和输出罐中的所有流体，通常在玩家使用空桶右键点击时调用。
+     * 清空后会标记方块为已更新状态，确保客户端和服务端数据同步。
+     * </p>
+     */
     public void clearAllFluids() {
         inputTank.setFluid(FluidStack.EMPTY);
         outputTank.setFluid(FluidStack.EMPTY);
         markUpdated();
     }
 
+    /**
+     * 标记方块为已更新状态并同步到客户端
+     * <p>
+     * 此方法在方块实体的数据发生变化时被调用（如流体数量变化、进度更新等）。
+     * 它会执行以下关键操作：
+     * </p>
+     * <ul>
+     *     <li><strong>保存标记</strong>：调用 setChanged() 标记方块需要保存到磁盘</li>
+     *     <li><strong>基础同步</strong>：调用 sendBlockUpdated() 通知世界方块已更新</li>
+     *     <li><strong>主动推送</strong>：在服务端主动向周围 64 格内的所有玩家发送更新数据包</li>
+     * </ul>
+     * <p>
+     * 这种双重同步机制确保了方块的数据既不会在世界重启后丢失，也能实时显示在客户端上。
+     * 通过距离检测（64 格）优化了网络性能，只向附近的玩家发送更新。
+     * </p>
+     */
     private void markUpdated() {
         setChanged();
         if (level != null) {
@@ -290,14 +531,40 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
 
+    /**
+     * 获取输入罐中的流体
+     * <p>
+     * 此方法用于读取当前输入罐中的流体堆，可用于渲染或信息显示。
+     * </p>
+     * 
+     * @return FluidStack 输入罐中的流体堆，如果为空则返回 EMPTY
+     */
     public FluidStack getInputFluid() {
         return inputTank.getFluid();
     }
 
+    /**
+     * 获取输出罐中的流体
+     * <p>
+     * 此方法用于读取当前输出罐中的流体堆，可用于渲染或信息显示。
+     * </p>
+     * 
+     * @return FluidStack 输出罐中的流体堆，如果为空则返回 EMPTY
+     */
     public FluidStack getOutputFluid() {
         return outputTank.getFluid();
     }
 
+    /**
+     * 获取流体处理器接口
+     * <p>
+     * 此方法用于获取当前方块实体的 IFluidHandler 实现实例，该处理器负责处理流体的输入输出操作。
+     * 返回的 fluidHandler 是一个懒加载的单例对象，在首次访问时创建。
+     * </p>
+     * 
+     * @param side 方向参数，用于判断从哪个方向访问流体处理器（目前未使用，所有方向行为相同）
+     * @return IFluidHandler 流体处理器实例
+     */
     @Nullable
     public IFluidHandler getFluidHandler(@Nullable Direction side) {
         return fluidHandler;

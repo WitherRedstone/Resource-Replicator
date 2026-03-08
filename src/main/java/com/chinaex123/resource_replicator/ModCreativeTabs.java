@@ -1,11 +1,13 @@
 package com.chinaex123.resource_replicator;
 
 import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
@@ -33,6 +35,16 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.FLUID_REPLICATOR_Tier3.get());
                         output.accept(ModBlocks.FLUID_REPLICATOR_Tier4.get());
                         output.accept(ModBlocks.FLUID_REPLICATOR_Tier5.get());
+
+                        // ======================= 化学品资源复制机 =======================
+                        // 加载 通用机械 时添加
+                        if (ModList.get().isLoaded("mekanism")) {
+                            output.accept(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier1.get());
+                            output.accept(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier2.get());
+                            output.accept(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier3.get());
+                            output.accept(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier4.get());
+                            output.accept(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier5.get());
+                        }
 
                     })
                     .build());
