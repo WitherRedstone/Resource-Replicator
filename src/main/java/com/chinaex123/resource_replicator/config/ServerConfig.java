@@ -246,8 +246,8 @@ public class ServerConfig {
 
         BUILDER.push("输出罐设置");
         FLUID_REPLICATOR_OUTPUT_TANK_SIZE = BUILDER
-                .comment("流体复制机输出罐的容量 (单位:mB，默认:10000)")
-                .defineInRange("outputTankSize", 10000, 1000, Integer.MAX_VALUE);
+                .comment("流体复制机输出罐的容量 (单位:mB，默认:8000)")
+                .defineInRange("outputTankSize", 8000, 1000, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("销毁功能设置");
@@ -292,11 +292,11 @@ public class ServerConfig {
                 .comment("等级 1 每次操作所需的 tick(默认:20)")
                 .defineInRange("outputTime", 20, 1, Integer.MAX_VALUE);
         FLUID_TIER1_WATER_AMOUNT = BUILDER
-                .comment("等级 1 复制水时的特殊产量 (单位:mB，默认:2000)")
-                .defineInRange("waterAmount", 2000, 1, Integer.MAX_VALUE);
+                .comment("等级 1 复制水时的特殊产量 (单位:mB，默认:1000)")
+                .defineInRange("waterAmount", 1000, 1, Integer.MAX_VALUE);
         FLUID_TIER1_LAVA_AMOUNT = BUILDER
-                .comment("等级 1 复制岩浆时的特殊产量 (单位:mB，默认:500)")
-                .defineInRange("lavaAmount", 500, 1, Integer.MAX_VALUE);
+                .comment("等级 1 复制岩浆时的特殊产量 (单位:mB，默认:10)")
+                .defineInRange("lavaAmount", 10, 1, Integer.MAX_VALUE);
         FLUID_TIER1_ENERGY_CAPACITY = BUILDER
                 .comment("等级 1 的最大能量存储 (单位:FE，默认:10000)")
                 .defineInRange("energyCapacity", 10000, 1000, Integer.MAX_VALUE);
@@ -307,17 +307,17 @@ public class ServerConfig {
 
         BUILDER.push("Tier 2");
         FLUID_TIER2_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 2 每次操作产生的流体数量 (单位:mB，默认:4000)")
-                .defineInRange("outputAmount", 4000, 1, Integer.MAX_VALUE);
+                .comment("等级 2 每次操作产生的流体数量 (单位:mB，默认:25500)")
+                .defineInRange("outputAmount", 2500, 1, Integer.MAX_VALUE);
         FLUID_TIER2_OUTPUT_TIME = BUILDER
                 .comment("等级 2 每次操作所需的 tick(默认:15)")
                 .defineInRange("outputTime", 15, 1, Integer.MAX_VALUE);
         FLUID_TIER2_WATER_AMOUNT = BUILDER
-                .comment("等级 2 复制水时的特殊产量 (单位:mB，默认:8000)")
-                .defineInRange("waterAmount", 8000, 1, Integer.MAX_VALUE);
+                .comment("等级 2 复制水时的特殊产量 (单位:mB，默认:10000)")
+                .defineInRange("waterAmount", 10000, 1, Integer.MAX_VALUE);
         FLUID_TIER2_LAVA_AMOUNT = BUILDER
-                .comment("等级 2 复制岩浆时的特殊产量 (单位:mB，默认:2000)")
-                .defineInRange("lavaAmount", 2000, 1, Integer.MAX_VALUE);
+                .comment("等级 2 复制岩浆时的特殊产量 (单位:mB，默认:50)")
+                .defineInRange("lavaAmount", 50, 1, Integer.MAX_VALUE);
         FLUID_TIER2_ENERGY_CAPACITY = BUILDER
                 .comment("等级 2 的最大能量存储 (单位:FE，默认:50000)")
                 .defineInRange("energyCapacity", 50000, 1000, Integer.MAX_VALUE);
@@ -328,17 +328,17 @@ public class ServerConfig {
 
         BUILDER.push("Tier 3");
         FLUID_TIER3_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 3 每次操作产生的流体数量 (单位:mB，默认:8000)")
-                .defineInRange("outputAmount", 8000, 1, Integer.MAX_VALUE);
+                .comment("等级 3 每次操作产生的流体数量 (单位:mB，默认:5000)")
+                .defineInRange("outputAmount", 5000, 1, Integer.MAX_VALUE);
         FLUID_TIER3_OUTPUT_TIME = BUILDER
                 .comment("等级 3 每次操作所需的 tick(默认:10)")
                 .defineInRange("outputTime", 10, 1, Integer.MAX_VALUE);
         FLUID_TIER3_WATER_AMOUNT = BUILDER
-                .comment("等级 3 复制水时的特殊产量 (单位:mB，默认:16000)")
-                .defineInRange("waterAmount", 16000, 1, Integer.MAX_VALUE);
+                .comment("等级 3 复制水时的特殊产量 (单位:mB，默认:100000)")
+                .defineInRange("waterAmount", 100000, 1, Integer.MAX_VALUE);
         FLUID_TIER3_LAVA_AMOUNT = BUILDER
-                .comment("等级 3 复制岩浆时的特殊产量 (单位:mB，默认:4000)")
-                .defineInRange("lavaAmount", 4000, 1, Integer.MAX_VALUE);
+                .comment("等级 3 复制岩浆时的特殊产量 (单位:mB，默认:100)")
+                .defineInRange("lavaAmount", 100, 1, Integer.MAX_VALUE);
         FLUID_TIER3_ENERGY_CAPACITY = BUILDER
                 .comment("等级 3 的最大能量存储 (单位:FE，默认:100000)")
                 .defineInRange("energyCapacity", 100000, 1000, Integer.MAX_VALUE);
@@ -349,17 +349,17 @@ public class ServerConfig {
 
         BUILDER.push("Tier 4");
         FLUID_TIER4_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 4 每次操作产生的流体数量 (单位:mB，默认:16000)")
-                .defineInRange("outputAmount", 16000, 1, Integer.MAX_VALUE);
+                .comment("等级 4 每次操作产生的流体数量 (单位:mB，默认:10000)")
+                .defineInRange("outputAmount", 10000, 1, Integer.MAX_VALUE);
         FLUID_TIER4_OUTPUT_TIME = BUILDER
                 .comment("等级 4 每次操作所需的 tick(默认:5)")
                 .defineInRange("outputTime", 5, 1, Integer.MAX_VALUE);
         FLUID_TIER4_WATER_AMOUNT = BUILDER
-                .comment("等级 4 复制水时的特殊产量 (单位:mB，默认:32000)")
-                .defineInRange("waterAmount", 32000, 1, Integer.MAX_VALUE);
+                .comment("等级 4 复制水时的特殊产量 (单位:mB，默认:1000000)")
+                .defineInRange("waterAmount", 1000000, 1, Integer.MAX_VALUE);
         FLUID_TIER4_LAVA_AMOUNT = BUILDER
-                .comment("等级 4 复制岩浆时的特殊产量 (单位:mB，默认:8000)")
-                .defineInRange("lavaAmount", 8000, 1, Integer.MAX_VALUE);
+                .comment("等级 4 复制岩浆时的特殊产量 (单位:mB，默认:500)")
+                .defineInRange("lavaAmount", 500, 1, Integer.MAX_VALUE);
         FLUID_TIER4_ENERGY_CAPACITY = BUILDER
                 .comment("等级 4 的最大能量存储 (单位:FE，默认:500000)")
                 .defineInRange("energyCapacity", 500000, 1000, Integer.MAX_VALUE);
@@ -370,17 +370,17 @@ public class ServerConfig {
 
         BUILDER.push("Tier 5");
         FLUID_TIER5_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 5 每次操作产生的流体数量 (单位:mB，默认:32000)")
-                .defineInRange("outputAmount", 32000, 1, Integer.MAX_VALUE);
+                .comment("等级 5 每次操作产生的流体数量 (单位:mB，默认:25000)")
+                .defineInRange("outputAmount", 25000, 1, Integer.MAX_VALUE);
         FLUID_TIER5_OUTPUT_TIME = BUILDER
                 .comment("等级 5 每次操作所需的 tick(默认:1)")
                 .defineInRange("outputTime", 1, 1, Integer.MAX_VALUE);
         FLUID_TIER5_WATER_AMOUNT = BUILDER
-                .comment("等级 5 复制水时的特殊产量 (单位:mB，默认:64000)")
-                .defineInRange("waterAmount", 64000, 1, Integer.MAX_VALUE);
+                .comment("等级 5 复制水时的特殊产量 (单位:mB，默认:10000000)")
+                .defineInRange("waterAmount", 10000000, 1, Integer.MAX_VALUE);
         FLUID_TIER5_LAVA_AMOUNT = BUILDER
-                .comment("等级 5 复制岩浆时的特殊产量 (单位:mB，默认:16000)")
-                .defineInRange("lavaAmount", 16000, 1, Integer.MAX_VALUE);
+                .comment("等级 5 复制岩浆时的特殊产量 (单位:mB，默认:1000)")
+                .defineInRange("lavaAmount", 1000, 1, Integer.MAX_VALUE);
         FLUID_TIER5_ENERGY_CAPACITY = BUILDER
                 .comment("等级 5 的最大能量存储 (单位:FE，默认:1000000)")
                 .defineInRange("energyCapacity", 1000000, 1000, Integer.MAX_VALUE);

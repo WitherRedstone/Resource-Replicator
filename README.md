@@ -6,7 +6,9 @@
 
 # **English**
 
-## 1️⃣ Item Replicator
+Place the items (or fluids, chemicals) to be duplicated into the block. As long as FE energy is supplied, the block will begin outputting the same resources. At the same time, the block's appearance will change in real-time to display what is currently being duplicated.
+
+## 1.Item Replicator
 
 **Function**: Replicates any item (can be restricted via blacklist/whitelist configuration)  
 **Tiers**: T1 - T5
@@ -20,14 +22,15 @@
 | T5   | 128 items            | 1 tick (0.05 seconds)   |
 
 **Features**:
-- Configurable output slot count (default: 1)
-- Blacklist/Whitelist filtering support (by item ID, mod ID, item tags)
-- Admin item protection (command blocks, bedrock, etc. cannot be replicated)
-- Destruction function (optional): When enabled, items input via pipes/hoppers are instantly destroyed, but items manually placed by players are preserved normally
+- Right-click with an item to place it; sneak right-click with an empty hand to remove the placed item.
+- Supports blacklist/whitelist. By default, mod items and admin items are added to the blacklist. Supports item ID/mod ID/tag.
+- Configurable processing speed and output multiplier for each tier. Default output amounts: T1: 4/20t, T2: 16/15t, T3: 32/10t, T4: 64/5t, T5: 128/1t.
+- Configurable destruction function. Items input via pipes will be destroyed, with destruction speed depending on the pipe's speed. Disabled by default.
+- Configurable number of output slots, with one cache slot by default.
+- Configurable automatic output. When enabled, items will be automatically output to containers on one adjacent face.
+- Configurable energy consumption.
 
----
-
-## 2️⃣ Fluid Replicator
+## 2.Fluid Replicator
 
 **Function**: Replicates any fluid (can be restricted via blacklist/whitelist configuration)  
 **Tiers**: T1 - T5
@@ -41,14 +44,17 @@
 | T5   | 25000 mB             | 1 tick   | Water: 10000000 mB, Lava: 1000 mB |
 
 **Features**:
-- Dual-tank system (input tank + output tank)
-- Configurable output tank capacity (default: 100000 mB)
-- Blacklist/Whitelist filtering support (by fluid ID, mod ID, fluid tags)
-- Destruction function (optional): When enabled, fluids input via pipes are instantly destroyed, but fluids inserted by players using buckets (right-click) are preserved normally
+- Right-click with a fluid bucket to place the fluid; right-click with an empty bucket to remove all fluid inside.
+- Supports blacklist/whitelist. Supports item ID/mod ID/tag.
+- Configurable processing speed and output multiplier for each tier. Default output amounts: T1: 1K/20t, T2: 2.5K/15t, T3: 5K/10t, T4: 10K/5t, T5: 25K/1t.
+- Configurable special output for water, with unchanged tick rate and output amounts of 1K, 10K, 100K, 1M, 10M.
+- Configurable special output for lava, with unchanged tick rate and output amounts of 10, 50, 100, 500, 1K.
+- Configurable destruction function. Fluids input via pipes will be destroyed, with destruction speed depending on the pipe's speed. Disabled by default.
+- Configurable output tank buffer size, default is 8000mB.
+- Configurable automatic output. When enabled, fluids will be automatically output to containers on one adjacent face.
+- Configurable energy consumption.
 
----
-
-## 3️⃣ Chemical Replicator (Mekanism Integration)
+## 3.Chemical Replicator (Mekanism Integration)
 
 **Function**: Replicates Mekanism mod chemicals  
 **Tiers**: T1 - T5
@@ -62,70 +68,22 @@
 | T5   | 1000 mB              | 1 tick   |
 
 **Features**:
-- Dual-tank system (input tank + output tank)
-- Configurable output tank capacity (default: 8000 mB)
-- Blacklist/Whitelist filtering support (by chemical ID, mod ID, chemical tags)
-- Destruction function (optional): When enabled, chemicals input via pipes are instantly destroyed, but chemicals inserted by players using tanks (right-click) are preserved normally
-- Requires Mekanism mod to be installed
-
----
-
-## ⚙️ Configuration System
-
-The mod provides a comprehensive configuration file (`resource_replicator-server.toml`) with all parameters customizable:
-
-### Item Replicator Configuration
-- Output slot count (1-9)
-- Destruction function toggle
-- Blacklist/Whitelist mode switch
-- Blacklist/Whitelist item list
-- Output quantities and durations for each tier
-
-### Fluid Replicator Configuration
-- Output tank capacity
-- Destruction function toggle
-- Blacklist/Whitelist mode switch
-- Blacklist/Whitelist fluid list
-- Output quantities, special fluid (water/lava) outputs, and durations for each tier
-
-### Chemical Replicator Configuration
-- Output tank capacity
-- Destruction function toggle
-- Blacklist/Whitelist mode switch
-- Blacklist/Whitelist chemical list
-- Output quantities and durations for each tier
-
----
-
-## 🔧 Technical Features
-
-### Intelligent Recognition System
-- Player vs Automation: Distinguishes between player right-click operations and pipe/hopper automation through stack trace technology
-- Selective Destruction: Only destroys when destruction function is enabled and input comes from pipes, protecting manually inserted resources
-
-### Data Synchronization
-- Real-time client-server data synchronization
-- Automatic notification to nearby players when chunks update
-- Complete NBT data preservation (data persists after world restart)
-
-### API Compatibility
-- Supports NeoForge Capabilities system
-- Compatible with Mekanism's IChemicalHandler interface
-- Supports item/fluid tag filtering
-
----
-
-## 🔐 Security Mechanisms
-
-- Admin Protection: Items that disrupt game balance such as command blocks, structure blocks, and bedrock cannot be replicated
-- Mod Item Protection: Resource Replicator's own machines and items cannot be replicated (prevents infinite loops)
-- Dual Blacklist/Whitelist Protection: Precise control over which resources can be replicated through configuration
+- Right-click with a tank containing chemicals to place them; right-click with an empty tank to remove all chemicals inside.
+- Supports blacklist/whitelist. Supports item ID/mod ID.
+- Configurable processing speed and output multiplier for each tier. Default output amounts: T1: 10/20t, T2: 50/15t, T3: 100/10t, T4: 500/5t, T5: 1K/1t.
+- Configurable destruction function. Chemicals input via pipes will be destroyed, with destruction speed depending on the pipe's speed. Disabled by default.
+- Configurable output tank buffer size, default is 8000mB.
+- Configurable energy consumption.
 
 ---
 
 # **中文**
 
-## 1️⃣ 物品复制机
+## 📖 模组简介
+
+将需要复制的物品（或流体、化学品）放入方块。只要为其提供FE能量，方块便会开始向外输出相同的资源。同时，方块的外观会实时变化，以显示当前正在复制的内容。
+
+## 1.物品复制机
 
 **功能**：复制任意物品（可通过黑白名单配置限制）  
 **等级**：T1 - T5
@@ -139,14 +97,15 @@ The mod provides a comprehensive configuration file (`resource_replicator-server
 | T5 | 128 个 | 1 tick（0.05 秒）  |
 
 **特性**：
-- 支持配置输出槽数量（默认 1 个）
-- 支持黑白名单过滤（可指定物品 ID、模组 ID、物品标签）
-- 管理员物品保护（命令方块、基岩等无法复制）
-- 销毁功能（可选）：启用后管道/漏斗输入的物品会被瞬间销毁，但玩家手动放入的物品正常保存
+- 手持物品右键放入，空手潜行右键清除放入的物品；
+- 支持黑白名单，默认添加模组物品和管理员物品为黑名单，支持物品ID/模组ID/tag；
+- 可配置每个等级的处理速度和产量倍率，默认输出数量：T1：4/20t，T2：16/15t，T3：32/10t，T4：64/5t，T5：128/1t。
+- 可配置销毁功能，通过管道输入的物品会被销毁，销毁速度取决于管道的速度，默认关闭；
+- 可配置输出槽数量，默认为一个缓存槽；
+- 可配置是否自动输出，启用后向周围一个面的容器自动输出物品；
+- 可配置能量消耗。
 
----
-
-## 2️⃣ 流体复制机
+## 2.流体复制机
 
 **功能**：复制任意流体（可通过黑白名单配置限制）  
 **等级**：T1 - T5
@@ -160,16 +119,19 @@ The mod provides a comprehensive configuration file (`resource_replicator-server
 | T5 | 25000 mB | 1 tick  | 水：10000000 mB，岩浆：1000 mB |
 
 **特性**：
-- 双罐系统（输入罐 + 输出罐）
-- 输出罐容量可配置（默认 100000 mB）
-- 支持黑白名单过滤（流体 ID、模组 ID、流体标签）
-- 销毁功能（可选）：启用后管道输入的流体会被瞬间销毁，但玩家手持桶右键放入的流体正常保存
+- 手持流体桶右键放入，手持空桶右键清除内部所有流体；
+- 支持黑白名单，支持物品ID/模组ID/tag；
+- 可配置每个等级的处理速度和产量倍率，默认输出数量：T1：1K/20t，T2：2.5K/15t，T3：5K/10t，T4：10K/5t，T5：25K/1t。
+- 可配置水特殊输出，tick不变，输出量为1K、10K、100K、1M、10M；
+- 可配置岩浆特殊输出，tick不变，输出量为10、50、100、500、1K；
+- 可配置销毁功能，通过管道输入的流体会被销毁，销毁速度取决于管道的速度，默认关闭；
+- 可配置输出罐缓存大小，默认为8000mB；
+- 可配置是否自动输出，启用后向周围一个面的容器自动输出流体；
+- 可配置能量消耗。
 
----
+## 3.化学品复制机（Mekanism 联动）
 
-## 3️⃣ 化学品复制机（Mekanism 联动）
-
-**功能**：复制 Mekanism 模组的化学品  
+**功能**：复制任意还化学品（可通过黑白名单配置限制）  
 **等级**：T1 - T5
 
 | 等级 | 每次产出    | 耗时      |
@@ -181,63 +143,11 @@ The mod provides a comprehensive configuration file (`resource_replicator-server
 | T5 | 1000 mB | 1 tick  |
 
 **特性**：
-- 双罐系统（输入罐 + 输出罐）
-- 输出罐容量可配置（默认 8000 mB）
-- 支持黑白名单过滤（化学品 ID、模组 ID、化学品标签）
-- 销毁功能（可选）：启用后管道输入的化学品会被瞬间销毁，但玩家手持储罐右键放入的化学品正常保存
-- 需要安装 Mekanism 模组才能使用
-
----
-
-## ⚙️ 配置系统
-
-模组提供完善的配置文件（`resource_replicator-server.toml`），所有参数均可自定义：
-
-### 物品复制机配置
-- 输出槽数量（1-9）
-- 销毁功能开关
-- 黑名单/白名单模式切换
-- 黑名单/白名单物品列表
-- 各等级的输出数量和耗时
-
-### 流体复制机配置
-- 输出罐容量
-- 销毁功能开关
-- 黑名单/白名单模式切换
-- 黑名单/白名单流体列表
-- 各等级的输出数量、特殊流体（水/岩浆）输出量和耗时
-
-### 化学品复制机配置
-- 输出罐容量
-- 销毁功能开关
-- 黑名单/白名单模式切换
-- 黑名单/白名单化学品列表
-- 各等级的输出数量和耗时
-
----
-
-## 🔧 技术特性
-
-### 智能识别系统
-- 玩家操作 vs 自动化：通过栈追踪技术区分玩家右键操作和管道/漏斗自动化操作
-- 选择性销毁：只在启用销毁功能且是管道输入时才销毁，保护玩家手动操作的资源
-
-### 数据同步
-- 客户端 - 服务端数据实时同步
-- 区块更新时自动通知附近玩家
-- NBT 数据完整保存（重启世界后数据不丢失）
-
-### API 兼容
-- 支持 NeoForge 的 Capabilities 系统
-- 兼容 Mekanism 的 IChemicalHandler 接口
-- 支持物品/流体的 Tag 过滤
-
----
-
-## 🔐 安全机制
-
-- 管理员保护：命令方块、结构方块、基岩等破坏游戏平衡的物品无法复制
-- 本模组物品保护：资源复制机 自身的机器和物品无法被复制（防止无限套娃）
-- 黑白名单双重保障：可以通过配置精确控制哪些资源可以被复制
+- 手持装有化学品的储罐右键放入，手持空储罐右键清除内部所有化学品；
+- 支持黑白名单，支持物品ID/模组ID；
+- 可配置每个等级的处理速度和产量倍率，默认输出数量：T1：10/20t，T2：50/15t，T3：100/10t，T4：500/5t，T5：1K/1t。
+- 可配置销毁功能，通过管道输入的化学品会被销毁，销毁速度取决于管道的速度，默认关闭；
+- 可配置输出罐缓存大小，默认为8000mB；
+- 可配置能量消耗。
 
 ---
