@@ -44,11 +44,19 @@ public class ResourceReplicator {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
                 ModBlockEntities.ITEM_REPLICATOR.get(),
                 ItemReplicatorBlockEntity::getItemHandler);
+        // 为物品复制机注册能量处理能力
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.ITEM_REPLICATOR.get(),
+                ItemReplicatorBlockEntity::getEnergyHandler);
 
         // 为流体复制机注册流体处理能力
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
                 ModBlockEntities.FLUID_REPLICATOR.get(),
                 FluidReplicatorBlockEntity::getFluidHandler);
+        // 为流体复制机注册能量处理能力
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
+                ModBlockEntities.FLUID_REPLICATOR.get(),
+                FluidReplicatorBlockEntity::getEnergyHandler);
 
         // Mekanism 化学品复制机（仅当 Mekanism 加载时）
         if (ModList.get().isLoaded("mekanism")) {
@@ -75,7 +83,6 @@ public class ResourceReplicator {
                         capability,
                         blockEntityType,
                         (blockEntity, side) -> {
-                            // 检查是否是 ChemicalReplicatorBlockEntity 实例
                             if (blockEntity instanceof ChemicalReplicatorBlockEntity chemicalBE) {
                                 var handler = chemicalBE.getChemicalHandler(side);
                                 if (handler != null) {
@@ -86,8 +93,21 @@ public class ResourceReplicator {
                         }
                 );
                 LOGGER.info("已注册 Mekanism 化学物质处理能力");
+
+                // 为化学品复制机注册能量处理能力 - 使用双重注册确保兼容性
+                event.registerBlockEntity(
+                        Capabilities.EnergyStorage.BLOCK,
+                        blockEntityType,
+                        (be, side) -> {
+                            if (be instanceof ChemicalReplicatorBlockEntity chemicalBE) {
+                                return chemicalBE.getEnergyHandler(side);
+                            }
+                            return null;
+                        }
+                );
+                LOGGER.info("已注册化学品复制机能量处理能力");
             } catch (Exception e) {
-                LOGGER.error("注册 Mekanism 化学物质能力失败：{}", e.getMessage(), e);
+                LOGGER.error("注册 Mekanism 相关能力失败：{}", e.getMessage(), e);
             }
         }
     }

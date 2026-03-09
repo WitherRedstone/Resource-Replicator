@@ -134,12 +134,14 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
                     return InteractionResult.CONSUME;
                 }
 
+                String itemName = heldItem.getHoverName().getString();
+                
                 if (replicator.addItem(heldItem)) {
                     if (!player.isCreative()) {
                         heldItem.shrink(1);
                     }
                     player.displayClientMessage(Component.translatable("message.item_replicator.inserted",
-                            heldItem.getHoverName()).withStyle(style -> style.withColor(ChatFormatting.GOLD)), true);
+                            Component.literal(itemName)).withStyle(style -> style.withColor(ChatFormatting.GOLD)), true);
                     return InteractionResult.CONSUME;
                 }
             }

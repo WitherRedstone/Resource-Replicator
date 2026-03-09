@@ -30,6 +30,18 @@ public class ServerConfig {
     private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_TIME;
 
+    // T1-T5 物品复制机能量配置
+    private static final ModConfigSpec.IntValue ITEM_TIER1_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue ITEM_TIER1_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue ITEM_TIER2_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue ITEM_TIER2_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue ITEM_TIER3_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue ITEM_TIER3_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue ITEM_TIER4_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue ITEM_TIER4_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CONSUMPTION;
+
     // ======================= 流体复制机配置 =======================
     private static final ModConfigSpec.IntValue FLUID_REPLICATOR_OUTPUT_TANK_SIZE;
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_ENABLE_DESTROY;
@@ -62,6 +74,19 @@ public class ServerConfig {
     private static final ModConfigSpec.IntValue FLUID_TIER5_LAVA_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_TIME;
 
+    // T1-T5 流体复制机能量配置
+    private static final ModConfigSpec.IntValue FLUID_TIER1_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue FLUID_TIER1_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue FLUID_TIER2_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue FLUID_TIER2_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue FLUID_TIER3_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue FLUID_TIER3_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue FLUID_TIER4_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue FLUID_TIER4_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue FLUID_TIER5_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue FLUID_TIER5_ENERGY_CONSUMPTION;
+
+
     // ==================== 化学品复制机参数（Mekanism 联动） ====================
     private static final ModConfigSpec.IntValue CHEMICAL_REPLICATOR_OUTPUT_TANK_SIZE;
     private static final ModConfigSpec.BooleanValue CHEMICAL_REPLICATOR_ENABLE_DESTROY;
@@ -69,17 +94,30 @@ public class ServerConfig {
     private static final ModConfigSpec.ConfigValue<List<?>> CHEMICAL_BLACKLIST_ITEMS;
     private static final ModConfigSpec.ConfigValue<List<?>> CHEMICAL_WHITELIST_ITEMS;
 
+    // T1-T5 化学品复制机配置
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_1_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_OUTPUT_AMOUNT;
-
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_1_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_OUTPUT_TIME;
+
+    // T1-T5 化学品复制机能量配置
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_1_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_1_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_ENERGY_CONSUMPTION;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_ENERGY_CAPACITY;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_ENERGY_CONSUMPTION;
+
 
     static {
         BUILDER.push("物品复制机设置");
@@ -127,47 +165,77 @@ public class ServerConfig {
 
         BUILDER.push("Tier 1");
         ITEM_TIER1_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 1 每次操作产生的物品数量（默认：4）")
+                .comment("等级 1 每次操作产生的物品数量 (默认:4)")
                 .defineInRange("outputAmount", 4, 1, Integer.MAX_VALUE);
         ITEM_TIER1_OUTPUT_TIME = BUILDER
-                .comment("等级 1 每次操作所需的tick（默认：20）")
+                .comment("等级 1 每次操作所需的 tick(默认:20)")
                 .defineInRange("outputTime", 20, 1, Integer.MAX_VALUE);
+        ITEM_TIER1_ENERGY_CAPACITY = BUILDER
+                .comment("等级 1 的最大能量存储 (单位:FE，默认:10000)")
+                .defineInRange("energyCapacity", 10000, 1000, Integer.MAX_VALUE);
+        ITEM_TIER1_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 1 每次操作消耗的能量 (单位:FE，默认:2000)")
+                .defineInRange("energyConsumption", 2000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 2");
         ITEM_TIER2_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 2 每次操作产生的物品数量（默认：16）")
+                .comment("等级 2 每次操作产生的物品数量 (默认:16)")
                 .defineInRange("outputAmount", 16, 1, Integer.MAX_VALUE);
         ITEM_TIER2_OUTPUT_TIME = BUILDER
-                .comment("等级 2 每次操作所需的tick（默认：15）")
+                .comment("等级 2 每次操作所需的 tick(默认:15)")
                 .defineInRange("outputTime", 15, 1, Integer.MAX_VALUE);
+        ITEM_TIER2_ENERGY_CAPACITY = BUILDER
+                .comment("等级 2 的最大能量存储 (单位:FE，默认:50000)")
+                .defineInRange("energyCapacity", 50000, 1000, Integer.MAX_VALUE);
+        ITEM_TIER2_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 2 每次操作消耗的能量 (单位:FE，默认:4000)")
+                .defineInRange("energyConsumption", 4000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 3");
         ITEM_TIER3_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 3 每次操作产生的物品数量（默认：32）")
+                .comment("等级 3 每次操作产生的物品数量 (默认:32)")
                 .defineInRange("outputAmount", 32, 1, Integer.MAX_VALUE);
         ITEM_TIER3_OUTPUT_TIME = BUILDER
-                .comment("等级 3 每次操作所需的tick（默认：10）")
+                .comment("等级 3 每次操作所需的 tick(默认:10)")
                 .defineInRange("outputTime", 10, 1, Integer.MAX_VALUE);
+        ITEM_TIER3_ENERGY_CAPACITY = BUILDER
+                .comment("等级 3 的最大能量存储 (单位:FE，默认:100000)")
+                .defineInRange("energyCapacity", 100000, 1000, Integer.MAX_VALUE);
+        ITEM_TIER3_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 3 每次操作消耗的能量 (单位:FE，默认:6000)")
+                .defineInRange("energyConsumption", 6000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 4");
         ITEM_TIER4_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 4 每次操作产生的物品数量（默认：64）")
+                .comment("等级 4 每次操作产生的物品数量 (默认:64)")
                 .defineInRange("outputAmount", 64, 1, Integer.MAX_VALUE);
         ITEM_TIER4_OUTPUT_TIME = BUILDER
-                .comment("等级 4 每次操作所需的tick（默认：5）")
+                .comment("等级 4 每次操作所需的 tick(默认:5)")
                 .defineInRange("outputTime", 5, 1, Integer.MAX_VALUE);
+        ITEM_TIER4_ENERGY_CAPACITY = BUILDER
+                .comment("等级 4 的最大能量存储 (单位:FE，默认:500000)")
+                .defineInRange("energyCapacity", 500000, 1000, Integer.MAX_VALUE);
+        ITEM_TIER4_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 4 每次操作消耗的能量 (单位:FE，默认:8000)")
+                .defineInRange("energyConsumption", 8000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 5");
         ITEM_TIER5_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 5 每次操作产生的物品数量（默认：128）")
+                .comment("等级 5 每次操作产生的物品数量 (默认:128)")
                 .defineInRange("outputAmount", 128, 1, Integer.MAX_VALUE);
         ITEM_TIER5_OUTPUT_TIME = BUILDER
-                .comment("等级 5 每次操作所需的tick（默认：1）")
+                .comment("等级 5 每次操作所需的 tick(默认:1)")
                 .defineInRange("outputTime", 1, 1, Integer.MAX_VALUE);
+        ITEM_TIER5_ENERGY_CAPACITY = BUILDER
+                .comment("等级 5 的最大能量存储 (单位:FE，默认:1000000)")
+                .defineInRange("energyCapacity", 1000000, 1000, Integer.MAX_VALUE);
+        ITEM_TIER5_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 5 每次操作消耗的能量 (单位:FE，默认:10000)")
+                .defineInRange("energyConsumption", 10000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.pop();
@@ -176,21 +244,21 @@ public class ServerConfig {
 
         BUILDER.push("流体复制机设置");
 
-        BUILDER.push("输出罐容量设置");
+        BUILDER.push("输出罐设置");
         FLUID_REPLICATOR_OUTPUT_TANK_SIZE = BUILDER
-                .comment("流体复制机输出罐容量（单位：毫桶，默认：100000）")
-                .defineInRange("outputTankCapacity", 100000, 1, Integer.MAX_VALUE);
+                .comment("流体复制机输出罐的容量 (单位:mB，默认:10000)")
+                .defineInRange("outputTankSize", 10000, 1000, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("销毁功能设置");
         FLUID_REPLICATOR_ENABLE_DESTROY = BUILDER
-                .comment("是否启用流体复制机的销毁功能（默认：false）。启用后，通过管道输入的流体会被销毁。")
+                .comment("是否启用流体复制机的销毁功能 (默认:false)。启用后，通过管道输入到输入罐的流体会被销毁。")
                 .define("enableDestroy", false);
         BUILDER.pop();
 
         BUILDER.push("自动输出功能设置");
         FLUID_REPLICATOR_AUTO_OUTPUT = BUILDER
-                .comment("是否启用流体复制机的自动输出功能（默认：true）。启用后，复制机会自动向周围相邻的容器输出流体。")
+                .comment("是否启用流体复制机的自动输出功能 (默认:true)。启用后，复制机会自动向周围相邻的容器输出流体。")
                 .define("autoOutput", true);
         BUILDER.pop();
 
@@ -215,79 +283,110 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("等级设置");
+
         BUILDER.push("Tier 1");
         FLUID_TIER1_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 1 每次操作产生的流体量（单位：毫桶，默认：1000）")
+                .comment("等级 1 每次操作产生的流体数量 (单位:mB，默认:1000)")
                 .defineInRange("outputAmount", 1000, 1, Integer.MAX_VALUE);
-        FLUID_TIER1_WATER_AMOUNT = BUILDER
-                .comment("等级 1 每次操作产生的水量（单位：毫桶，默认：1000）")
-                .defineInRange("waterOutputAmount", 1000, 1, Integer.MAX_VALUE);
-        FLUID_TIER1_LAVA_AMOUNT = BUILDER
-                .comment("等级 1 每次操作产生的岩浆量（单位：毫桶，默认：10）")
-                .defineInRange("lavaOutputAmount", 10, 1, Integer.MAX_VALUE);
         FLUID_TIER1_OUTPUT_TIME = BUILDER
-                .comment("等级 1 每次操作所需的 tick（默认：20）")
+                .comment("等级 1 每次操作所需的 tick(默认:20)")
                 .defineInRange("outputTime", 20, 1, Integer.MAX_VALUE);
+        FLUID_TIER1_WATER_AMOUNT = BUILDER
+                .comment("等级 1 复制水时的特殊产量 (单位:mB，默认:2000)")
+                .defineInRange("waterAmount", 2000, 1, Integer.MAX_VALUE);
+        FLUID_TIER1_LAVA_AMOUNT = BUILDER
+                .comment("等级 1 复制岩浆时的特殊产量 (单位:mB，默认:500)")
+                .defineInRange("lavaAmount", 500, 1, Integer.MAX_VALUE);
+        FLUID_TIER1_ENERGY_CAPACITY = BUILDER
+                .comment("等级 1 的最大能量存储 (单位:FE，默认:10000)")
+                .defineInRange("energyCapacity", 10000, 1000, Integer.MAX_VALUE);
+        FLUID_TIER1_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 1 每 1000mB 流体消耗的能量 (单位:FE，默认:2000)")
+                .defineInRange("energyConsumption", 2000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 2");
         FLUID_TIER2_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 2 每次操作产生的流体量（单位：毫桶，默认：2500）")
-                .defineInRange("outputAmount", 2500, 1, Integer.MAX_VALUE);
-        FLUID_TIER2_WATER_AMOUNT = BUILDER
-                .comment("等级 2 每次操作产生的水量（单位：毫桶，默认：10000）")
-                .defineInRange("waterOutputAmount", 10000, 1, Integer.MAX_VALUE);
-        FLUID_TIER2_LAVA_AMOUNT = BUILDER
-                .comment("等级 2 每次操作产生的岩浆量（单位：毫桶，默认：50）")
-                .defineInRange("lavaOutputAmount", 50, 1, Integer.MAX_VALUE);
+                .comment("等级 2 每次操作产生的流体数量 (单位:mB，默认:4000)")
+                .defineInRange("outputAmount", 4000, 1, Integer.MAX_VALUE);
         FLUID_TIER2_OUTPUT_TIME = BUILDER
-                .comment("等级 2 每次操作所需的 tick（默认：15）")
+                .comment("等级 2 每次操作所需的 tick(默认:15)")
                 .defineInRange("outputTime", 15, 1, Integer.MAX_VALUE);
+        FLUID_TIER2_WATER_AMOUNT = BUILDER
+                .comment("等级 2 复制水时的特殊产量 (单位:mB，默认:8000)")
+                .defineInRange("waterAmount", 8000, 1, Integer.MAX_VALUE);
+        FLUID_TIER2_LAVA_AMOUNT = BUILDER
+                .comment("等级 2 复制岩浆时的特殊产量 (单位:mB，默认:2000)")
+                .defineInRange("lavaAmount", 2000, 1, Integer.MAX_VALUE);
+        FLUID_TIER2_ENERGY_CAPACITY = BUILDER
+                .comment("等级 2 的最大能量存储 (单位:FE，默认:50000)")
+                .defineInRange("energyCapacity", 50000, 1000, Integer.MAX_VALUE);
+        FLUID_TIER2_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 2 每 1000mB 流体消耗的能量 (单位:FE，默认:4000)")
+                .defineInRange("energyConsumption", 4000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 3");
         FLUID_TIER3_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 3 每次操作产生的流体量（单位：毫桶，默认：5000）")
-                .defineInRange("outputAmount", 5000, 1, Integer.MAX_VALUE);
-        FLUID_TIER3_WATER_AMOUNT = BUILDER
-                .comment("等级 3 每次操作产生的水量（单位：毫桶，默认：100000）")
-                .defineInRange("waterOutputAmount", 100000, 1, Integer.MAX_VALUE);
-        FLUID_TIER3_LAVA_AMOUNT = BUILDER
-                .comment("等级 3 每次操作产生的岩浆量（单位：毫桶，默认：5000）")
-                .defineInRange("lavaOutputAmount", 100, 1, Integer.MAX_VALUE);
+                .comment("等级 3 每次操作产生的流体数量 (单位:mB，默认:8000)")
+                .defineInRange("outputAmount", 8000, 1, Integer.MAX_VALUE);
         FLUID_TIER3_OUTPUT_TIME = BUILDER
-                .comment("等级 3 每次操作所需的 tick（默认：10）")
+                .comment("等级 3 每次操作所需的 tick(默认:10)")
                 .defineInRange("outputTime", 10, 1, Integer.MAX_VALUE);
+        FLUID_TIER3_WATER_AMOUNT = BUILDER
+                .comment("等级 3 复制水时的特殊产量 (单位:mB，默认:16000)")
+                .defineInRange("waterAmount", 16000, 1, Integer.MAX_VALUE);
+        FLUID_TIER3_LAVA_AMOUNT = BUILDER
+                .comment("等级 3 复制岩浆时的特殊产量 (单位:mB，默认:4000)")
+                .defineInRange("lavaAmount", 4000, 1, Integer.MAX_VALUE);
+        FLUID_TIER3_ENERGY_CAPACITY = BUILDER
+                .comment("等级 3 的最大能量存储 (单位:FE，默认:100000)")
+                .defineInRange("energyCapacity", 100000, 1000, Integer.MAX_VALUE);
+        FLUID_TIER3_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 3 每 1000mB 流体消耗的能量 (单位:FE，默认:6000)")
+                .defineInRange("energyConsumption", 6000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 4");
         FLUID_TIER4_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 4 每次操作产生的流体量（单位：毫桶，默认：10000）")
-                .defineInRange("outputAmount", 10000, 1, Integer.MAX_VALUE);
-        FLUID_TIER4_WATER_AMOUNT = BUILDER
-                .comment("等级 4 每次操作产生的水量（单位：毫桶，默认：1000000）")
-                .defineInRange("waterOutputAmount", 1000000, 1, Integer.MAX_VALUE);
-        FLUID_TIER4_LAVA_AMOUNT = BUILDER
-                .comment("等级 4 每次操作产生的岩浆量（单位：毫桶，默认：500）")
-                .defineInRange("lavaOutputAmount", 500, 1, Integer.MAX_VALUE);
+                .comment("等级 4 每次操作产生的流体数量 (单位:mB，默认:16000)")
+                .defineInRange("outputAmount", 16000, 1, Integer.MAX_VALUE);
         FLUID_TIER4_OUTPUT_TIME = BUILDER
-                .comment("等级 4 每次操作所需的 tick（默认：5）")
+                .comment("等级 4 每次操作所需的 tick(默认:5)")
                 .defineInRange("outputTime", 5, 1, Integer.MAX_VALUE);
+        FLUID_TIER4_WATER_AMOUNT = BUILDER
+                .comment("等级 4 复制水时的特殊产量 (单位:mB，默认:32000)")
+                .defineInRange("waterAmount", 32000, 1, Integer.MAX_VALUE);
+        FLUID_TIER4_LAVA_AMOUNT = BUILDER
+                .comment("等级 4 复制岩浆时的特殊产量 (单位:mB，默认:8000)")
+                .defineInRange("lavaAmount", 8000, 1, Integer.MAX_VALUE);
+        FLUID_TIER4_ENERGY_CAPACITY = BUILDER
+                .comment("等级 4 的最大能量存储 (单位:FE，默认:500000)")
+                .defineInRange("energyCapacity", 500000, 1000, Integer.MAX_VALUE);
+        FLUID_TIER4_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 4 每 1000mB 流体消耗的能量 (单位:FE，默认:8000)")
+                .defineInRange("energyConsumption", 8000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 5");
         FLUID_TIER5_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 5 每次操作产生的流体量（单位：毫桶，默认：25000）")
-                .defineInRange("outputAmount", 25000, 1, Integer.MAX_VALUE);
-        FLUID_TIER5_WATER_AMOUNT = BUILDER
-                .comment("等级 5 每次操作产生的水量（单位：毫桶，默认：10000000）")
-                .defineInRange("waterOutputAmount", 10000000, 1, Integer.MAX_VALUE);
-        FLUID_TIER5_LAVA_AMOUNT = BUILDER
-                .comment("等级 5 每次操作产生的岩浆量（单位：毫桶，默认：1000）")
-                .defineInRange("lavaOutputAmount", 1000, 1, Integer.MAX_VALUE);
+                .comment("等级 5 每次操作产生的流体数量 (单位:mB，默认:32000)")
+                .defineInRange("outputAmount", 32000, 1, Integer.MAX_VALUE);
         FLUID_TIER5_OUTPUT_TIME = BUILDER
-                .comment("等级 5 每次操作所需的 tick（默认：1）")
+                .comment("等级 5 每次操作所需的 tick(默认:1)")
                 .defineInRange("outputTime", 1, 1, Integer.MAX_VALUE);
+        FLUID_TIER5_WATER_AMOUNT = BUILDER
+                .comment("等级 5 复制水时的特殊产量 (单位:mB，默认:64000)")
+                .defineInRange("waterAmount", 64000, 1, Integer.MAX_VALUE);
+        FLUID_TIER5_LAVA_AMOUNT = BUILDER
+                .comment("等级 5 复制岩浆时的特殊产量 (单位:mB，默认:16000)")
+                .defineInRange("lavaAmount", 16000, 1, Integer.MAX_VALUE);
+        FLUID_TIER5_ENERGY_CAPACITY = BUILDER
+                .comment("等级 5 的最大能量存储 (单位:FE，默认:1000000)")
+                .defineInRange("energyCapacity", 1000000, 1000, Integer.MAX_VALUE);
+        FLUID_TIER5_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 5 每 1000mB 流体消耗的能量 (单位:FE，默认:10000)")
+                .defineInRange("energyConsumption", 10000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.pop();
@@ -338,6 +437,12 @@ public class ServerConfig {
         CHEMICAL_TIER_1_OUTPUT_TIME = BUILDER
                 .comment("等级 1 每次操作所需的 tick（默认：20）")
                 .defineInRange("outputTime", 20, 1, Integer.MAX_VALUE);
+        CHEMICAL_TIER_1_ENERGY_CAPACITY = BUILDER
+                .comment("等级 1 的最大能量存储 (单位:FE，默认:10000)")
+                .defineInRange("energyCapacity", 10000, 1000, Integer.MAX_VALUE);
+        CHEMICAL_TIER_1_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 1 每 1000mB 化学品消耗的能量 (单位:FE，默认:2000)")
+                .defineInRange("energyConsumption", 2000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 2");
@@ -347,6 +452,12 @@ public class ServerConfig {
         CHEMICAL_TIER_2_OUTPUT_TIME = BUILDER
                 .comment("等级 2 每次操作所需的 tick（默认：15）")
                 .defineInRange("outputTime", 15, 1, Integer.MAX_VALUE);
+        CHEMICAL_TIER_2_ENERGY_CAPACITY = BUILDER
+                .comment("等级 2 的最大能量存储 (单位:FE，默认:50000)")
+                .defineInRange("energyCapacity", 50000, 1000, Integer.MAX_VALUE);
+        CHEMICAL_TIER_2_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 2 每 1000mB 化学品消耗的能量 (单位:FE，默认:4000)")
+                .defineInRange("energyConsumption", 4000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 3");
@@ -356,6 +467,12 @@ public class ServerConfig {
         CHEMICAL_TIER_3_OUTPUT_TIME = BUILDER
                 .comment("等级 3 每次操作所需的 tick（默认：10）")
                 .defineInRange("outputTime", 10, 1, Integer.MAX_VALUE);
+        CHEMICAL_TIER_3_ENERGY_CAPACITY = BUILDER
+                .comment("等级 3 的最大能量存储 (单位:FE，默认:100000)")
+                .defineInRange("energyCapacity", 100000, 1000, Integer.MAX_VALUE);
+        CHEMICAL_TIER_3_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 3 每 1000mB 化学品消耗的能量 (单位:FE，默认:6000)")
+                .defineInRange("energyConsumption", 6000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 4");
@@ -365,6 +482,12 @@ public class ServerConfig {
         CHEMICAL_TIER_4_OUTPUT_TIME = BUILDER
                 .comment("等级 4 每次操作所需的 tick（默认：5）")
                 .defineInRange("outputTime", 5, 1, Integer.MAX_VALUE);
+        CHEMICAL_TIER_4_ENERGY_CAPACITY = BUILDER
+                .comment("等级 4 的最大能量存储 (单位:FE，默认:500000)")
+                .defineInRange("energyCapacity", 500000, 1000, Integer.MAX_VALUE);
+        CHEMICAL_TIER_4_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 4 每 1000mB 化学品消耗的能量 (单位:FE，默认:8000)")
+                .defineInRange("energyConsumption", 8000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("Tier 5");
@@ -374,6 +497,12 @@ public class ServerConfig {
         CHEMICAL_TIER_5_OUTPUT_TIME = BUILDER
                 .comment("等级 5 每次操作所需的 tick（默认：1）")
                 .defineInRange("outputTime", 1, 1, Integer.MAX_VALUE);
+        CHEMICAL_TIER_5_ENERGY_CAPACITY = BUILDER
+                .comment("等级 5 的最大能量存储 (单位:FE，默认:1000000)")
+                .defineInRange("energyCapacity", 1000000, 1000, Integer.MAX_VALUE);
+        CHEMICAL_TIER_5_ENERGY_CONSUMPTION = BUILDER
+                .comment("等级 5 每 1000mB 化学品消耗的能量 (单位:FE，默认:10000)")
+                .defineInRange("energyConsumption", 10000, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.pop();
@@ -417,6 +546,14 @@ public class ServerConfig {
         return ITEM_TIER1_OUTPUT_TIME.get();
     }
 
+    public static int getItemTier1EnergyCapacity() {
+        return ITEM_TIER1_ENERGY_CAPACITY.get();
+    }
+
+    public static int getItemTier1EnergyConsumption() {
+        return ITEM_TIER1_ENERGY_CONSUMPTION.get();
+    }
+
     // Tier 2
     public static int getItemTier2OutputAmount() {
         return ITEM_TIER2_OUTPUT_AMOUNT.get();
@@ -424,6 +561,14 @@ public class ServerConfig {
 
     public static int getItemTier2OutputTime() {
         return ITEM_TIER2_OUTPUT_TIME.get();
+    }
+
+    public static int getItemTier2EnergyCapacity() {
+        return ITEM_TIER2_ENERGY_CAPACITY.get();
+    }
+
+    public static int getItemTier2EnergyConsumption() {
+        return ITEM_TIER2_ENERGY_CONSUMPTION.get();
     }
 
     // Tier 3
@@ -435,6 +580,14 @@ public class ServerConfig {
         return ITEM_TIER3_OUTPUT_TIME.get();
     }
 
+    public static int getItemTier3EnergyCapacity() {
+        return ITEM_TIER3_ENERGY_CAPACITY.get();
+    }
+
+    public static int getItemTier3EnergyConsumption() {
+        return ITEM_TIER3_ENERGY_CONSUMPTION.get();
+    }
+
     // Tier 4
     public static int getItemTier4OutputAmount() {
         return ITEM_TIER4_OUTPUT_AMOUNT.get();
@@ -444,6 +597,14 @@ public class ServerConfig {
         return ITEM_TIER4_OUTPUT_TIME.get();
     }
 
+    public static int getItemTier4EnergyCapacity() {
+        return ITEM_TIER4_ENERGY_CAPACITY.get();
+    }
+
+    public static int getItemTier4EnergyConsumption() {
+        return ITEM_TIER4_ENERGY_CONSUMPTION.get();
+    }
+
     // Tier 5
     public static int getItemTier5OutputAmount() {
         return ITEM_TIER5_OUTPUT_AMOUNT.get();
@@ -451,6 +612,14 @@ public class ServerConfig {
 
     public static int getItemTier5OutputTime() {
         return ITEM_TIER5_OUTPUT_TIME.get();
+    }
+
+    public static int getItemTier5EnergyCapacity() {
+        return ITEM_TIER5_ENERGY_CAPACITY.get();
+    }
+
+    public static int getItemTier5EnergyConsumption() {
+        return ITEM_TIER5_ENERGY_CONSUMPTION.get();
     }
 
     // ======================= 流体复制机配置获取方法 =======================
@@ -478,9 +647,13 @@ public class ServerConfig {
                 .toList();
     }
 
-    // Tier 1
+    // Tier 1 Fluid
     public static int getFluidTier1OutputAmount() {
         return FLUID_TIER1_OUTPUT_AMOUNT.get();
+    }
+
+    public static int getFluidTier1OutputTime() {
+        return FLUID_TIER1_OUTPUT_TIME.get();
     }
 
     public static int getFluidTier1WaterAmount() {
@@ -491,13 +664,21 @@ public class ServerConfig {
         return FLUID_TIER1_LAVA_AMOUNT.get();
     }
 
-    public static int getFluidTier1OutputTime() {
-        return FLUID_TIER1_OUTPUT_TIME.get();
+    public static int getFluidTier1EnergyCapacity() {
+        return FLUID_TIER1_ENERGY_CAPACITY.get();
     }
 
-    // Tier 2
+    public static int getFluidTier1EnergyConsumption() {
+        return FLUID_TIER1_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 2 Fluid
     public static int getFluidTier2OutputAmount() {
         return FLUID_TIER2_OUTPUT_AMOUNT.get();
+    }
+
+    public static int getFluidTier2OutputTime() {
+        return FLUID_TIER2_OUTPUT_TIME.get();
     }
 
     public static int getFluidTier2WaterAmount() {
@@ -508,13 +689,21 @@ public class ServerConfig {
         return FLUID_TIER2_LAVA_AMOUNT.get();
     }
 
-    public static int getFluidTier2OutputTime() {
-        return FLUID_TIER2_OUTPUT_TIME.get();
+    public static int getFluidTier2EnergyCapacity() {
+        return FLUID_TIER2_ENERGY_CAPACITY.get();
     }
 
-    // Tier 3
+    public static int getFluidTier2EnergyConsumption() {
+        return FLUID_TIER2_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 3 Fluid
     public static int getFluidTier3OutputAmount() {
         return FLUID_TIER3_OUTPUT_AMOUNT.get();
+    }
+
+    public static int getFluidTier3OutputTime() {
+        return FLUID_TIER3_OUTPUT_TIME.get();
     }
 
     public static int getFluidTier3WaterAmount() {
@@ -525,13 +714,21 @@ public class ServerConfig {
         return FLUID_TIER3_LAVA_AMOUNT.get();
     }
 
-    public static int getFluidTier3OutputTime() {
-        return FLUID_TIER3_OUTPUT_TIME.get();
+    public static int getFluidTier3EnergyCapacity() {
+        return FLUID_TIER3_ENERGY_CAPACITY.get();
     }
 
-    // Tier 4
+    public static int getFluidTier3EnergyConsumption() {
+        return FLUID_TIER3_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 4 Fluid
     public static int getFluidTier4OutputAmount() {
         return FLUID_TIER4_OUTPUT_AMOUNT.get();
+    }
+
+    public static int getFluidTier4OutputTime() {
+        return FLUID_TIER4_OUTPUT_TIME.get();
     }
 
     public static int getFluidTier4WaterAmount() {
@@ -542,13 +739,21 @@ public class ServerConfig {
         return FLUID_TIER4_LAVA_AMOUNT.get();
     }
 
-    public static int getFluidTier4OutputTime() {
-        return FLUID_TIER4_OUTPUT_TIME.get();
+    public static int getFluidTier4EnergyCapacity() {
+        return FLUID_TIER4_ENERGY_CAPACITY.get();
     }
 
-    // Tier 5
+    public static int getFluidTier4EnergyConsumption() {
+        return FLUID_TIER4_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 5 Fluid
     public static int getFluidTier5OutputAmount() {
         return FLUID_TIER5_OUTPUT_AMOUNT.get();
+    }
+
+    public static int getFluidTier5OutputTime() {
+        return FLUID_TIER5_OUTPUT_TIME.get();
     }
 
     public static int getFluidTier5WaterAmount() {
@@ -559,10 +764,13 @@ public class ServerConfig {
         return FLUID_TIER5_LAVA_AMOUNT.get();
     }
 
-    public static int getFluidTier5OutputTime() {
-        return FLUID_TIER5_OUTPUT_TIME.get();
+    public static int getFluidTier5EnergyCapacity() {
+        return FLUID_TIER5_ENERGY_CAPACITY.get();
     }
 
+    public static int getFluidTier5EnergyConsumption() {
+        return FLUID_TIER5_ENERGY_CONSUMPTION.get();
+    }
 
 
     // ======================= 化学品复制机配置获取方法（Mekanism 联动） =======================
@@ -589,7 +797,7 @@ public class ServerConfig {
                 .toList();
     }
 
-    // Tier 1
+    // Tier 1 Chemical
     public static int getChemicalTier1OutputAmount() {
         return CHEMICAL_TIER_1_OUTPUT_AMOUNT.get();
     }
@@ -598,7 +806,15 @@ public class ServerConfig {
         return CHEMICAL_TIER_1_OUTPUT_TIME.get();
     }
 
-    // Tier 2
+    public static int getChemicalTier1EnergyCapacity() {
+        return CHEMICAL_TIER_1_ENERGY_CAPACITY.get();
+    }
+
+    public static int getChemicalTier1EnergyConsumption() {
+        return CHEMICAL_TIER_1_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 2 Chemical
     public static int getChemicalTier2OutputAmount() {
         return CHEMICAL_TIER_2_OUTPUT_AMOUNT.get();
     }
@@ -607,7 +823,15 @@ public class ServerConfig {
         return CHEMICAL_TIER_2_OUTPUT_TIME.get();
     }
 
-    // Tier 3
+    public static int getChemicalTier2EnergyCapacity() {
+        return CHEMICAL_TIER_2_ENERGY_CAPACITY.get();
+    }
+
+    public static int getChemicalTier2EnergyConsumption() {
+        return CHEMICAL_TIER_2_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 3 Chemical
     public static int getChemicalTier3OutputAmount() {
         return CHEMICAL_TIER_3_OUTPUT_AMOUNT.get();
     }
@@ -616,7 +840,15 @@ public class ServerConfig {
         return CHEMICAL_TIER_3_OUTPUT_TIME.get();
     }
 
-    // Tier 4
+    public static int getChemicalTier3EnergyCapacity() {
+        return CHEMICAL_TIER_3_ENERGY_CAPACITY.get();
+    }
+
+    public static int getChemicalTier3EnergyConsumption() {
+        return CHEMICAL_TIER_3_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 4 Chemical
     public static int getChemicalTier4OutputAmount() {
         return CHEMICAL_TIER_4_OUTPUT_AMOUNT.get();
     }
@@ -625,12 +857,28 @@ public class ServerConfig {
         return CHEMICAL_TIER_4_OUTPUT_TIME.get();
     }
 
-    // Tier 5
+    public static int getChemicalTier4EnergyCapacity() {
+        return CHEMICAL_TIER_4_ENERGY_CAPACITY.get();
+    }
+
+    public static int getChemicalTier4EnergyConsumption() {
+        return CHEMICAL_TIER_4_ENERGY_CONSUMPTION.get();
+    }
+
+    // Tier 5 Chemical
     public static int getChemicalTier5OutputAmount() {
         return CHEMICAL_TIER_5_OUTPUT_AMOUNT.get();
     }
 
     public static int getChemicalTier5OutputTime() {
         return CHEMICAL_TIER_5_OUTPUT_TIME.get();
+    }
+
+    public static int getChemicalTier5EnergyCapacity() {
+        return CHEMICAL_TIER_5_ENERGY_CAPACITY.get();
+    }
+
+    public static int getChemicalTier5EnergyConsumption() {
+        return CHEMICAL_TIER_5_ENERGY_CONSUMPTION.get();
     }
 }

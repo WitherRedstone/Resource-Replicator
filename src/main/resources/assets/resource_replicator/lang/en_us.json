@@ -24,9 +24,10 @@
   "message.item_replicator.contains": "§aThere are items inside: %s",
   "message.item_replicator.extracted": "§aExtracted: %s",
   "tooltip.item_replicator.output_amount": "Output: %s items/op",
-  "tooltip.item_replicator.speed": "Speed: %s ticks/op",
+  "tooltip.item_replicator.speed": "Speed: %s tick/op",
   "tooltip.item_replicator.items_per_second": "Output rate: %s items/s",
   "tooltip.item_replicator.output_slots": "Output slots: %s",
+  "tooltip.item_replicator.energy_consumption": "Energy Consumption: %d FE/tick",
 
   "_comment.tooltip_fluid": "Fluid Tooltip",
   "message.fluid_replicator.empty": "§dIt is empty inside.",
@@ -37,9 +38,10 @@
   "tooltip.fluid_replicator.fluid_output_amount": "Output: %s mB/op",
   "tooltip.fluid_replicator.water_output_amount": "Water output: %s mB/op",
   "tooltip.fluid_replicator.lava_output_amount": "Lava output: %s mB/op",
-  "tooltip.fluid_replicator.speed": "Speed: %s ticks/op",
+  "tooltip.fluid_replicator.speed": "Speed: %s tick/op",
   "tooltip.fluid_replicator.mb_per_second": "Output rate: %s mB/s",
   "tooltip.fluid_replicator.tank_capacity": "Output Ouffer: %s mB",
+  "tooltip.fluid_replicator.energy_consumption": "Energy Consumption: %s FE/1000mB",
 
   "_comment.tooltip_chemical": "Chemical Tooltip",
   "message.chemical_replicator.empty": "§dIt is empty inside.",
@@ -49,7 +51,8 @@
   "message.chemical_replicator.filter.denied": "§cThis chemical cannot be inserted",
   "message.chemical_replicator.insufficient_chemicals": "§6Insufficient chemicals! Need at least 1000mB, but only have %dmB",
   "tooltip.chemical_replicator.chemical_output_amount": "Output: %s mB/op",
-  "tooltip.chemical_replicator.speed": "Speed: %s ticks/op",
+  "tooltip.chemical_replicator.speed": "Speed: %s tick/op",
   "tooltip.chemical_replicator.chemical_per_second": "Output rate: %s mB/s",
-  "tooltip.chemical_replicator.chemical_output_capacity": "Output Ouffer: %s mB"
+  "tooltip.chemical_replicator.chemical_output_capacity": "Output Ouffer: %s mB",
+  "tooltip.chemical_replicator.energy_consumption": "Energy Consumption: %s FE/1000mB"
 }

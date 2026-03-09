@@ -75,6 +75,7 @@ public class ModTooltips {
         // 获取配置的速度和输出量
         int outputAmount = getItemTierOutputAmount(tier);
         int outputTime = getItemTierOutputTime(tier);
+        int energyConsumption = getItemTierEnergyConsumption(tier);
         double ticksPerSecond = 20.0 / outputTime;
         double itemsPerSecond = outputAmount * ticksPerSecond;
 
@@ -97,6 +98,13 @@ public class ModTooltips {
         toolTip.add(Component.translatable("tooltip.item_replicator.output_slots",
                         Component.literal(String.valueOf(ServerConfig.getItemReplicatorOutputSlots())).withStyle(ChatFormatting.LIGHT_PURPLE))
                 .withStyle(ChatFormatting.GRAY));
+
+        // 显示能量消耗
+        if (energyConsumption > 0) {
+            toolTip.add(Component.translatable("tooltip.item_replicator.energy_consumption",
+                            Component.literal(String.valueOf(energyConsumption)).withStyle(ChatFormatting.RED))
+                    .withStyle(ChatFormatting.GRAY));
+        }
     }
 
     private static void addFluidReplicatorTooltip(List<Component> toolTip, int tier) {
@@ -105,6 +113,7 @@ public class ModTooltips {
         // 获取配置的速度和输出量
         int outputAmount = getFluidTierOutputAmount(tier);
         int outputTime = getFluidTierOutputTime(tier);
+        int energyConsumption = getFluidTierEnergyConsumption(tier);
         double ticksPerSecond = 20.0 / outputTime;
         double mbPerSecond = outputAmount * ticksPerSecond;
         int tankCapacity = ServerConfig.getFluidReplicatorOutputTankSize();
@@ -144,6 +153,13 @@ public class ModTooltips {
         toolTip.add(Component.translatable("tooltip.fluid_replicator.tank_capacity",
                         Component.literal(String.valueOf(tankCapacity)).withStyle(ChatFormatting.LIGHT_PURPLE))
                 .withStyle(ChatFormatting.GRAY));
+
+        // 显示能量消耗
+        if (energyConsumption > 0) {
+            toolTip.add(Component.translatable("tooltip.fluid_replicator.energy_consumption",
+                            Component.literal(String.valueOf(energyConsumption)).withStyle(ChatFormatting.RED))
+                    .withStyle(ChatFormatting.GRAY));
+        }
     }
 
     private static int getItemTierOutputAmount(int tier) {
@@ -165,6 +181,17 @@ public class ModTooltips {
             case 4 -> ServerConfig.getItemTier4OutputTime();
             case 5 -> ServerConfig.getItemTier5OutputTime();
             default -> 20;
+        };
+    }
+
+    private static int getItemTierEnergyConsumption(int tier) {
+        return switch (tier) {
+            case 1 -> ServerConfig.getItemTier1EnergyConsumption();
+            case 2 -> ServerConfig.getItemTier2EnergyConsumption();
+            case 3 -> ServerConfig.getItemTier3EnergyConsumption();
+            case 4 -> ServerConfig.getItemTier4EnergyConsumption();
+            case 5 -> ServerConfig.getItemTier5EnergyConsumption();
+            default -> 0;
         };
     }
 
@@ -212,12 +239,24 @@ public class ModTooltips {
         };
     }
 
+    private static int getFluidTierEnergyConsumption(int tier) {
+        return switch (tier) {
+            case 1 -> ServerConfig.getFluidTier1EnergyConsumption();
+            case 2 -> ServerConfig.getFluidTier2EnergyConsumption();
+            case 3 -> ServerConfig.getFluidTier3EnergyConsumption();
+            case 4 -> ServerConfig.getFluidTier4EnergyConsumption();
+            case 5 -> ServerConfig.getFluidTier5EnergyConsumption();
+            default -> 0;
+        };
+    }
+
     private static void addChemicalReplicatorTooltip(List<Component> toolTip, int tier) {
         toolTip.add(Component.empty());
 
         // 获取配置的速度和输出量
         int outputAmount = getChemicalTierOutputAmount(tier);
         int outputTime = getChemicalTierOutputTime(tier);
+        int energyConsumption = getChemicalTierEnergyConsumption(tier);
         double ticksPerSecond = 20.0 / outputTime;
         double mbPerSecond = outputAmount * ticksPerSecond;
         int outputTankCapacity = ServerConfig.getChemicalReplicatorOutputTankSize();
@@ -241,6 +280,13 @@ public class ModTooltips {
         toolTip.add(Component.translatable("tooltip.chemical_replicator.chemical_output_capacity",
                         Component.literal(String.valueOf(outputTankCapacity)).withStyle(ChatFormatting.LIGHT_PURPLE))
                 .withStyle(ChatFormatting.GRAY));
+
+        // 显示能量消耗
+        if (energyConsumption > 0) {
+            toolTip.add(Component.translatable("tooltip.chemical_replicator.energy_consumption",
+                            Component.literal(String.valueOf(energyConsumption)).withStyle(ChatFormatting.RED))
+                    .withStyle(ChatFormatting.GRAY));
+        }
     }
 
     private static int getChemicalTierOutputAmount(int tier) {
@@ -262,6 +308,17 @@ public class ModTooltips {
             case 4 -> ServerConfig.getChemicalTier4OutputTime();
             case 5 -> ServerConfig.getChemicalTier5OutputTime();
             default -> 20;
+        };
+    }
+
+    private static int getChemicalTierEnergyConsumption(int tier) {
+        return switch (tier) {
+            case 1 -> ServerConfig.getChemicalTier1EnergyConsumption();
+            case 2 -> ServerConfig.getChemicalTier2EnergyConsumption();
+            case 3 -> ServerConfig.getChemicalTier3EnergyConsumption();
+            case 4 -> ServerConfig.getChemicalTier4EnergyConsumption();
+            case 5 -> ServerConfig.getChemicalTier5EnergyConsumption();
+            default -> 0;
         };
     }
 }

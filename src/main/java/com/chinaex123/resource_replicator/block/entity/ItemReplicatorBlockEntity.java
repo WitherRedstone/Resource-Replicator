@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,39 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     public final ItemStack[] items = new ItemStack[TOTAL_SLOTS];
     private int tickCounter = 0;
     private ItemReplicatorTier tier = ItemReplicatorTier.ITEM_TIER_1;
+    private int energyStored;
+    private int energyCapacity;
+    private int energyConsumption;
+
+    {
+        updateEnergyStats();
+        energyStored = 0;
+    }
+
+    private void updateEnergyStats() {
+        switch (tier) {
+            case ITEM_TIER_1:
+                energyCapacity = ServerConfig.getItemTier1EnergyCapacity();
+                energyConsumption = ServerConfig.getItemTier1EnergyConsumption();
+                break;
+            case ITEM_TIER_2:
+                energyCapacity = ServerConfig.getItemTier2EnergyCapacity();
+                energyConsumption = ServerConfig.getItemTier2EnergyConsumption();
+                break;
+            case ITEM_TIER_3:
+                energyCapacity = ServerConfig.getItemTier3EnergyCapacity();
+                energyConsumption = ServerConfig.getItemTier3EnergyConsumption();
+                break;
+            case ITEM_TIER_4:
+                energyCapacity = ServerConfig.getItemTier4EnergyCapacity();
+                energyConsumption = ServerConfig.getItemTier4EnergyConsumption();
+                break;
+            case ITEM_TIER_5:
+                energyCapacity = ServerConfig.getItemTier5EnergyCapacity();
+                energyConsumption = ServerConfig.getItemTier5EnergyConsumption();
+                break;
+        }
+    }
 
     /**
      * 物品处理器接口实现
@@ -46,7 +80,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     private final IItemHandler itemHandler = new IItemHandler() {
         /**
          * 获取可用槽位的总数量
-         * 
+         *
          * @return int 固定返回 TOTAL_SLOTS（1 个输入槽 + 多个输出槽）
          */
         @Override
@@ -199,6 +233,60 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         }
     };
 
+    /**
+     * 能量处理器接口实现
+     * <p>
+     * 此接口用于处理能量的输入输出操作，实现了 NeoForge 的能量自动化交互。
+     * </p>
+     */
+    private final IEnergyStorage energyHandler = new IEnergyStorage() {
+        @Override
+        public int receiveEnergy(int maxReceive, boolean simulate) {
+            if (!canReceive()) {
+                return 0;
+            }
+            int canReceive = Math.min(maxReceive, energyCapacity - energyStored);
+            if (!simulate) {
+                energyStored += canReceive;
+                markUpdated();
+            }
+            return canReceive;
+        }
+
+        @Override
+        public int extractEnergy(int maxExtract, boolean simulate) {
+            if (!canExtract()) {
+                return 0;
+            }
+            int canExtract = Math.min(maxExtract, energyStored);
+            if (!simulate) {
+                energyStored -= canExtract;
+                markUpdated();
+            }
+            return canExtract;
+        }
+
+        @Override
+        public int getEnergyStored() {
+            return energyStored;
+        }
+
+        @Override
+        public int getMaxEnergyStored() {
+            return energyCapacity;
+        }
+
+        @Override
+        public boolean canExtract() {
+            return false;
+        }
+
+        @Override
+        public boolean canReceive() {
+            return true;
+        }
+    };
+
     // 判断是否是玩家插入（通过检查调用栈）
     private boolean isPlayerInsertion() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -246,6 +334,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         // 保存刻计数器和机器等级
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
+        tag.putInt("energyStored", energyStored);
 
         // 遍历所有槽位并保存非空物品
         CompoundTag itemsTag = new CompoundTag();
@@ -275,6 +364,9 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         tickCounter = tag.getInt("tickCounter");
         if (tag.contains("tier")) {
             this.tier = ItemReplicatorTier.fromId(tag.getInt("tier"));
+        }
+        if (tag.contains("energyStored")) {
+            this.energyStored = tag.getInt("energyStored");
         }
 
         // 遍历所有槽位并加载非空物品
@@ -320,6 +412,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         CompoundTag tag = new CompoundTag();
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
+        tag.putInt("energyStored", energyStored);
 
         CompoundTag itemsTag = new CompoundTag();
         for (int i = 0; i < items.length; i++) {
@@ -342,6 +435,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      */
     public void setTier(int tierId) {
         this.tier = ItemReplicatorTier.fromId(tierId);
+        updateEnergyStats();
     }
 
     /**
@@ -357,101 +451,166 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      * @param blockEntity 当前方块实体
      */
     public static void serverTick(Level level, BlockPos pos, BlockState state, ItemReplicatorBlockEntity blockEntity) {
+        // 累加刻计数器，用于控制复制速度
         blockEntity.tickCounter++;
 
-        // 如果刻计数器达到处理速度，开始复制逻辑
+        // 当刻计数器达到处理速度时，执行复制操作
+        // getProcessSpeed() 返回完成一次复制需要多少刻
         if (blockEntity.tickCounter >= blockEntity.tier.getProcessSpeed()) {
-            // 重置刻计数器
-            blockEntity.tickCounter = 0;
-
-            // 获取输入槽中的物品
+            // 获取输入槽的物品（INPUT_SLOT = 0）
             ItemStack inputStack = blockEntity.items[INPUT_SLOT];
-            // 如果输入槽不为空
-            if (!inputStack.isEmpty()) {
-                // 获取当前等级的输出数量
-                int remainingOutput = blockEntity.tier.getOutputAmount();
-                // 标记是否有更新
-                boolean hasUpdated = false;
 
-                // 检查是否启用了自动输出功能
+            // 如果输入槽不为空（有物品）
+            if (!inputStack.isEmpty()) {
+                // 获取目标产出数量（不同等级产量不同）
+                int targetOutput = blockEntity.tier.getOutputAmount();
+                // 获取每个物品的能耗（从 config 读取）
+                int energyPerItem = blockEntity.energyConsumption;
+
+                // ========== 预检查能量 ==========
+                // 先检查是否有足够的能量支持至少 1 个物品的输出
+                // 如果连 1 个物品的能量都不够，直接返回停止后续处理
+                if (blockEntity.energyStored < energyPerItem) {
+                    return;
+                }
+
+                // 剩余待输出的物品数量（初始等于目标产出量）
+                int remainingOutput = targetOutput;
+                // 标记是否有过更新操作
+                boolean hasUpdated = false;
+                // 记录总共输出了多少物品
+                int totalInserted = 0;
+                // 记录实际消耗的能量
+                int actualEnergyNeeded = 0;
+
+                // 检查配置中是否启用了自动输出功能
                 boolean autoOutputEnabled = ServerConfig.isItemReplicatorAutoOutputEnabled();
 
-                // 如果启用了自动输出，尝试向周围相邻容器输出物品
+                // ========== 自动输出逻辑 ==========
+                // 如果启用了自动输出
                 if (autoOutputEnabled) {
-                    // 获取六个方向的数组
+                    // 获取所有六个方向（上、下、东、西、南、北）
                     Direction[] directions = Direction.values();
-                    // 遍历六个方向尝试向相邻容器输出物品
+
+                    // 主动输出：每个 tick 只尝试输出到一个方向
                     for (Direction dir : directions) {
-                        // 如果剩余输出量已为 0，跳出循环
+                        // 如果已经不需要再输出了，提前结束循环
                         if (remainingOutput <= 0) break;
 
                         // 获取相邻方块的坐标
                         BlockPos neighborPos = pos.relative(dir);
-                        // 获取相邻方块的物品处理器（从相反方向访问）
+                        // 获取相邻方块的物品处理能力（从相反方向访问）
+                        // 例如：从上方查询时，使用下方来访问邻居的能力
                         IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
 
-                        // 如果相邻方块有物品处理器
+                        // 如果邻居有物品处理能力
                         if (handler != null) {
-                            // 创建要输出的物品堆（每次输出 1 个）
-                            ItemStack outputStack = inputStack.copy();
-                            outputStack.setCount(1);
-
-                            // 尝试将物品插入到相邻容器的处理器中
+                            // 计算要插入的数量（取剩余产出量和物品最大堆叠量的较小值）
+                            int amountToInsert = Math.min(remainingOutput, inputStack.getMaxStackSize());
+                            // 创建要输出的物品堆（复制输入物品，设置数量）
+                            ItemStack outputStack = inputStack.copyWithCount(amountToInsert);
+                            // 尝试向邻居插入物品，获取剩余的物品（没插进去的部分）
+                            // insertItem 返回的是未被接受的物品
                             ItemStack remainder = ItemHandlerHelper.insertItem(handler, outputStack, false);
 
-                            // 如果全部插入成功（remainder 为空）
-                            if (remainder.isEmpty()) {
-                                // 减少剩余输出量
-                                remainingOutput--;
+                            // 计算实际插入的数量 = 尝试插入的数量 - 剩余的数量
+                            int inserted = amountToInsert - remainder.getCount();
+
+                            // 如果成功插入了物品
+                            if (inserted > 0) {
+                                // 累加到总输出量
+                                totalInserted += inserted;
+                                // 减少剩余待输出量
+                                remainingOutput -= inserted;
                                 // 标记已更新
                                 hasUpdated = true;
+                                // 累加能量消耗（每插入 1 个物品消耗 energyPerItem）
+                                actualEnergyNeeded += inserted * energyPerItem;
+
+                                // 主动输出只输出一个面就停止（找到第一个能接受的邻居就停止）
+                                break;
                             }
                         }
                     }
                 }
 
-                // 如果还有剩余的输出量，存入输出槽
+                // ========== 将剩余物品存入输出槽 ==========
+                // 如果还有剩余物品没有输出出去
                 if (remainingOutput > 0) {
-                    // 遍历所有输出槽
+                    // 遍历所有输出槽（从 OUTPUT_SLOT_START 开始到 TOTAL_SLOTS）
+                    // 条件是还有剩余物品且槽位未遍历完
                     for (int slot = OUTPUT_SLOT_START; slot < TOTAL_SLOTS && remainingOutput > 0; slot++) {
                         // 获取当前输出槽的物品
                         ItemStack currentOutput = blockEntity.items[slot];
 
-                        // 如果当前输出槽为空
+                        // 如果这个输出槽是空的
                         if (currentOutput.isEmpty()) {
-                            // 创建新的物品堆，数量为剩余输出量和物品最大堆叠数的较小值
+                            // 复制输入物品
                             ItemStack newOutput = inputStack.copy();
-                            newOutput.setCount(Math.min(remainingOutput, inputStack.getMaxStackSize()));
+                            // 计算能加入的数量（取剩余产出量和物品最大堆叠量的较小值）
+                            int addAmount = Math.min(remainingOutput, inputStack.getMaxStackSize());
+                            // 设置新物品堆的数量
+                            newOutput.setCount(addAmount);
                             // 放入输出槽
                             blockEntity.items[slot] = newOutput;
-                            // 减少剩余输出量
-                            remainingOutput -= newOutput.getCount();
+                            // 累加到总输出量
+                            totalInserted += addAmount;
+                            // 减少剩余待输出量
+                            remainingOutput -= addAmount;
                             // 标记已更新
                             hasUpdated = true;
-                        } 
-                        // 如果当前输出槽的物品与输入物品相同
+                            // 累加能量消耗
+                            actualEnergyNeeded += addAmount * energyPerItem;
+
+                            // 能量检查：如果当前能量不足以支持下一个物品的消耗，提前退出循环
+                            // actualEnergyNeeded + energyPerItem = 已计划消耗 + 下一个物品需要的能量
+                            if (blockEntity.energyStored < actualEnergyNeeded + energyPerItem) {
+                                break;
+                            }
+                        }
+                        // 如果输出槽中的物品与当前产出的物品相同（比较物品 ID 和组件）
                         else if (ItemStack.isSameItemSameComponents(currentOutput, inputStack)) {
-                            // 计算还能添加的数量（取物品最大堆叠数减去当前数量和剩余输出量的较小值）
+                            // 计算还能加入多少物品
+                            // 取：(最大堆叠数 - 当前数量) 和 剩余产出量 的较小值
                             int canAdd = Math.min(
                                     inputStack.getMaxStackSize() - currentOutput.getCount(),
                                     remainingOutput
                             );
-                            // 如果可以添加
+
+                            // 如果有空间可以加入
                             if (canAdd > 0) {
-                                // 增加当前输出槽的物品数量
+                                // 增加输出槽中的物品数量
                                 currentOutput.grow(canAdd);
-                                // 减少剩余输出量
+                                // 累加到总输出量
+                                totalInserted += canAdd;
+                                // 减少剩余待输出量
                                 remainingOutput -= canAdd;
                                 // 标记已更新
                                 hasUpdated = true;
+                                // 累加能量消耗
+                                actualEnergyNeeded += canAdd * energyPerItem;
+
+                                // 能量检查：如果当前能量不足以支持下一个物品的消耗，提前退出循环
+                                if (blockEntity.energyStored < actualEnergyNeeded + energyPerItem) {
+                                    break;
+                                }
                             }
                         }
                     }
                 }
 
-                // 如果有更新，标记方块实体并同步到客户端
-                if (hasUpdated) {
-                    blockEntity.markUpdated();
+                // ========== 最终检查和能量扣除 ==========
+                // 如果有更新、总输出量大于 0、且需要消耗能量
+                if (hasUpdated && totalInserted > 0 && actualEnergyNeeded > 0) {
+                    // 再次检查能量是否足够（双重保险）
+                    if (blockEntity.energyStored >= actualEnergyNeeded) {
+                        // 扣除能量
+                        blockEntity.energyStored -= actualEnergyNeeded;
+                        // 重置刻计数器
+                        blockEntity.tickCounter = 0;
+                        // 标记方块为已更新状态，同步到客户端
+                        blockEntity.markUpdated();
+                    }
                 }
             }
         }
@@ -472,23 +631,16 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
             return false;
         }
 
-        // 如果输入槽为空，直接放入物品
         if (items[INPUT_SLOT].isEmpty()) {
-            // 复制物品堆并放入输入槽
-            items[INPUT_SLOT] = stack.copy();
-            // 标记方块为已更新状态
+            ItemStack singleItem = stack.copyWithCount(1);
+            items[INPUT_SLOT] = singleItem;
             markUpdated();
             return true;
-        } 
-        // 如果输入槽中的物品与要放入的物品相同
+        }
         else if (ItemStack.isSameItemSameComponents(items[INPUT_SLOT], stack)) {
-            // 计算还能添加的数量（最大堆叠数减去当前数量）
-            int canAdd = stack.getMaxStackSize() - items[INPUT_SLOT].getCount();
-            // 如果还可以添加物品
-            if (canAdd > 0) {
-                // 增加输入槽中的物品数量（取可添加数量和物品总数的较小值）
-                items[INPUT_SLOT].grow(Math.min(canAdd, stack.getCount()));
-                // 标记方块为已更新状态
+            int canAdd = items[INPUT_SLOT].getMaxStackSize() - items[INPUT_SLOT].getCount();
+            if (canAdd > 0 && stack.getCount() > 0) {
+                items[INPUT_SLOT].grow(1);
                 markUpdated();
                 return true;
             }
@@ -507,8 +659,8 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      */
     public ItemStack extractItem() {
         if (!items[INPUT_SLOT].isEmpty()) {
-            ItemStack extracted = items[INPUT_SLOT].copy();
-            items[INPUT_SLOT] = ItemStack.EMPTY;
+            ItemStack extracted = items[INPUT_SLOT].copyWithCount(1);
+            items[INPUT_SLOT].shrink(1);
             markUpdated();
             return extracted;
         }
@@ -555,5 +707,19 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     @Nullable
     public IItemHandler getItemHandler(@Nullable Direction side) {
         return itemHandler;
+    }
+
+    /**
+     * 获取能量处理器接口
+     * <p>
+     * 此方法用于获取能量处理器接口，通常在能量自动化交互时调用。
+     * </p>
+     *
+     * @param side 方块的朝向，如果为 null 则返回默认的能量处理器接口
+     * @return IEnergyStorage 能量处理器接口的实现
+     */
+    @Nullable
+    public IEnergyStorage getEnergyHandler(@Nullable Direction side) {
+        return energyHandler;
     }
 }

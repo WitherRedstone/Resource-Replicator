@@ -27,6 +27,7 @@
   "tooltip.item_replicator.speed": "速度：%s tick/次",
   "tooltip.item_replicator.items_per_second": "输出速率：%s个/秒",
   "tooltip.item_replicator.output_slots": "输出槽：%s 个",
+  "tooltip.item_replicator.energy_consumption": "能量消耗: %d FE/tick",
 
   "_comment.tooltip_fluid": "流体提示",
   "message.fluid_replicator.empty": "§d里面是空的",
@@ -40,6 +41,7 @@
   "tooltip.fluid_replicator.speed": "速度：%s tick/次",
   "tooltip.fluid_replicator.mb_per_second": "输出速率：%s mB/秒",
   "tooltip.fluid_replicator.tank_capacity": "输出缓存：%s mB",
+  "tooltip.fluid_replicator.energy_consumption": "能量消耗：%s FE/1000mB",
 
   "_comment.tooltip_chemical": "化学品提示",
   "message.chemical_replicator.empty": "§d里面是空的",
@@ -51,5 +53,6 @@
   "tooltip.chemical_replicator.chemical_output_amount": "输出：%s mB/次",
   "tooltip.chemical_replicator.speed": "速度：%s tick/次",
   "tooltip.chemical_replicator.chemical_per_second": "输出速率：%s mB/秒",
-  "tooltip.chemical_replicator.chemical_output_capacity": "输出缓存：%s mB"
+  "tooltip.chemical_replicator.chemical_output_capacity": "输出缓存：%s mB",
+  "tooltip.chemical_replicator.energy_consumption": "能量消耗：%s FE/1000mB"
 }

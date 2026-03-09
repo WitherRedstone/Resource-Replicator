@@ -16,6 +16,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +39,93 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
 
     int tickCounter = 0;
     int tier = 1;
+    private int energyStored;
+    private int energyCapacity;
+    private int energyConsumption;
+
+    {
+        updateEnergyStats();
+        energyStored = 0;
+    }
+
+    private void updateEnergyStats() {
+        switch (tier) {
+            case 1:
+                energyCapacity = ServerConfig.getChemicalTier1EnergyCapacity();
+                energyConsumption = ServerConfig.getChemicalTier1EnergyConsumption();
+                break;
+            case 2:
+                energyCapacity = ServerConfig.getChemicalTier2EnergyCapacity();
+                energyConsumption = ServerConfig.getChemicalTier2EnergyConsumption();
+                break;
+            case 3:
+                energyCapacity = ServerConfig.getChemicalTier3EnergyCapacity();
+                energyConsumption = ServerConfig.getChemicalTier3EnergyConsumption();
+                break;
+            case 4:
+                energyCapacity = ServerConfig.getChemicalTier4EnergyCapacity();
+                energyConsumption = ServerConfig.getChemicalTier4EnergyConsumption();
+                break;
+            case 5:
+                energyCapacity = ServerConfig.getChemicalTier5EnergyCapacity();
+                energyConsumption = ServerConfig.getChemicalTier5EnergyConsumption();
+                break;
+        }
+    }
+
+    /**
+     * 能量处理器接口实现
+     * <p>
+     * 此接口用于处理能量的输入输出操作，实现了 NeoForge 的能量自动化交互。
+     * </p>
+     */
+    private final IEnergyStorage energyHandler = new IEnergyStorage() {
+        @Override
+        public int receiveEnergy(int maxReceive, boolean simulate) {
+            if (!canReceive()) {
+                return 0;
+            }
+            int canReceive = Math.min(maxReceive, getMaxEnergyStored() - getEnergyStored());
+            if (!simulate && canReceive > 0) {
+                energyStored += canReceive;
+                markUpdated();
+            }
+            return canReceive;
+        }
+
+        @Override
+        public int extractEnergy(int maxExtract, boolean simulate) {
+            if (!canExtract()) {
+                return 0;
+            }
+            int canExtract = Math.min(maxExtract, getEnergyStored());
+            if (!simulate) {
+                energyStored -= canExtract;
+                markUpdated();
+            }
+            return canExtract;
+        }
+
+        @Override
+        public int getEnergyStored() {
+            return energyStored;
+        }
+
+        @Override
+        public int getMaxEnergyStored() {
+            return energyCapacity;
+        }
+
+        @Override
+        public boolean canExtract() {
+            return false;
+        }
+
+        @Override
+        public boolean canReceive() {
+            return true;
+        }
+    };
 
     // 懒加载的化学品处理器
     @Nullable
@@ -63,6 +151,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
         // 保存刻计数器和机器等级
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier);
+        tag.putInt("energyStored", energyStored);
 
         // 创建化学品数据标签并保存输入和输出罐的化学品
         CompoundTag chemicalsTag = new CompoundTag();
@@ -89,13 +178,22 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
     public void loadAdditional(@NotNull CompoundTag compound, HolderLookup.@NotNull Provider registries) {
         super.loadAdditional(compound, registries);
 
-        // 从 "chemicals" 嵌套标签中读取化学品数据
         CompoundTag chemicalsTag = compound.getCompound("chemicals");
         inputChemical = readChemicalFromNBT(chemicalsTag.getCompound("inputChemical"), registries);
         outputChemical = readChemicalFromNBT(chemicalsTag.getCompound("outputChemical"), registries);
 
         tickCounter = compound.getInt("tickCounter");
-        tier = compound.getInt("tier");
+        int loadedTier = compound.getInt("tier");
+        if (loadedTier < 1 || loadedTier > 5) {
+            loadedTier = 1;
+        }
+        this.tier = loadedTier;
+
+        if (compound.contains("energyStored")) {
+            this.energyStored = compound.getInt("energyStored");
+        }
+
+        updateEnergyStats();
     }
 
     /**
@@ -112,10 +210,21 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
     public void handleUpdateTag(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider lookupProvider) {
         super.handleUpdateTag(tag, lookupProvider);
 
-        // 从 "chemicals" 嵌套标签中读取化学品数据
         CompoundTag chemicalsTag = tag.getCompound("chemicals");
         inputChemical = readChemicalFromNBT(chemicalsTag.getCompound("inputChemical"), lookupProvider);
         outputChemical = readChemicalFromNBT(chemicalsTag.getCompound("outputChemical"), lookupProvider);
+
+        if (tag.contains("tier")) {
+            this.tier = tag.getInt("tier");
+        }
+        if (tag.contains("energyStored")) {
+            this.energyStored = tag.getInt("energyStored");
+        }
+        if (tag.contains("energyCapacity")) {
+            this.energyCapacity = tag.getInt("energyCapacity");
+        }
+
+        updateEnergyStats();
     }
 
     /**
@@ -145,7 +254,11 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
      */
     @Override
     public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("tickCounter", tickCounter);
+        tag.putInt("tier", tier);
+        tag.putInt("energyStored", energyStored);
+        tag.putInt("energyCapacity", energyCapacity);
 
         CompoundTag chemicalsTag = new CompoundTag();
         if (!inputChemical.isEmpty()) {
@@ -161,6 +274,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
 
     public void setTier(int tierId) {
         this.tier = tierId;
+        updateEnergyStats();
     }
 
     public int getTier() {
@@ -198,12 +312,20 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
 
             // 如果刻计数器达到处理速度，执行复制操作
             if (tickCounter >= actualSpeed) {
-                // 重置刻计数器
-                tickCounter = 0;
-                // 获取当前等级的实际输出量
                 int actualOutput = tier.getActualOutputAmount(inputChemical.getChemical());
 
-                // 检查输出罐是否有空间
+                // 计算能量消耗 (每 1000mB 消耗 config 中定义的能量)
+                int energyPer1000MB = energyConsumption;
+                int energyNeeded = (int)((actualOutput * energyPer1000MB) / 1000L);
+                if (energyNeeded < 1 && actualOutput > 0) {
+                    energyNeeded = 1;
+                }
+
+                // 检查是否有足够的能量
+                if (energyStored < energyNeeded) {
+                    return;
+                }
+
                 if (!outputChemical.isEmpty()) {
                     // 如果输出罐不为空，检查是否是同种化学品
                     if (outputChemical.getChemical() != inputChemical.getChemical()) {
@@ -228,8 +350,17 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
                     outputChemical = new ChemicalStack(holder, actualOutput);
                 }
 
-                // 标记方块已更新，同步状态到客户端
-                markUpdated();
+                // 计算实际消耗的能量
+                int actualEnergyNeeded = (int)((actualOutput * energyPer1000MB) / 1000L);
+                if (actualEnergyNeeded < 1 && actualOutput > 0) {
+                    actualEnergyNeeded = 1;
+                }
+
+                if (energyStored >= actualEnergyNeeded) {
+                    energyStored -= actualEnergyNeeded;
+                    tickCounter = 0;
+                    markUpdated();
+                }
             }
         }
     }
@@ -297,6 +428,19 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
             }
         }
         return chemicalHandler;
+    }
+
+    /**
+     * 获取能量处理器接口
+     * <p>
+     * 此方法用于获取能量处理器接口，通常在能量自动化交互时调用。
+     * </p>
+     *
+     * @param side 方块的朝向，如果为 null 则返回默认的能量处理器接口
+     * @return IEnergyStorage 能量处理器接口的实现
+     */
+    public IEnergyStorage getEnergyHandler(@Nullable Direction side) {
+        return energyHandler;
     }
 
     // 添加用于渲染的方法，返回 Object 避免编译时依赖
@@ -381,7 +525,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
                 return new ChemicalStack(holderOpt.get(), amount);
             }
         } catch (Exception e) {
-            MekanismAPI.logger.warn("从 NBT 加载化学品失败：{}", chemicalId);
+            MekanismAPI.logger.warn("[化学品复制机]从 NBT 加载化学品失败：{}", chemicalId);
         }
 
         return ChemicalStack.EMPTY;

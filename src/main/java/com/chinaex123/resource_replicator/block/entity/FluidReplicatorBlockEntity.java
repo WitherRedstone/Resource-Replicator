@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -234,6 +235,93 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
     private int tickCounter = 0;
     private FluidReplicatorTier tier = FluidReplicatorTier.FLUID_TIER_1;
+    private int energyStored;
+    private int energyCapacity;
+    private int energyConsumption;
+
+    {
+        updateEnergyStats();
+        energyStored = 0;
+    }
+
+    private void updateEnergyStats() {
+        switch (tier) {
+            case FLUID_TIER_1:
+                energyCapacity = ServerConfig.getFluidTier1EnergyCapacity();
+                energyConsumption = ServerConfig.getFluidTier1EnergyConsumption();
+                break;
+            case FLUID_TIER_2:
+                energyCapacity = ServerConfig.getFluidTier2EnergyCapacity();
+                energyConsumption = ServerConfig.getFluidTier2EnergyConsumption();
+                break;
+            case FLUID_TIER_3:
+                energyCapacity = ServerConfig.getFluidTier3EnergyCapacity();
+                energyConsumption = ServerConfig.getFluidTier3EnergyConsumption();
+                break;
+            case FLUID_TIER_4:
+                energyCapacity = ServerConfig.getFluidTier4EnergyCapacity();
+                energyConsumption = ServerConfig.getFluidTier4EnergyConsumption();
+                break;
+            case FLUID_TIER_5:
+                energyCapacity = ServerConfig.getFluidTier5EnergyCapacity();
+                energyConsumption = ServerConfig.getFluidTier5EnergyConsumption();
+                break;
+        }
+    }
+
+    /**
+     * 能量处理器接口实现
+     * <p>
+     * 此接口用于处理能量的输入输出操作，实现了 NeoForge 的能量自动化交互。
+     * </p>
+     */
+    private final IEnergyStorage energyHandler = new IEnergyStorage() {
+        @Override
+        public int receiveEnergy(int maxReceive, boolean simulate) {
+            if (!canReceive()) {
+                return 0;
+            }
+            int canReceive = Math.min(maxReceive, energyCapacity - energyStored);
+            if (!simulate) {
+                energyStored += canReceive;
+                markUpdated();
+            }
+            return canReceive;
+        }
+
+        @Override
+        public int extractEnergy(int maxExtract, boolean simulate) {
+            if (!canExtract()) {
+                return 0;
+            }
+            int canExtract = Math.min(maxExtract, energyStored);
+            if (!simulate) {
+                energyStored -= canExtract;
+                markUpdated();
+            }
+            return canExtract;
+        }
+
+        @Override
+        public int getEnergyStored() {
+            return energyStored;
+        }
+
+        @Override
+        public int getMaxEnergyStored() {
+            return energyCapacity;
+        }
+
+        @Override
+        public boolean canExtract() {
+            return false;
+        }
+
+        @Override
+        public boolean canReceive() {
+            return true;
+        }
+    };
 
     public FluidReplicatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.FLUID_REPLICATOR.get(), pos, state);
@@ -256,6 +344,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         // 保存刻计数器和机器等级
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
+        tag.putInt("energyStored", energyStored);
 
         // 创建流体罐数据标签并保存输入和输出罐的流体
         CompoundTag tanksTag = new CompoundTag();
@@ -283,14 +372,14 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        // 读取刻计数器
         tickCounter = tag.getInt("tickCounter");
-        // 读取机器等级（如果存在）
         if (tag.contains("tier")) {
             this.tier = FluidReplicatorTier.fromId(tag.getInt("tier"));
         }
+        if (tag.contains("energyStored")) {
+            this.energyStored = tag.getInt("energyStored");
+        }
 
-        // 从 "tanks" 嵌套标签中读取流体罐数据
         CompoundTag tanksTag = tag.getCompound("tanks");
         if (tanksTag.contains("inputTank")) {
             inputTank.readFromNBT(registries, tanksTag.getCompound("inputTank"));
@@ -302,6 +391,8 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         } else {
             outputTank.setFluid(FluidStack.EMPTY);
         }
+
+        updateEnergyStats();
     }
 
     /**
@@ -336,6 +427,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         CompoundTag tag = new CompoundTag();
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
+        tag.putInt("energyStored", energyStored);
 
         CompoundTag tanksTag = new CompoundTag();
         if (!inputTank.isEmpty()) {
@@ -351,6 +443,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
     public void setTier(int tierId) {
         this.tier = FluidReplicatorTier.fromId(tierId);
+        updateEnergyStats();
     }
 
     /**
@@ -373,113 +466,160 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
      * @param blockEntity 流体复制机方块实体实例
      */
     public static void serverTick(Level level, BlockPos pos, BlockState state, FluidReplicatorBlockEntity blockEntity) {
+        // 累加刻计数器，用于控制复制速度
         blockEntity.tickCounter++;
 
+        // 获取输入罐中的流体
         FluidStack inputFluid = blockEntity.inputTank.getFluid();
+
+        // 如果输入罐不为空（有流体）
         if (!inputFluid.isEmpty()) {
+            // 检查当前等级的复制机是否能复制这种流体
+            // 如果不能复制，直接返回停止后续处理
             if (!blockEntity.tier.canReplicateFluid(inputFluid)) {
                 return;
             }
 
+            // 获取实际处理速度（不同流体可能有不同的速度倍率）
             int actualSpeed = blockEntity.tier.getActualProcessSpeed(inputFluid);
 
+            // 当刻计数器达到处理速度时，执行复制操作
             if (blockEntity.tickCounter >= actualSpeed) {
-                blockEntity.tickCounter = 0;
+                // 获取实际产出数量（不同流体可能有不同的产量倍率）
                 int actualOutput = blockEntity.tier.getActualOutputAmount(inputFluid);
 
-                // 检查是否启用了自动输出功能
+                // ========== 计算能量需求 ==========
+                // 每 1000mB 流体消耗的能量值（从 config 读取）
+                int energyPer1000MB = blockEntity.energyConsumption;
+                // 根据产出量计算总能量需求：产出量 × 每 1000mB 能耗 ÷ 1000
+                int energyNeeded = (actualOutput * energyPer1000MB) / 1000;
+                // 如果计算结果小于 1 但产出量大于 0，则至少消耗 1 FE（避免零消耗）
+                if (energyNeeded < 1 && actualOutput > 0) {
+                    energyNeeded = 1;
+                }
+
+                // 检查存储的能量是否足够
+                // 如果能量不足，直接返回，不进行复制
+                if (blockEntity.energyStored < energyNeeded) {
+                    return;
+                }
+
+                // ========== 自动输出逻辑 ==========
+                // 检查配置中是否启用了自动输出功能
                 boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
 
+                // 剩余待输出的流体数量（初始等于总产出量）
                 int remainingOutput = actualOutput;
+                // 标记是否有过更新操作
                 boolean hasUpdated = false;
+                // 记录总共输出了多少流体
+                int totalOutput = 0;
 
-                // 如果启用了自动输出，尝试向周围六个方向输出流体
+                // 如果启用了自动输出
                 if (autoOutputEnabled) {
+                    // 获取所有六个方向（上、下、东、西、南、北）
                     Direction[] directions = Direction.values();
 
+                    // 遍历每个方向
                     for (Direction dir : directions) {
+                        // 如果已经不需要再输出了，提前结束循环
                         if (remainingOutput <= 0) break;
 
+                        // 获取相邻方块的坐标
                         BlockPos neighborPos = pos.relative(dir);
-
+                        // 获取相邻方块的方块状态
                         BlockState neighborState = level.getBlockState(neighborPos);
-                        // 跳过其他流体复制机，避免循环输出
+
+                        // 如果相邻方块也是流体复制机，跳过（避免互相输入）
                         if (neighborState.getBlock() instanceof FluidReplicatorBlock) {
                             continue;
                         }
 
+                        // 获取相邻方块的流体处理能力（从相反方向访问）
+                        // 例如：从上方查询时，使用下方来访问邻居的能力
                         IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, neighborPos, dir.getOpposite());
 
+                        // 如果邻居有流体处理能力
                         if (handler != null) {
+                            // 创建要输出的流体堆
                             FluidStack outputStack = new FluidStack(inputFluid.getFluid(), remainingOutput);
+                            // 尝试向邻居注入流体，获取实际注入的量
                             int filled = handler.fill(outputStack, IFluidHandler.FluidAction.EXECUTE);
 
+                            // 如果成功注入了流体
                             if (filled > 0) {
+                                // 累加到总输出量
+                                totalOutput += filled;
+                                // 减少剩余待输出量
                                 remainingOutput -= filled;
+                                // 标记已更新
                                 hasUpdated = true;
+
+                                // 主动输出只输出一个面（找到第一个能接受的邻居就停止）
+                                break;
                             }
                         }
                     }
                 }
 
-                // 如果还有剩余的输出量，存入输出罐
+                // ========== 将剩余流体存入输出罐 ==========
+                // 如果还有剩余流体没有输出出去
                 if (remainingOutput > 0) {
+                    // 获取输出罐当前的流体
                     FluidStack currentOutput = blockEntity.outputTank.getFluid();
 
+                    // 如果输出罐是空的
                     if (currentOutput.isEmpty()) {
-                        // 输出罐为空，创建新的流体堆
+                        // 创建新的流体堆放入输出罐
                         FluidStack newOutput = new FluidStack(inputFluid.getFluid(), remainingOutput);
                         blockEntity.outputTank.setFluid(newOutput);
+                        // 累加到总输出量
+                        totalOutput += remainingOutput;
+                        // 标记已更新
                         hasUpdated = true;
-                    } else if (currentOutput.getFluidHolder().equals(inputFluid.getFluidHolder())) {
-                        // 输出罐不为空且流体种类相同，累加数量
+                    }
+                    // 如果输出罐中的流体与当前产出的流体类型相同
+                    else if (currentOutput.getFluidHolder().equals(inputFluid.getFluidHolder())) {
+                        // 计算输出罐的剩余空间
                         int spaceAvailable = blockEntity.outputTank.getCapacity() - currentOutput.getAmount();
+                        // 计算实际能加入的量（取剩余空间和剩余产出量的较小值）
                         int toAdd = Math.min(spaceAvailable, remainingOutput);
 
+                        // 如果有空间可以加入
                         if (toAdd > 0) {
+                            // 增加输出罐中的流体数量
                             currentOutput.grow(toAdd);
+                            // 累加到总输出量
+                            totalOutput += toAdd;
+                            // 标记已更新
                             hasUpdated = true;
                         }
                     }
                 }
 
-                // 如果有更新，标记方块并同步到客户端
-                if (hasUpdated) {
-                    blockEntity.markUpdated();
+                // ========== 消耗能量并重置计数器 ==========
+                // 如果有更新且总输出量大于 0
+                if (hasUpdated && totalOutput > 0) {
+                    // 计算实际消耗的能量（基于实际输出的总量）
+                    int actualEnergyNeeded = (totalOutput * energyPer1000MB) / 1000;
+                    // 确保至少消耗 1 FE
+                    if (actualEnergyNeeded < 1) {
+                        actualEnergyNeeded = 1;
+                    }
+
+                    // 再次检查能量是否足够
+                    if (blockEntity.energyStored >= actualEnergyNeeded) {
+                        // 扣除能量
+                        blockEntity.energyStored -= actualEnergyNeeded;
+                        // 重置刻计数器
+                        blockEntity.tickCounter = 0;
+                        // 标记方块为已更新状态，同步到客户端
+                        blockEntity.markUpdated();
+                    }
                 }
             }
         }
     }
-
-//    public boolean addFluid(FluidStack stack) {
-//        if (inputTank.isEmpty()) {
-//            inputTank.fill(stack, IFluidHandler.FluidAction.EXECUTE);
-//            markUpdated();
-//            return true;
-//        } else if (inputTank.getFluid().getFluidHolder().equals(stack.getFluidHolder())) {
-//            int canAdd = inputTank.getCapacity() - inputTank.getFluidAmount();
-//            if (canAdd > 0) {
-//                int added = inputTank.fill(new FluidStack(stack.getFluid(), Math.min(canAdd, stack.getAmount())), IFluidHandler.FluidAction.EXECUTE);
-//                markUpdated();
-//                return added > 0;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    public FluidStack extractFluid(int amount) {
-//        if (!inputTank.isEmpty()) {
-//            FluidStack extracted = inputTank.drain(amount, IFluidHandler.FluidAction.EXECUTE);
-//            markUpdated();
-//            return extracted;
-//        }
-//        return FluidStack.EMPTY;
-//    }
-//
-//    public void clearInputFluid() {
-//        inputTank.setFluid(FluidStack.EMPTY);
-//        markUpdated();
-//    }
 
     /**
      * 清空所有流体
@@ -569,5 +709,38 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     @Nullable
     public IFluidHandler getFluidHandler(@Nullable Direction side) {
         return fluidHandler;
+    }
+
+
+    /**
+     * 获取能量处理器接口
+     * <p>
+     * 此方法用于获取能量处理器接口，通常在能量自动化交互时调用。
+     * </p>
+     *
+     * @param side 方块的朝向，如果为 null 则返回默认的能量处理器接口
+     * @return IEnergyStorage 能量处理器接口的实现
+     */
+    @Nullable
+    public IEnergyStorage getEnergyHandler(@Nullable Direction side) {
+        return energyHandler;
+    }
+
+    /**
+     * 获取当前存储的能量
+     *
+     * @return int 当前存储的能量值（FE）
+     */
+    public int getEnergyStored() {
+        return energyStored;
+    }
+
+    /**
+     * 获取最大能量存储
+     *
+     * @return int 最大能量存储（FE）
+     */
+    public int getMaxEnergyStored() {
+        return energyCapacity;
     }
 }
