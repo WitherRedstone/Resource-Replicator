@@ -131,7 +131,7 @@ Place the items (or fluids, chemicals) to be duplicated into the block. As long 
 
 ## 3.化学品复制机（Mekanism 联动）
 
-**功能**：复制任意还化学品（可通过黑白名单配置限制）  
+**功能**：复制任意化学品（可通过黑白名单配置限制）  
 **等级**：T1 - T5
 
 | 等级 | 每次产出    | 耗时      |

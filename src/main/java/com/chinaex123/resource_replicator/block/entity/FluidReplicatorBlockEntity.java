@@ -25,11 +25,6 @@ import javax.annotation.Nonnull;
 
 public class FluidReplicatorBlockEntity extends BlockEntity {
     private static final int INPUT_TANK_CAPACITY = 1000;
-    private static final int OUTPUT_TANK_CAPACITY;
-
-    static {
-        OUTPUT_TANK_CAPACITY = ServerConfig.getFluidReplicatorOutputTankSize();
-    }
 
     /**
      * 输入流体储罐
@@ -70,11 +65,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     /**
      * 输出流体储罐
      * <p>
-     * 此储罐用于存储复制完成的产物流体，容量由 OUTPUT_TANK_CAPACITY 定义。
+     * 此储罐用于存储复制完成的产物流体，容量由当前等级的配置决定。
      * 当罐内流体发生变化时会自动标记方块为已更新状态以同步到客户端。
      * </p>
      */
-    private final FluidTank outputTank = new FluidTank(OUTPUT_TANK_CAPACITY) {
+    private final FluidTank outputTank = new FluidTank(ServerConfig.getFluidTier5OutputTankCapacity()) {
 
         // 当流体被加入或取出时自动调用，用于触发方块数据同步。
         @Override
@@ -126,7 +121,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
          */
         @Override
         public int getTankCapacity(int tank) {
-            return tank == 0 ? INPUT_TANK_CAPACITY : OUTPUT_TANK_CAPACITY;
+            return tank == 0 ? INPUT_TANK_CAPACITY : currentOutputTankCapacity;
         }
 
         /**
@@ -238,9 +233,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     private int energyStored;
     private int energyCapacity;
     private int energyConsumption;
+    private int currentOutputTankCapacity;
 
     {
         updateEnergyStats();
+        updateOutputTankCapacity();
         energyStored = 0;
     }
 
@@ -267,6 +264,16 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 energyConsumption = ServerConfig.getFluidTier5EnergyConsumption();
                 break;
         }
+    }
+
+    private void updateOutputTankCapacity() {
+        this.currentOutputTankCapacity = switch (tier) {
+            case FLUID_TIER_1 -> ServerConfig.getFluidTier1OutputTankCapacity();
+            case FLUID_TIER_2 -> ServerConfig.getFluidTier2OutputTankCapacity();
+            case FLUID_TIER_3 -> ServerConfig.getFluidTier3OutputTankCapacity();
+            case FLUID_TIER_4 -> ServerConfig.getFluidTier4OutputTankCapacity();
+            case FLUID_TIER_5 -> ServerConfig.getFluidTier5OutputTankCapacity();
+        };
     }
 
     /**
@@ -393,6 +400,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
 
         updateEnergyStats();
+        updateOutputTankCapacity();
     }
 
     /**
@@ -444,6 +452,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     public void setTier(int tierId) {
         this.tier = FluidReplicatorTier.fromId(tierId);
         updateEnergyStats();
+        updateOutputTankCapacity();
     }
 
     /**

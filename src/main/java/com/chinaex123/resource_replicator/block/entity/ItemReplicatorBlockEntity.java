@@ -27,11 +27,8 @@ import java.util.Arrays;
 public class ItemReplicatorBlockEntity extends BlockEntity {
     private static final int INPUT_SLOT = 0;
     private static final int OUTPUT_SLOT_START = 1;
-    private static final int TOTAL_SLOTS;
-
-    static {
-        TOTAL_SLOTS = 1 + ServerConfig.getItemReplicatorOutputSlots();
-    }
+    private static final int MAX_OUTPUT_SLOTS = 9;
+    private static final int TOTAL_SLOTS = 1 + MAX_OUTPUT_SLOTS;
 
     public final ItemStack[] items = new ItemStack[TOTAL_SLOTS];
     private int tickCounter = 0;
@@ -39,10 +36,12 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     private int energyStored;
     private int energyCapacity;
     private int energyConsumption;
+    private int currentOutputSlots;
 
     {
         updateEnergyStats();
         energyStored = 0;
+        updateOutputSlots();
     }
 
     private void updateEnergyStats() {
@@ -68,6 +67,16 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 energyConsumption = ServerConfig.getItemTier5EnergyConsumption();
                 break;
         }
+    }
+
+    private void updateOutputSlots() {
+        this.currentOutputSlots = switch (tier) {
+            case ITEM_TIER_1 -> ServerConfig.getItemTier1OutputSlots();
+            case ITEM_TIER_2 -> ServerConfig.getItemTier2OutputSlots();
+            case ITEM_TIER_3 -> ServerConfig.getItemTier3OutputSlots();
+            case ITEM_TIER_4 -> ServerConfig.getItemTier4OutputSlots();
+            case ITEM_TIER_5 -> ServerConfig.getItemTier5OutputSlots();
+        };
     }
 
     /**
@@ -368,6 +377,10 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         if (tag.contains("energyStored")) {
             this.energyStored = tag.getInt("energyStored");
         }
+        
+        // 加载等级后更新能量和输出槽配置
+        updateEnergyStats();
+        updateOutputSlots();
 
         // 遍历所有槽位并加载非空物品
         CompoundTag itemsTag = tag.getCompound("items");
@@ -436,6 +449,16 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     public void setTier(int tierId) {
         this.tier = ItemReplicatorTier.fromId(tierId);
         updateEnergyStats();
+        updateOutputSlots();
+    }
+
+    /**
+     * 获取当前等级的输出槽数量
+     * 
+     * @return int 当前等级的输出槽数量
+     */
+    public int getCurrentOutputSlots() {
+        return currentOutputSlots;
     }
 
     /**
@@ -537,9 +560,9 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 // ========== 将剩余物品存入输出槽 ==========
                 // 如果还有剩余物品没有输出出去
                 if (remainingOutput > 0) {
-                    // 遍历所有输出槽（从 OUTPUT_SLOT_START 开始到 TOTAL_SLOTS）
+                    // 遍历所有输出槽（从 OUTPUT_SLOT_START 开始，根据当前等级的输出槽数量确定结束位置）
                     // 条件是还有剩余物品且槽位未遍历完
-                    for (int slot = OUTPUT_SLOT_START; slot < TOTAL_SLOTS && remainingOutput > 0; slot++) {
+                    for (int slot = OUTPUT_SLOT_START; slot < OUTPUT_SLOT_START + blockEntity.currentOutputSlots && remainingOutput > 0; slot++) {
                         // 获取当前输出槽的物品
                         ItemStack currentOutput = blockEntity.items[slot];
 

@@ -27,11 +27,6 @@ import java.util.Optional;
  */
 public class ChemicalReplicatorBlockEntity extends BlockEntity {
     static final int INPUT_TANK_CAPACITY = 1000;
-    static final int OUTPUT_TANK_CAPACITY;
-
-    static {
-        OUTPUT_TANK_CAPACITY = ServerConfig.getChemicalReplicatorOutputTankSize();
-    }
 
     // 化学品储罐
     ChemicalStack inputChemical = ChemicalStack.EMPTY;
@@ -42,9 +37,11 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
     private int energyStored;
     private int energyCapacity;
     private int energyConsumption;
+    private int currentOutputTankCapacity;
 
     {
         updateEnergyStats();
+        updateOutputTankCapacity();
         energyStored = 0;
     }
 
@@ -71,6 +68,17 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
                 energyConsumption = ServerConfig.getChemicalTier5EnergyConsumption();
                 break;
         }
+    }
+
+    private void updateOutputTankCapacity() {
+        this.currentOutputTankCapacity = switch (tier) {
+            case 1 -> ServerConfig.getChemicalTier1OutputTankCapacity();
+            case 2 -> ServerConfig.getChemicalTier2OutputTankCapacity();
+            case 3 -> ServerConfig.getChemicalTier3OutputTankCapacity();
+            case 4 -> ServerConfig.getChemicalTier4OutputTankCapacity();
+            case 5 -> ServerConfig.getChemicalTier5OutputTankCapacity();
+            default -> ServerConfig.getChemicalTier1OutputTankCapacity();
+        };
     }
 
     /**
@@ -194,6 +202,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
         }
 
         updateEnergyStats();
+        updateOutputTankCapacity();
     }
 
     /**
@@ -225,6 +234,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
         }
 
         updateEnergyStats();
+        updateOutputTankCapacity();
     }
 
     /**
@@ -275,10 +285,20 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
     public void setTier(int tierId) {
         this.tier = tierId;
         updateEnergyStats();
+        updateOutputTankCapacity();
     }
 
     public int getTier() {
         return tier;
+    }
+
+    /**
+     * 获取当前等级的输出罐容量
+     * 
+     * @return int 当前等级的输出罐容量（单位：mB）
+     */
+    public int getCurrentOutputTankCapacity() {
+        return currentOutputTankCapacity;
     }
 
     /**
@@ -332,7 +352,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
                         return;
                     }
                     // 计算输出罐剩余空间
-                    long spaceInOutput = OUTPUT_TANK_CAPACITY - outputChemical.getAmount();
+                    long spaceInOutput = currentOutputTankCapacity - outputChemical.getAmount();
                     // 如果剩余空间不足，等待下次处理
                     if (spaceInOutput < actualOutput) {
                         return;

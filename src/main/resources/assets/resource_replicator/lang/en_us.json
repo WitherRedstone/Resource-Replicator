@@ -41,7 +41,7 @@
   "tooltip.fluid_replicator.speed": "Speed: %s tick/op",
   "tooltip.fluid_replicator.mb_per_second": "Output rate: %s mB/s",
   "tooltip.fluid_replicator.tank_capacity": "Output Ouffer: %s mB",
-  "tooltip.fluid_replicator.energy_consumption": "Energy Consumption: %s FE/1000mB",
+  "tooltip.fluid_replicator.energy_consumption": "Energy Consumption: %s FE/times",
 
   "_comment.tooltip_chemical": "Chemical Tooltip",
   "message.chemical_replicator.empty": "§dIt is empty inside.",
@@ -54,5 +54,5 @@
   "tooltip.chemical_replicator.speed": "Speed: %s tick/op",
   "tooltip.chemical_replicator.chemical_per_second": "Output rate: %s mB/s",
   "tooltip.chemical_replicator.chemical_output_capacity": "Output Ouffer: %s mB",
-  "tooltip.chemical_replicator.energy_consumption": "Energy Consumption: %s FE/1000mB"
+  "tooltip.chemical_replicator.energy_consumption": "Energy Consumption: %s FE/times"
 }

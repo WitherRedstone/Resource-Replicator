@@ -76,6 +76,7 @@ public class ModTooltips {
         int outputAmount = getItemTierOutputAmount(tier);
         int outputTime = getItemTierOutputTime(tier);
         int energyConsumption = getItemTierEnergyConsumption(tier);
+        int outputSlots = getItemTierOutputSlots(tier);
         double ticksPerSecond = 20.0 / outputTime;
         double itemsPerSecond = outputAmount * ticksPerSecond;
 
@@ -96,7 +97,7 @@ public class ModTooltips {
 
         // 显示输出槽数量
         toolTip.add(Component.translatable("tooltip.item_replicator.output_slots",
-                        Component.literal(String.valueOf(ServerConfig.getItemReplicatorOutputSlots())).withStyle(ChatFormatting.LIGHT_PURPLE))
+                        Component.literal(String.valueOf(outputSlots)).withStyle(ChatFormatting.LIGHT_PURPLE))
                 .withStyle(ChatFormatting.GRAY));
 
         // 显示能量消耗
@@ -114,9 +115,9 @@ public class ModTooltips {
         int outputAmount = getFluidTierOutputAmount(tier);
         int outputTime = getFluidTierOutputTime(tier);
         int energyConsumption = getFluidTierEnergyConsumption(tier);
+        int tankCapacity = getFluidTierOutputTankCapacity(tier);
         double ticksPerSecond = 20.0 / outputTime;
         double mbPerSecond = outputAmount * ticksPerSecond;
-        int tankCapacity = ServerConfig.getFluidReplicatorOutputTankSize();
 
         // 显示每次操作的输出数量（普通流体）
         toolTip.add(Component.translatable("tooltip.fluid_replicator.fluid_output_amount",
@@ -173,6 +174,17 @@ public class ModTooltips {
         };
     }
 
+    private static int getItemTierOutputSlots(int tier) {
+        return switch (tier) {
+            case 1 -> ServerConfig.getItemTier1OutputSlots();
+            case 2 -> ServerConfig.getItemTier2OutputSlots();
+            case 3 -> ServerConfig.getItemTier3OutputSlots();
+            case 4 -> ServerConfig.getItemTier4OutputSlots();
+            case 5 -> ServerConfig.getItemTier5OutputSlots();
+            default -> 1;
+        };
+    }
+
     private static int getItemTierOutputTime(int tier) {
         return switch (tier) {
             case 1 -> ServerConfig.getItemTier1OutputTime();
@@ -203,6 +215,17 @@ public class ModTooltips {
             case 4 -> ServerConfig.getFluidTier4OutputAmount();
             case 5 -> ServerConfig.getFluidTier5OutputAmount();
             default -> 1000;
+        };
+    }
+
+    private static int getFluidTierOutputTankCapacity(int tier) {
+        return switch (tier) {
+            case 1 -> ServerConfig.getFluidTier1OutputTankCapacity();
+            case 2 -> ServerConfig.getFluidTier2OutputTankCapacity();
+            case 3 -> ServerConfig.getFluidTier3OutputTankCapacity();
+            case 4 -> ServerConfig.getFluidTier4OutputTankCapacity();
+            case 5 -> ServerConfig.getFluidTier5OutputTankCapacity();
+            default -> 4000;
         };
     }
 
@@ -257,9 +280,9 @@ public class ModTooltips {
         int outputAmount = getChemicalTierOutputAmount(tier);
         int outputTime = getChemicalTierOutputTime(tier);
         int energyConsumption = getChemicalTierEnergyConsumption(tier);
+        int outputTankCapacity = getChemicalTierOutputTankCapacity(tier);
         double ticksPerSecond = 20.0 / outputTime;
         double mbPerSecond = outputAmount * ticksPerSecond;
-        int outputTankCapacity = ServerConfig.getChemicalReplicatorOutputTankSize();
 
         // 显示每次操作的输出数量
         toolTip.add(Component.translatable("tooltip.chemical_replicator.chemical_output_amount",
@@ -297,6 +320,17 @@ public class ModTooltips {
             case 4 -> ServerConfig.getChemicalTier4OutputAmount();
             case 5 -> ServerConfig.getChemicalTier5OutputAmount();
             default -> 1000;
+        };
+    }
+
+    private static int getChemicalTierOutputTankCapacity(int tier) {
+        return switch (tier) {
+            case 1 -> ServerConfig.getChemicalTier1OutputTankCapacity();
+            case 2 -> ServerConfig.getChemicalTier2OutputTankCapacity();
+            case 3 -> ServerConfig.getChemicalTier3OutputTankCapacity();
+            case 4 -> ServerConfig.getChemicalTier4OutputTankCapacity();
+            case 5 -> ServerConfig.getChemicalTier5OutputTankCapacity();
+            default -> 4000;
         };
     }
 

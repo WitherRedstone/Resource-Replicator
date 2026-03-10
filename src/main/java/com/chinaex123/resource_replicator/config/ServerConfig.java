@@ -9,7 +9,6 @@ public class ServerConfig {
     public static final ModConfigSpec CONFIG_SPEC;
 
     // ======================= 物品复制机配置 =======================
-    private static final ModConfigSpec.IntValue ITEM_REPLICATOR_OUTPUT_SLOTS;
     private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_ENABLE_DESTROY;
     private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_AUTO_OUTPUT;
 
@@ -18,15 +17,20 @@ public class ServerConfig {
     private static final ModConfigSpec.ConfigValue<List<?>> BLACKLIST_ITEMS;
     private static final ModConfigSpec.ConfigValue<List<?>> WHITELIST_ITEMS;
 
-    // T1-T5 物品复制机配置
+    // T1-T5 物品复制机配置 - 输出槽、输出数量、输出时间
+    private static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_SLOTS;
     private static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_SLOTS;
     private static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_SLOTS;
     private static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_SLOTS;
     private static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_SLOTS;
     private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_TIME;
 
@@ -42,8 +46,8 @@ public class ServerConfig {
     private static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CAPACITY;
     private static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CONSUMPTION;
 
+
     // ======================= 流体复制机配置 =======================
-    private static final ModConfigSpec.IntValue FLUID_REPLICATOR_OUTPUT_TANK_SIZE;
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_ENABLE_DESTROY;
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_AUTO_OUTPUT;
 
@@ -52,23 +56,28 @@ public class ServerConfig {
     private static final ModConfigSpec.ConfigValue<List<?>> FLUID_BLACKLIST_ITEMS;
     private static final ModConfigSpec.ConfigValue<List<?>> FLUID_WHITELIST_ITEMS;
 
-    // T1-T5 流体复制机配置
+    // T1-T5 流体复制机配置 - 输出槽、输出数量、输出时间
+    private static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER1_WATER_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER1_LAVA_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER2_WATER_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER2_LAVA_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER3_WATER_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER3_LAVA_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER4_WATER_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER4_LAVA_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER5_WATER_AMOUNT;
     private static final ModConfigSpec.IntValue FLUID_TIER5_LAVA_AMOUNT;
@@ -88,21 +97,25 @@ public class ServerConfig {
 
 
     // ==================== 化学品复制机参数（Mekanism 联动） ====================
-    private static final ModConfigSpec.IntValue CHEMICAL_REPLICATOR_OUTPUT_TANK_SIZE;
     private static final ModConfigSpec.BooleanValue CHEMICAL_REPLICATOR_ENABLE_DESTROY;
     private static final ModConfigSpec.BooleanValue CHEMICAL_BLACKLIST_MODE;
     private static final ModConfigSpec.ConfigValue<List<?>> CHEMICAL_BLACKLIST_ITEMS;
     private static final ModConfigSpec.ConfigValue<List<?>> CHEMICAL_WHITELIST_ITEMS;
 
-    // T1-T5 化学品复制机配置
+    // T1-T5 化学品复制机配置 - 输出罐容量、输出数量、输出时间
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_1_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_1_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_1_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_2_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_3_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_4_OUTPUT_TIME;
+    private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_OUTPUT_TANK_CAPACITY;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_OUTPUT_AMOUNT;
     private static final ModConfigSpec.IntValue CHEMICAL_TIER_5_OUTPUT_TIME;
 
@@ -121,12 +134,6 @@ public class ServerConfig {
 
     static {
         BUILDER.push("物品复制机设置");
-        
-        BUILDER.push("输出槽设置");
-        ITEM_REPLICATOR_OUTPUT_SLOTS = BUILDER
-                .comment("物品复制机的输出槽数量（默认：1）")
-                .defineInRange("outputSlots", 1, 1, 9);
-        BUILDER.pop();
 
         BUILDER.push("销毁功能设置");
         ITEM_REPLICATOR_ENABLE_DESTROY = BUILDER
@@ -159,11 +166,14 @@ public class ServerConfig {
                         示例：["minecraft:cobblestone", "minecraft:sand", "#minecraft:planks"]""")
                 .defineList("whitelistItems", List::of, obj -> obj instanceof String);
         BUILDER.pop();
-        
+
 
         BUILDER.push("等级设置");
 
         BUILDER.push("Tier 1");
+        ITEM_TIER1_OUTPUT_SLOTS = BUILDER
+                .comment("等级 1 的输出槽数量（默认：1）")
+                .defineInRange("outputSlots", 1, 1, 9);
         ITEM_TIER1_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 1 每次操作产生的物品数量 (默认:4)")
                 .defineInRange("outputAmount", 4, 1, Integer.MAX_VALUE);
@@ -179,6 +189,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 2");
+        ITEM_TIER2_OUTPUT_SLOTS = BUILDER
+                .comment("等级 2 的输出槽数量（默认：2）")
+                .defineInRange("outputSlots", 2, 1, 9);
         ITEM_TIER2_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 2 每次操作产生的物品数量 (默认:16)")
                 .defineInRange("outputAmount", 16, 1, Integer.MAX_VALUE);
@@ -194,6 +207,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 3");
+        ITEM_TIER3_OUTPUT_SLOTS = BUILDER
+                .comment("等级 3 的输出槽数量（默认：3）")
+                .defineInRange("outputSlots", 3, 1, 9);
         ITEM_TIER3_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 3 每次操作产生的物品数量 (默认:32)")
                 .defineInRange("outputAmount", 32, 1, Integer.MAX_VALUE);
@@ -209,6 +225,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 4");
+        ITEM_TIER4_OUTPUT_SLOTS = BUILDER
+                .comment("等级 4 的输出槽数量（默认：5）")
+                .defineInRange("outputSlots", 5, 1, 9);
         ITEM_TIER4_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 4 每次操作产生的物品数量 (默认:64)")
                 .defineInRange("outputAmount", 64, 1, Integer.MAX_VALUE);
@@ -224,6 +243,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 5");
+        ITEM_TIER5_OUTPUT_SLOTS = BUILDER
+                .comment("等级 5 的输出槽数量（默认：9）")
+                .defineInRange("outputSlots", 9, 1, 9);
         ITEM_TIER5_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 5 每次操作产生的物品数量 (默认:128)")
                 .defineInRange("outputAmount", 128, 1, Integer.MAX_VALUE);
@@ -243,12 +265,6 @@ public class ServerConfig {
 
 
         BUILDER.push("流体复制机设置");
-
-        BUILDER.push("输出罐设置");
-        FLUID_REPLICATOR_OUTPUT_TANK_SIZE = BUILDER
-                .comment("流体复制机输出罐的容量 (单位:mB，默认:8000)")
-                .defineInRange("outputTankSize", 8000, 1000, Integer.MAX_VALUE);
-        BUILDER.pop();
 
         BUILDER.push("销毁功能设置");
         FLUID_REPLICATOR_ENABLE_DESTROY = BUILDER
@@ -285,6 +301,9 @@ public class ServerConfig {
         BUILDER.push("等级设置");
 
         BUILDER.push("Tier 1");
+        FLUID_TIER1_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 1 的输出罐容量 (单位:mB，默认:8000)")
+                .defineInRange("outputTankCapacity", 8000, 1000, Integer.MAX_VALUE);
         FLUID_TIER1_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 1 每次操作产生的流体数量 (单位:mB，默认:1000)")
                 .defineInRange("outputAmount", 1000, 1, Integer.MAX_VALUE);
@@ -306,8 +325,11 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 2");
+        FLUID_TIER2_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 2 的输出罐容量 (单位:mB，默认:10000)")
+                .defineInRange("outputTankCapacity", 10000, 1000, Integer.MAX_VALUE);
         FLUID_TIER2_OUTPUT_AMOUNT = BUILDER
-                .comment("等级 2 每次操作产生的流体数量 (单位:mB，默认:25500)")
+                .comment("等级 2 每次操作产生的流体数量 (单位:mB，默认:2500)")
                 .defineInRange("outputAmount", 2500, 1, Integer.MAX_VALUE);
         FLUID_TIER2_OUTPUT_TIME = BUILDER
                 .comment("等级 2 每次操作所需的 tick(默认:15)")
@@ -327,6 +349,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 3");
+        FLUID_TIER3_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 3 的输出罐容量 (单位:mB，默认:30000)")
+                .defineInRange("outputTankCapacity", 30000, 1000, Integer.MAX_VALUE);
         FLUID_TIER3_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 3 每次操作产生的流体数量 (单位:mB，默认:5000)")
                 .defineInRange("outputAmount", 5000, 1, Integer.MAX_VALUE);
@@ -348,6 +373,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 4");
+        FLUID_TIER4_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 4 的输出罐容量 (单位:mB，默认:100000)")
+                .defineInRange("outputTankCapacity", 100000, 1000, Integer.MAX_VALUE);
         FLUID_TIER4_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 4 每次操作产生的流体数量 (单位:mB，默认:10000)")
                 .defineInRange("outputAmount", 10000, 1, Integer.MAX_VALUE);
@@ -369,6 +397,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 5");
+        FLUID_TIER5_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 5 的输出罐容量 (单位:mB，默认:500000)")
+                .defineInRange("outputTankCapacity", 500000, 1000, Integer.MAX_VALUE);
         FLUID_TIER5_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 5 每次操作产生的流体数量 (单位:mB，默认:25000)")
                 .defineInRange("outputAmount", 25000, 1, Integer.MAX_VALUE);
@@ -395,12 +426,6 @@ public class ServerConfig {
 
         // 化学品复制机配置（Mekanism 联动）
         BUILDER.push("化学品复制机设置（Mekanism 联动）");
-
-        BUILDER.push("输出罐容量设置");
-        CHEMICAL_REPLICATOR_OUTPUT_TANK_SIZE = BUILDER
-                .comment("化学品复制机输出罐容量（单位：毫桶，默认：8000）")
-                .defineInRange("outputTankCapacity", 8000, 1, Integer.MAX_VALUE);
-        BUILDER.pop();
 
         BUILDER.push("销毁功能设置");
         CHEMICAL_REPLICATOR_ENABLE_DESTROY = BUILDER
@@ -431,6 +456,9 @@ public class ServerConfig {
         BUILDER.push("等级设置");
 
         BUILDER.push("Tier 1");
+        CHEMICAL_TIER_1_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 1 的输出罐容量 (单位:mB，默认:4000)")
+                .defineInRange("outputTankCapacity", 4000, 1000, Integer.MAX_VALUE);
         CHEMICAL_TIER_1_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 1 每次操作产生的化学品的量（单位：mB，默认：10）")
                 .defineInRange("outputAmount", 10, 1, Integer.MAX_VALUE);
@@ -446,6 +474,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 2");
+        CHEMICAL_TIER_2_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 2 的输出罐容量 (单位:mB，默认:10000)")
+                .defineInRange("outputTankCapacity", 10000, 1000, Integer.MAX_VALUE);
         CHEMICAL_TIER_2_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 2 每次操作产生的化学品的量（单位：mB，默认：50）")
                 .defineInRange("outputAmount", 50, 1, Integer.MAX_VALUE);
@@ -461,6 +492,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 3");
+        CHEMICAL_TIER_3_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 3 的输出罐容量 (单位:mB，默认:25000)")
+                .defineInRange("outputTankCapacity", 25000, 1000, Integer.MAX_VALUE);
         CHEMICAL_TIER_3_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 3 每次操作产生的化学品的量（单位：mB，默认：100）")
                 .defineInRange("outputAmount", 100, 1, Integer.MAX_VALUE);
@@ -476,6 +510,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 4");
+        CHEMICAL_TIER_4_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 4 的输出罐容量 (单位:mB，默认:50000)")
+                .defineInRange("outputTankCapacity", 50000, 1000, Integer.MAX_VALUE);
         CHEMICAL_TIER_4_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 4 每次操作产生的化学品的量（单位：mB，默认：500）")
                 .defineInRange("outputAmount", 500, 1, Integer.MAX_VALUE);
@@ -491,6 +528,9 @@ public class ServerConfig {
         BUILDER.pop();
 
         BUILDER.push("Tier 5");
+        CHEMICAL_TIER_5_OUTPUT_TANK_CAPACITY = BUILDER
+                .comment("等级 5 的输出罐容量 (单位:mB，默认:100000)")
+                .defineInRange("outputTankCapacity", 100000, 1000, Integer.MAX_VALUE);
         CHEMICAL_TIER_5_OUTPUT_AMOUNT = BUILDER
                 .comment("等级 5 每次操作产生的化学品的量（单位：mB，默认：1000）")
                 .defineInRange("outputAmount", 1000, 1, Integer.MAX_VALUE);
@@ -512,25 +552,23 @@ public class ServerConfig {
     }
 
     // ======================= 物品复制机配置获取方法 =======================
-    public static int getItemReplicatorOutputSlots() {
-        return ITEM_REPLICATOR_OUTPUT_SLOTS.get();
-    }
-
     public static boolean isItemReplicatorDestroyEnabled() {return ITEM_REPLICATOR_ENABLE_DESTROY.get();}
-
-    // 检查物品复制机的自动输出功能是否启用
+    // 物品复制机的自动输出
     public static boolean isItemReplicatorAutoOutputEnabled() {return ITEM_REPLICATOR_AUTO_OUTPUT.get();}
 
+    // 物品复制机的黑白名单配置
     public static boolean isBlacklistMode() {
         return BLACKLIST_MODE.get();
     }
 
+    // 物品复制机的黑名单列表
     public static List<String> getBlacklistItems() {
         return BLACKLIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
                 .toList();
     }
 
+    // 物品复制机的白名单列表
     public static List<String> getWhitelistItems() {
         return WHITELIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
@@ -538,109 +576,61 @@ public class ServerConfig {
     }
 
     // Tier 1
-    public static int getItemTier1OutputAmount() {
-        return ITEM_TIER1_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getItemTier1OutputTime() {
-        return ITEM_TIER1_OUTPUT_TIME.get();
-    }
-
-    public static int getItemTier1EnergyCapacity() {
-        return ITEM_TIER1_ENERGY_CAPACITY.get();
-    }
-
-    public static int getItemTier1EnergyConsumption() {
-        return ITEM_TIER1_ENERGY_CONSUMPTION.get();
-    }
+    public static int getItemTier1OutputSlots() {return ITEM_TIER1_OUTPUT_SLOTS.get();}
+    public static int getItemTier1OutputAmount() {return ITEM_TIER1_OUTPUT_AMOUNT.get();}
+    public static int getItemTier1OutputTime() {return ITEM_TIER1_OUTPUT_TIME.get();}
+    public static int getItemTier1EnergyCapacity() {return ITEM_TIER1_ENERGY_CAPACITY.get();}
+    public static int getItemTier1EnergyConsumption() {return ITEM_TIER1_ENERGY_CONSUMPTION.get();}
 
     // Tier 2
-    public static int getItemTier2OutputAmount() {
-        return ITEM_TIER2_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getItemTier2OutputTime() {
-        return ITEM_TIER2_OUTPUT_TIME.get();
-    }
-
-    public static int getItemTier2EnergyCapacity() {
-        return ITEM_TIER2_ENERGY_CAPACITY.get();
-    }
-
-    public static int getItemTier2EnergyConsumption() {
-        return ITEM_TIER2_ENERGY_CONSUMPTION.get();
-    }
+    public static int getItemTier2OutputSlots() {return ITEM_TIER2_OUTPUT_SLOTS.get();}
+    public static int getItemTier2OutputAmount() {return ITEM_TIER2_OUTPUT_AMOUNT.get();}
+    public static int getItemTier2OutputTime() {return ITEM_TIER2_OUTPUT_TIME.get();}
+    public static int getItemTier2EnergyCapacity() {return ITEM_TIER2_ENERGY_CAPACITY.get();}
+    public static int getItemTier2EnergyConsumption() {return ITEM_TIER2_ENERGY_CONSUMPTION.get();}
 
     // Tier 3
-    public static int getItemTier3OutputAmount() {
-        return ITEM_TIER3_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getItemTier3OutputTime() {
-        return ITEM_TIER3_OUTPUT_TIME.get();
-    }
-
-    public static int getItemTier3EnergyCapacity() {
-        return ITEM_TIER3_ENERGY_CAPACITY.get();
-    }
-
-    public static int getItemTier3EnergyConsumption() {
-        return ITEM_TIER3_ENERGY_CONSUMPTION.get();
-    }
+    public static int getItemTier3OutputSlots() {return ITEM_TIER3_OUTPUT_SLOTS.get();}
+    public static int getItemTier3OutputAmount() {return ITEM_TIER3_OUTPUT_AMOUNT.get();}
+    public static int getItemTier3OutputTime() {return ITEM_TIER3_OUTPUT_TIME.get();}
+    public static int getItemTier3EnergyCapacity() {return ITEM_TIER3_ENERGY_CAPACITY.get();}
+    public static int getItemTier3EnergyConsumption() {return ITEM_TIER3_ENERGY_CONSUMPTION.get();}
 
     // Tier 4
-    public static int getItemTier4OutputAmount() {
-        return ITEM_TIER4_OUTPUT_AMOUNT.get();
-    }
+    public static int getItemTier4OutputSlots() {return ITEM_TIER4_OUTPUT_SLOTS.get();}
+    public static int getItemTier4OutputAmount() {return ITEM_TIER4_OUTPUT_AMOUNT.get();}
 
-    public static int getItemTier4OutputTime() {
-        return ITEM_TIER4_OUTPUT_TIME.get();
-    }
-
-    public static int getItemTier4EnergyCapacity() {
-        return ITEM_TIER4_ENERGY_CAPACITY.get();
-    }
-
-    public static int getItemTier4EnergyConsumption() {
-        return ITEM_TIER4_ENERGY_CONSUMPTION.get();
-    }
+    public static int getItemTier4OutputTime() {return ITEM_TIER4_OUTPUT_TIME.get();}
+    public static int getItemTier4EnergyCapacity() {return ITEM_TIER4_ENERGY_CAPACITY.get();}
+    public static int getItemTier4EnergyConsumption() {return ITEM_TIER4_ENERGY_CONSUMPTION.get();}
 
     // Tier 5
-    public static int getItemTier5OutputAmount() {
-        return ITEM_TIER5_OUTPUT_AMOUNT.get();
-    }
+    public static int getItemTier5OutputSlots() {return ITEM_TIER5_OUTPUT_SLOTS.get();}
+    public static int getItemTier5OutputAmount() {return ITEM_TIER5_OUTPUT_AMOUNT.get();}
+    public static int getItemTier5OutputTime() {return ITEM_TIER5_OUTPUT_TIME.get();}
+    public static int getItemTier5EnergyCapacity() {return ITEM_TIER5_ENERGY_CAPACITY.get();}
+    public static int getItemTier5EnergyConsumption() {return ITEM_TIER5_ENERGY_CONSUMPTION.get();}
 
-    public static int getItemTier5OutputTime() {
-        return ITEM_TIER5_OUTPUT_TIME.get();
-    }
-
-    public static int getItemTier5EnergyCapacity() {
-        return ITEM_TIER5_ENERGY_CAPACITY.get();
-    }
-
-    public static int getItemTier5EnergyConsumption() {
-        return ITEM_TIER5_ENERGY_CONSUMPTION.get();
-    }
 
     // ======================= 流体复制机配置获取方法 =======================
-    public static int getFluidReplicatorOutputTankSize() {
-        return FLUID_REPLICATOR_OUTPUT_TANK_SIZE.get();
-    }
     public static boolean isFluidReplicatorDestroyEnabled() {return FLUID_REPLICATOR_ENABLE_DESTROY.get();}
 
-    // 检查流体复制机的自动输出功能是否启用
+    // 流体复制机的自动输出
     public static boolean isFluidReplicatorAutoOutputEnabled() {return FLUID_REPLICATOR_AUTO_OUTPUT.get();}
 
+    // 流体复制机黑白名单配置
     public static boolean isFluidBlacklistMode() {
         return FLUID_BLACKLIST_MODE.get();
     }
 
+    // 流体复制机黑名单列表
     public static List<String> getFluidBlacklistItems() {
         return FLUID_BLACKLIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
                 .toList();
     }
 
+    // 流体复制机白名单列表
     public static List<String> getFluidWhitelistItems() {
         return FLUID_WHITELIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
@@ -648,149 +638,67 @@ public class ServerConfig {
     }
 
     // Tier 1 Fluid
-    public static int getFluidTier1OutputAmount() {
-        return FLUID_TIER1_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getFluidTier1OutputTime() {
-        return FLUID_TIER1_OUTPUT_TIME.get();
-    }
-
-    public static int getFluidTier1WaterAmount() {
-        return FLUID_TIER1_WATER_AMOUNT.get();
-    }
-
-    public static int getFluidTier1LavaAmount() {
-        return FLUID_TIER1_LAVA_AMOUNT.get();
-    }
-
-    public static int getFluidTier1EnergyCapacity() {
-        return FLUID_TIER1_ENERGY_CAPACITY.get();
-    }
-
-    public static int getFluidTier1EnergyConsumption() {
-        return FLUID_TIER1_ENERGY_CONSUMPTION.get();
-    }
+    public static int getFluidTier1OutputTankCapacity() {return FLUID_TIER1_OUTPUT_TANK_CAPACITY.get();}
+    public static int getFluidTier1OutputAmount() {return FLUID_TIER1_OUTPUT_AMOUNT.get();}
+    public static int getFluidTier1OutputTime() {return FLUID_TIER1_OUTPUT_TIME.get();}
+    public static int getFluidTier1WaterAmount() {return FLUID_TIER1_WATER_AMOUNT.get();}
+    public static int getFluidTier1LavaAmount() {return FLUID_TIER1_LAVA_AMOUNT.get();}
+    public static int getFluidTier1EnergyCapacity() {return FLUID_TIER1_ENERGY_CAPACITY.get();}
+    public static int getFluidTier1EnergyConsumption() {return FLUID_TIER1_ENERGY_CONSUMPTION.get();}
 
     // Tier 2 Fluid
-    public static int getFluidTier2OutputAmount() {
-        return FLUID_TIER2_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getFluidTier2OutputTime() {
-        return FLUID_TIER2_OUTPUT_TIME.get();
-    }
-
-    public static int getFluidTier2WaterAmount() {
-        return FLUID_TIER2_WATER_AMOUNT.get();
-    }
-
-    public static int getFluidTier2LavaAmount() {
-        return FLUID_TIER2_LAVA_AMOUNT.get();
-    }
-
-    public static int getFluidTier2EnergyCapacity() {
-        return FLUID_TIER2_ENERGY_CAPACITY.get();
-    }
-
-    public static int getFluidTier2EnergyConsumption() {
-        return FLUID_TIER2_ENERGY_CONSUMPTION.get();
-    }
+    public static int getFluidTier2OutputTankCapacity() {return FLUID_TIER2_OUTPUT_TANK_CAPACITY.get();}
+    public static int getFluidTier2OutputAmount() {return FLUID_TIER2_OUTPUT_AMOUNT.get();}
+    public static int getFluidTier2OutputTime() {return FLUID_TIER2_OUTPUT_TIME.get();}
+    public static int getFluidTier2WaterAmount() {return FLUID_TIER2_WATER_AMOUNT.get();}
+    public static int getFluidTier2LavaAmount() {return FLUID_TIER2_LAVA_AMOUNT.get();}
+    public static int getFluidTier2EnergyCapacity() {return FLUID_TIER2_ENERGY_CAPACITY.get();}
+    public static int getFluidTier2EnergyConsumption() {return FLUID_TIER2_ENERGY_CONSUMPTION.get();}
 
     // Tier 3 Fluid
-    public static int getFluidTier3OutputAmount() {
-        return FLUID_TIER3_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getFluidTier3OutputTime() {
-        return FLUID_TIER3_OUTPUT_TIME.get();
-    }
-
-    public static int getFluidTier3WaterAmount() {
-        return FLUID_TIER3_WATER_AMOUNT.get();
-    }
-
-    public static int getFluidTier3LavaAmount() {
-        return FLUID_TIER3_LAVA_AMOUNT.get();
-    }
-
-    public static int getFluidTier3EnergyCapacity() {
-        return FLUID_TIER3_ENERGY_CAPACITY.get();
-    }
-
-    public static int getFluidTier3EnergyConsumption() {
-        return FLUID_TIER3_ENERGY_CONSUMPTION.get();
-    }
+    public static int getFluidTier3OutputTankCapacity() {return FLUID_TIER3_OUTPUT_TANK_CAPACITY.get();}
+    public static int getFluidTier3OutputAmount() {return FLUID_TIER3_OUTPUT_AMOUNT.get();}
+    public static int getFluidTier3OutputTime() {return FLUID_TIER3_OUTPUT_TIME.get();}
+    public static int getFluidTier3WaterAmount() {return FLUID_TIER3_WATER_AMOUNT.get();}
+    public static int getFluidTier3LavaAmount() {return FLUID_TIER3_LAVA_AMOUNT.get();}
+    public static int getFluidTier3EnergyCapacity() {return FLUID_TIER3_ENERGY_CAPACITY.get();}
+    public static int getFluidTier3EnergyConsumption() {return FLUID_TIER3_ENERGY_CONSUMPTION.get();}
 
     // Tier 4 Fluid
-    public static int getFluidTier4OutputAmount() {
-        return FLUID_TIER4_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getFluidTier4OutputTime() {
-        return FLUID_TIER4_OUTPUT_TIME.get();
-    }
-
-    public static int getFluidTier4WaterAmount() {
-        return FLUID_TIER4_WATER_AMOUNT.get();
-    }
-
-    public static int getFluidTier4LavaAmount() {
-        return FLUID_TIER4_LAVA_AMOUNT.get();
-    }
-
-    public static int getFluidTier4EnergyCapacity() {
-        return FLUID_TIER4_ENERGY_CAPACITY.get();
-    }
-
-    public static int getFluidTier4EnergyConsumption() {
-        return FLUID_TIER4_ENERGY_CONSUMPTION.get();
-    }
+    public static int getFluidTier4OutputTankCapacity() {return FLUID_TIER4_OUTPUT_TANK_CAPACITY.get();}
+    public static int getFluidTier4OutputAmount() {return FLUID_TIER4_OUTPUT_AMOUNT.get();}
+    public static int getFluidTier4OutputTime() {return FLUID_TIER4_OUTPUT_TIME.get();}
+    public static int getFluidTier4WaterAmount() {return FLUID_TIER4_WATER_AMOUNT.get();}
+    public static int getFluidTier4LavaAmount() {return FLUID_TIER4_LAVA_AMOUNT.get();}
+    public static int getFluidTier4EnergyCapacity() {return FLUID_TIER4_ENERGY_CAPACITY.get();}
+    public static int getFluidTier4EnergyConsumption() {return FLUID_TIER4_ENERGY_CONSUMPTION.get();}
 
     // Tier 5 Fluid
-    public static int getFluidTier5OutputAmount() {
-        return FLUID_TIER5_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getFluidTier5OutputTime() {
-        return FLUID_TIER5_OUTPUT_TIME.get();
-    }
-
-    public static int getFluidTier5WaterAmount() {
-        return FLUID_TIER5_WATER_AMOUNT.get();
-    }
-
-    public static int getFluidTier5LavaAmount() {
-        return FLUID_TIER5_LAVA_AMOUNT.get();
-    }
-
-    public static int getFluidTier5EnergyCapacity() {
-        return FLUID_TIER5_ENERGY_CAPACITY.get();
-    }
-
-    public static int getFluidTier5EnergyConsumption() {
-        return FLUID_TIER5_ENERGY_CONSUMPTION.get();
-    }
+    public static int getFluidTier5OutputTankCapacity() {return FLUID_TIER5_OUTPUT_TANK_CAPACITY.get();}
+    public static int getFluidTier5OutputAmount() {return FLUID_TIER5_OUTPUT_AMOUNT.get();}
+    public static int getFluidTier5OutputTime() {return FLUID_TIER5_OUTPUT_TIME.get();}
+    public static int getFluidTier5WaterAmount() {return FLUID_TIER5_WATER_AMOUNT.get();}
+    public static int getFluidTier5LavaAmount() {return FLUID_TIER5_LAVA_AMOUNT.get();}
+    public static int getFluidTier5EnergyCapacity() {return FLUID_TIER5_ENERGY_CAPACITY.get();}
+    public static int getFluidTier5EnergyConsumption() {return FLUID_TIER5_ENERGY_CONSUMPTION.get();}
 
 
     // ======================= 化学品复制机配置获取方法（Mekanism 联动） =======================
-    // 化学品复制机输出槽容量
-    public static int getChemicalReplicatorOutputTankSize() {
-        return CHEMICAL_REPLICATOR_OUTPUT_TANK_SIZE.get();
-    }
-
     public static boolean isChemicalReplicatorDestroyEnabled() {
         return CHEMICAL_REPLICATOR_ENABLE_DESTROY.get();
     }
 
+    // 化学品复制机黑白名单配置
     public static boolean isChemicalBlacklistMode() {return CHEMICAL_BLACKLIST_MODE.get();}
 
+    // 化学品复制机黑名单列表
     public static List<String> getChemicalBlacklistItems() {
         return CHEMICAL_BLACKLIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
                 .toList();
     }
 
+    // 化学品复制机白名单列表
     public static List<String> getChemicalWhitelistItems() {
         return CHEMICAL_WHITELIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
@@ -798,87 +706,37 @@ public class ServerConfig {
     }
 
     // Tier 1 Chemical
-    public static int getChemicalTier1OutputAmount() {
-        return CHEMICAL_TIER_1_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getChemicalTier1OutputTime() {
-        return CHEMICAL_TIER_1_OUTPUT_TIME.get();
-    }
-
-    public static int getChemicalTier1EnergyCapacity() {
-        return CHEMICAL_TIER_1_ENERGY_CAPACITY.get();
-    }
-
-    public static int getChemicalTier1EnergyConsumption() {
-        return CHEMICAL_TIER_1_ENERGY_CONSUMPTION.get();
-    }
+    public static int getChemicalTier1OutputTankCapacity() {return CHEMICAL_TIER_1_OUTPUT_TANK_CAPACITY.get();}
+    public static int getChemicalTier1OutputAmount() {return CHEMICAL_TIER_1_OUTPUT_AMOUNT.get();}
+    public static int getChemicalTier1OutputTime() {return CHEMICAL_TIER_1_OUTPUT_TIME.get();}
+    public static int getChemicalTier1EnergyCapacity() {return CHEMICAL_TIER_1_ENERGY_CAPACITY.get();}
+    public static int getChemicalTier1EnergyConsumption() {return CHEMICAL_TIER_1_ENERGY_CONSUMPTION.get();}
 
     // Tier 2 Chemical
-    public static int getChemicalTier2OutputAmount() {
-        return CHEMICAL_TIER_2_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getChemicalTier2OutputTime() {
-        return CHEMICAL_TIER_2_OUTPUT_TIME.get();
-    }
-
-    public static int getChemicalTier2EnergyCapacity() {
-        return CHEMICAL_TIER_2_ENERGY_CAPACITY.get();
-    }
-
-    public static int getChemicalTier2EnergyConsumption() {
-        return CHEMICAL_TIER_2_ENERGY_CONSUMPTION.get();
-    }
+    public static int getChemicalTier2OutputTankCapacity() {return CHEMICAL_TIER_2_OUTPUT_TANK_CAPACITY.get();}
+    public static int getChemicalTier2OutputAmount() {return CHEMICAL_TIER_2_OUTPUT_AMOUNT.get();}
+    public static int getChemicalTier2OutputTime() {return CHEMICAL_TIER_2_OUTPUT_TIME.get();}
+    public static int getChemicalTier2EnergyCapacity() {return CHEMICAL_TIER_2_ENERGY_CAPACITY.get();}
+    public static int getChemicalTier2EnergyConsumption() {return CHEMICAL_TIER_2_ENERGY_CONSUMPTION.get();}
 
     // Tier 3 Chemical
-    public static int getChemicalTier3OutputAmount() {
-        return CHEMICAL_TIER_3_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getChemicalTier3OutputTime() {
-        return CHEMICAL_TIER_3_OUTPUT_TIME.get();
-    }
-
-    public static int getChemicalTier3EnergyCapacity() {
-        return CHEMICAL_TIER_3_ENERGY_CAPACITY.get();
-    }
-
-    public static int getChemicalTier3EnergyConsumption() {
-        return CHEMICAL_TIER_3_ENERGY_CONSUMPTION.get();
-    }
+    public static int getChemicalTier3OutputTankCapacity() {return CHEMICAL_TIER_3_OUTPUT_TANK_CAPACITY.get();}
+    public static int getChemicalTier3OutputAmount() {return CHEMICAL_TIER_3_OUTPUT_AMOUNT.get();}
+    public static int getChemicalTier3OutputTime() {return CHEMICAL_TIER_3_OUTPUT_TIME.get();}
+    public static int getChemicalTier3EnergyCapacity() {return CHEMICAL_TIER_3_ENERGY_CAPACITY.get();}
+    public static int getChemicalTier3EnergyConsumption() {return CHEMICAL_TIER_3_ENERGY_CONSUMPTION.get();}
 
     // Tier 4 Chemical
-    public static int getChemicalTier4OutputAmount() {
-        return CHEMICAL_TIER_4_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getChemicalTier4OutputTime() {
-        return CHEMICAL_TIER_4_OUTPUT_TIME.get();
-    }
-
-    public static int getChemicalTier4EnergyCapacity() {
-        return CHEMICAL_TIER_4_ENERGY_CAPACITY.get();
-    }
-
-    public static int getChemicalTier4EnergyConsumption() {
-        return CHEMICAL_TIER_4_ENERGY_CONSUMPTION.get();
-    }
+    public static int getChemicalTier4OutputTankCapacity() {return CHEMICAL_TIER_4_OUTPUT_TANK_CAPACITY.get();}
+    public static int getChemicalTier4OutputAmount() {return CHEMICAL_TIER_4_OUTPUT_AMOUNT.get();}
+    public static int getChemicalTier4OutputTime() {return CHEMICAL_TIER_4_OUTPUT_TIME.get();}
+    public static int getChemicalTier4EnergyCapacity() {return CHEMICAL_TIER_4_ENERGY_CAPACITY.get();}
+    public static int getChemicalTier4EnergyConsumption() {return CHEMICAL_TIER_4_ENERGY_CONSUMPTION.get();}
 
     // Tier 5 Chemical
-    public static int getChemicalTier5OutputAmount() {
-        return CHEMICAL_TIER_5_OUTPUT_AMOUNT.get();
-    }
-
-    public static int getChemicalTier5OutputTime() {
-        return CHEMICAL_TIER_5_OUTPUT_TIME.get();
-    }
-
-    public static int getChemicalTier5EnergyCapacity() {
-        return CHEMICAL_TIER_5_ENERGY_CAPACITY.get();
-    }
-
-    public static int getChemicalTier5EnergyConsumption() {
-        return CHEMICAL_TIER_5_ENERGY_CONSUMPTION.get();
-    }
+    public static int getChemicalTier5OutputTankCapacity() {return CHEMICAL_TIER_5_OUTPUT_TANK_CAPACITY.get();}
+    public static int getChemicalTier5OutputAmount() {return CHEMICAL_TIER_5_OUTPUT_AMOUNT.get();}
+    public static int getChemicalTier5OutputTime() {return CHEMICAL_TIER_5_OUTPUT_TIME.get();}
+    public static int getChemicalTier5EnergyCapacity() {return CHEMICAL_TIER_5_ENERGY_CAPACITY.get();}
+    public static int getChemicalTier5EnergyConsumption() {return CHEMICAL_TIER_5_ENERGY_CONSUMPTION.get();}
 }

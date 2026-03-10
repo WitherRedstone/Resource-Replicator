@@ -70,7 +70,7 @@ public class ChemicalReplicatorHandler implements IChemicalHandler {
      */
     @Override
     public long getChemicalTankCapacity(int tank) {
-        return tank == 0 ? ChemicalReplicatorBlockEntity.INPUT_TANK_CAPACITY : ChemicalReplicatorBlockEntity.OUTPUT_TANK_CAPACITY;
+        return tank == 0 ? ChemicalReplicatorBlockEntity.INPUT_TANK_CAPACITY : blockEntity.getCurrentOutputTankCapacity();
     }
 
     /**

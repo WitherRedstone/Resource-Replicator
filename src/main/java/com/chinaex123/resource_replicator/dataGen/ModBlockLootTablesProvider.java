@@ -1,6 +1,7 @@
 package com.chinaex123.resource_replicator.dataGen;
 
 import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class ModBlockLootTablesProvider extends BlockLootSubProvider {
     public ModBlockLootTablesProvider(HolderLookup.Provider registries) {
@@ -37,11 +39,20 @@ public class ModBlockLootTablesProvider extends BlockLootSubProvider {
         dropSelf(ModBlocks.FLUID_REPLICATOR_Tier3.get());
         dropSelf(ModBlocks.FLUID_REPLICATOR_Tier4.get());
         dropSelf(ModBlocks.FLUID_REPLICATOR_Tier5.get());
+
+        // ======================= 化学品资源复制机 =======================
+        dropSelf(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier1.get());
+        dropSelf(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier2.get());
+        dropSelf(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier3.get());
+        dropSelf(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier4.get());
+        dropSelf(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier5.get());
     }
 
 
     @Override
     protected @NotNull Iterable<Block> getKnownBlocks() {
-        return ModBlocks.BLOCK_REGISTER.getEntries().stream().map(Holder::value)::iterator;
+        Stream<Block> modBlocks = ModBlocks.BLOCK_REGISTER.getEntries().stream().map(Holder::value);
+        Stream<Block> compatBlocks = CompatMekBlocks.BLOCKS.getEntries().stream().map(Holder::value);
+        return Stream.concat(modBlocks, compatBlocks)::iterator;
     }
 }
