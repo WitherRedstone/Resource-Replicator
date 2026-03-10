@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "resource_replicator:block/chemical_replicator_tier2"
+    }
+  }
+}
