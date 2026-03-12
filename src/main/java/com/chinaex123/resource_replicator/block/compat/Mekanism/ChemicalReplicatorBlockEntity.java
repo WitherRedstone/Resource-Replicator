@@ -2,9 +2,11 @@ package com.chinaex123.resource_replicator.block.compat.Mekanism;
 
 import com.chinaex123.resource_replicator.block.entity.ModBlockEntities;
 import com.chinaex123.resource_replicator.config.ServerConfig;
+import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.IChemicalHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -379,8 +381,58 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
                 if (energyStored >= actualEnergyNeeded) {
                     energyStored -= actualEnergyNeeded;
                     tickCounter = 0;
+
+                    // 自动输出逻辑
+                    if (ServerConfig.isChemicalReplicatorAutoOutputEnabled() && !outputChemical.isEmpty()) {
+                        autoOutputChemical();
+                    }
+
                     markUpdated();
                 }
+            }
+        }
+    }
+
+    /**
+     * 自动输出化学品到相邻的容器
+     * <p>
+     * 此方法尝试将输出罐中的化学品输出到指定方向的相邻容器中。
+     * 只有当配置文件中启用了自动输出功能时才会执行。
+     * </p>
+     */
+    private void autoOutputChemical() {
+        if (level == null || level.isClientSide || outputChemical.isEmpty()) {
+            return;
+        }
+
+        // 从配置中获取输出方向
+        Direction outputDirection = ServerConfig.getChemicalReplicatorAutoOutputDirection();
+
+        // 获取相邻方块的坐标
+        BlockPos neighborPos = worldPosition.relative(outputDirection);
+
+        // 获取相邻方块的 BlockEntity
+        BlockEntity neighborBE = level.getBlockEntity(neighborPos);
+        if (neighborBE == null) {
+            return;
+        }
+
+        // 检查邻居是否实现了 IChemicalHandler 接口
+        if (neighborBE instanceof IChemicalHandler handler) {
+            // 调用 insertChemical 方法（tank 0 是输入罐，接受外部输入）
+            ChemicalStack remainder = handler.insertChemical(0, outputChemical, Action.EXECUTE);
+
+            // 如果成功插入，减少输出罐中的化学品数量
+            if (remainder.getAmount() < outputChemical.getAmount()) {
+                long inserted = outputChemical.getAmount() - remainder.getAmount();
+
+                outputChemical = outputChemical.copyWithAmount(outputChemical.getAmount() - inserted);
+
+                if (outputChemical.getAmount() <= 0) {
+                    outputChemical = ChemicalStack.EMPTY;
+                }
+
+                markUpdated();
             }
         }
     }

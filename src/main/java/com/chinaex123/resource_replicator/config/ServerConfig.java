@@ -1,5 +1,6 @@
 package com.chinaex123.resource_replicator.config;
 
+import net.minecraft.core.Direction;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public class ServerConfig {
     // ======================= 物品复制机配置 =======================
     private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_ENABLE_DESTROY;
     private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_AUTO_OUTPUT;
+    private static final ModConfigSpec.EnumValue<Direction> ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION;
 
     // 黑白名单配置
     private static final ModConfigSpec.BooleanValue BLACKLIST_MODE;
@@ -50,6 +52,7 @@ public class ServerConfig {
     // ======================= 流体复制机配置 =======================
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_ENABLE_DESTROY;
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_AUTO_OUTPUT;
+    private static final ModConfigSpec.EnumValue<Direction> FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION;
 
     // 流体黑白名单配置
     private static final ModConfigSpec.BooleanValue FLUID_BLACKLIST_MODE;
@@ -98,6 +101,8 @@ public class ServerConfig {
 
     // ==================== 化学品复制机参数（Mekanism 联动） ====================
     private static final ModConfigSpec.BooleanValue CHEMICAL_REPLICATOR_ENABLE_DESTROY;
+    private static final ModConfigSpec.BooleanValue CHEMICAL_REPLICATOR_AUTO_OUTPUT;
+    private static final ModConfigSpec.EnumValue<Direction> CHEMICAL_REPLICATOR_AUTO_OUTPUT_DIRECTION;
     private static final ModConfigSpec.BooleanValue CHEMICAL_BLACKLIST_MODE;
     private static final ModConfigSpec.ConfigValue<List<?>> CHEMICAL_BLACKLIST_ITEMS;
     private static final ModConfigSpec.ConfigValue<List<?>> CHEMICAL_WHITELIST_ITEMS;
@@ -145,6 +150,9 @@ public class ServerConfig {
         ITEM_REPLICATOR_AUTO_OUTPUT = BUILDER
                 .comment("是否启用物品复制机的自动输出功能（默认：true）。启用后，复制机会自动向周围相邻的容器输出物品。")
                 .define("autoOutput", true);
+        ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION = BUILDER
+                .comment("物品复制机自动输出的方向（默认：UP）。可选值：UP, DOWN, NORTH, SOUTH, EAST, WEST")
+                .defineEnum("autoOutputDirection", Direction.UP);
         BUILDER.pop();
 
         BUILDER.push("黑白名单设置");
@@ -276,6 +284,9 @@ public class ServerConfig {
         FLUID_REPLICATOR_AUTO_OUTPUT = BUILDER
                 .comment("是否启用流体复制机的自动输出功能 (默认:true)。启用后，复制机会自动向周围相邻的容器输出流体。")
                 .define("autoOutput", true);
+        FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION = BUILDER
+                .comment("流体复制机自动输出的方向（默认：UP）。可选值：UP, DOWN, NORTH, SOUTH, EAST, WEST")
+                .defineEnum("autoOutputDirection", Direction.UP);
         BUILDER.pop();
 
         BUILDER.push("黑白名单模式");
@@ -433,6 +444,15 @@ public class ServerConfig {
                 .define("enableDestroy", false);
         BUILDER.pop();
 
+        BUILDER.push("自动输出功能设置");
+        CHEMICAL_REPLICATOR_AUTO_OUTPUT = BUILDER
+                .comment("是否启用化学品复制机的自动输出功能（默认：true）。启用后，复制机会自动向周围相邻的容器输出化学品。")
+                .define("autoOutput", true);
+        CHEMICAL_REPLICATOR_AUTO_OUTPUT_DIRECTION = BUILDER
+                .comment("化学品复制机自动输出的方向（默认：UP）。可选值：UP, DOWN, NORTH, SOUTH, EAST, WEST")
+                .defineEnum("autoOutputDirection", Direction.UP);
+        BUILDER.pop();
+
         BUILDER.push("黑白名单设置");
         CHEMICAL_BLACKLIST_MODE = BUILDER
                 .comment("是否使用化学品黑名单模式（true=黑名单，false=白名单）")
@@ -556,6 +576,9 @@ public class ServerConfig {
     // 物品复制机的自动输出
     public static boolean isItemReplicatorAutoOutputEnabled() {return ITEM_REPLICATOR_AUTO_OUTPUT.get();}
 
+    // 物品复制机的自动输出方向
+    public static Direction getItemReplicatorAutoOutputDirection() {return ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();}
+
     // 物品复制机的黑白名单配置
     public static boolean isBlacklistMode() {
         return BLACKLIST_MODE.get();
@@ -617,6 +640,9 @@ public class ServerConfig {
 
     // 流体复制机的自动输出
     public static boolean isFluidReplicatorAutoOutputEnabled() {return FLUID_REPLICATOR_AUTO_OUTPUT.get();}
+
+    // 流体复制机的自动输出方向
+    public static Direction getFluidReplicatorAutoOutputDirection() {return FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();}
 
     // 流体复制机黑白名单配置
     public static boolean isFluidBlacklistMode() {
@@ -687,6 +713,12 @@ public class ServerConfig {
     public static boolean isChemicalReplicatorDestroyEnabled() {
         return CHEMICAL_REPLICATOR_ENABLE_DESTROY.get();
     }
+
+    // 化学品复制机的自动输出
+    public static boolean isChemicalReplicatorAutoOutputEnabled() {return CHEMICAL_REPLICATOR_AUTO_OUTPUT.get();}
+
+    // 化学品复制机的自动输出方向
+    public static Direction getChemicalReplicatorAutoOutputDirection() {return CHEMICAL_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();}
 
     // 化学品复制机黑白名单配置
     public static boolean isChemicalBlacklistMode() {return CHEMICAL_BLACKLIST_MODE.get();}

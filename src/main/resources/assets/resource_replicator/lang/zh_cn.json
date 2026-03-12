@@ -17,6 +17,10 @@
   "block.resource_replicator.chemical_replicator_tier4": "化学品复制机T4",
   "block.resource_replicator.chemical_replicator_tier5": "化学品复制机T5",
 
+  "_comment.auto_output": "自动输出提示",
+  "tooltip.resource_replicator.auto_output_direction": "自动输出方向：%s",
+  "tooltip.resource_replicator.auto_output_disabled": "自动输出：关闭",
+
   "_comment.tooltip_Item": "物品提示",
   "message.item_replicator.empty": "§d里面是空的",
   "message.item_replicator.inserted": "§a已放入：%s",

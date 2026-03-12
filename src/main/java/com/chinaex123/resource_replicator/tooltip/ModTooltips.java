@@ -106,6 +106,18 @@ public class ModTooltips {
                             Component.literal(String.valueOf(energyConsumption)).withStyle(ChatFormatting.RED))
                     .withStyle(ChatFormatting.GRAY));
         }
+
+        // 显示自动输出状态
+        boolean autoOutputEnabled = ServerConfig.isItemReplicatorAutoOutputEnabled();
+        if (autoOutputEnabled) {
+            String directionName = ServerConfig.getItemReplicatorAutoOutputDirection().getName();
+            toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
+                            Component.literal(directionName).withStyle(ChatFormatting.AQUA))
+                    .withStyle(ChatFormatting.GRAY));
+        } else {
+            toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_disabled")
+                    .withStyle(ChatFormatting.RED));
+        }
     }
 
     private static void addFluidReplicatorTooltip(List<Component> toolTip, int tier) {
@@ -160,6 +172,18 @@ public class ModTooltips {
             toolTip.add(Component.translatable("tooltip.fluid_replicator.energy_consumption",
                             Component.literal(String.valueOf(energyConsumption)).withStyle(ChatFormatting.RED))
                     .withStyle(ChatFormatting.GRAY));
+        }
+
+        // 显示自动输出状态
+        boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
+        if (autoOutputEnabled) {
+            String directionName = ServerConfig.getFluidReplicatorAutoOutputDirection().getName();
+            toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
+                            Component.literal(directionName).withStyle(ChatFormatting.AQUA))
+                    .withStyle(ChatFormatting.GRAY));
+        } else {
+            toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_disabled")
+                    .withStyle(ChatFormatting.RED));
         }
     }
 
@@ -309,6 +333,18 @@ public class ModTooltips {
             toolTip.add(Component.translatable("tooltip.chemical_replicator.energy_consumption",
                             Component.literal(String.valueOf(energyConsumption)).withStyle(ChatFormatting.RED))
                     .withStyle(ChatFormatting.GRAY));
+        }
+
+        // 显示自动输出状态
+        boolean autoOutputEnabled = ServerConfig.isChemicalReplicatorAutoOutputEnabled();
+        if (autoOutputEnabled) {
+            String directionName = ServerConfig.getChemicalReplicatorAutoOutputDirection().getName();
+            toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
+                            Component.literal(directionName).withStyle(ChatFormatting.AQUA))
+                    .withStyle(ChatFormatting.GRAY));
+        } else {
+            toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_disabled")
+                    .withStyle(ChatFormatting.RED));
         }
     }
 
