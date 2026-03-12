@@ -17,6 +17,10 @@
   "block.resource_replicator.chemical_replicator_tier4": "Chemical Replicator T4",
   "block.resource_replicator.chemical_replicator_tier5": "Chemical Replicator T5",
 
+  "_comment.auto_output": "Auto Output Tooltip",
+  "tooltip.resource_replicator.auto_output_direction": "Auto Output Direction: %s",
+  "tooltip.resource_replicator.auto_output_disabled": "Auto Output: Disabled",
+
   "_comment.tooltip_Item": "Item Tooltip",
   "message.item_replicator.empty": "§dIt is empty inside.",
   "message.item_replicator.inserted": "§aInserted: %s",

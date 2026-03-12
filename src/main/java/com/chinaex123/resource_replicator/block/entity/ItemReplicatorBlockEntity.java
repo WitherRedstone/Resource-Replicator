@@ -512,47 +512,37 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 // ========== 自动输出逻辑 ==========
                 // 如果启用了自动输出
                 if (autoOutputEnabled) {
-                    // 获取所有六个方向（上、下、东、西、南、北）
-                    Direction[] directions = Direction.values();
+                    // 从配置中获取输出方向
+                    Direction outputDirection = ServerConfig.getItemReplicatorAutoOutputDirection();
 
-                    // 主动输出：每个 tick 只尝试输出到一个方向
-                    for (Direction dir : directions) {
-                        // 如果已经不需要再输出了，提前结束循环
-                        if (remainingOutput <= 0) break;
+                    // 获取相邻方块的坐标
+                    BlockPos neighborPos = pos.relative(outputDirection);
 
-                        // 获取相邻方块的坐标
-                        BlockPos neighborPos = pos.relative(dir);
-                        // 获取相邻方块的物品处理能力（从相反方向访问）
-                        // 例如：从上方查询时，使用下方来访问邻居的能力
-                        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, dir.getOpposite());
+                    // 获取相邻方块的物品处理能力（从相反方向访问）
+                    IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, neighborPos, outputDirection.getOpposite());
 
-                        // 如果邻居有物品处理能力
-                        if (handler != null) {
-                            // 计算要插入的数量（取剩余产出量和物品最大堆叠量的较小值）
-                            int amountToInsert = Math.min(remainingOutput, inputStack.getMaxStackSize());
-                            // 创建要输出的物品堆（复制输入物品，设置数量）
-                            ItemStack outputStack = inputStack.copyWithCount(amountToInsert);
-                            // 尝试向邻居插入物品，获取剩余的物品（没插进去的部分）
-                            // insertItem 返回的是未被接受的物品
-                            ItemStack remainder = ItemHandlerHelper.insertItem(handler, outputStack, false);
+                    // 如果邻居有物品处理能力
+                    if (handler != null) {
+                        // 计算要插入的数量（取剩余产出量和物品最大堆叠量的较小值）
+                        int amountToInsert = Math.min(remainingOutput, inputStack.getMaxStackSize());
+                        // 创建要输出的物品堆（复制输入物品，设置数量）
+                        ItemStack outputStack = inputStack.copyWithCount(amountToInsert);
+                        // 尝试向邻居插入物品，获取剩余的物品（没插进去的部分）
+                        ItemStack remainder = ItemHandlerHelper.insertItem(handler, outputStack, false);
 
-                            // 计算实际插入的数量 = 尝试插入的数量 - 剩余的数量
-                            int inserted = amountToInsert - remainder.getCount();
+                        // 计算实际插入的数量 = 尝试插入的数量 - 剩余的数量
+                        int inserted = amountToInsert - remainder.getCount();
 
-                            // 如果成功插入了物品
-                            if (inserted > 0) {
-                                // 累加到总输出量
-                                totalInserted += inserted;
-                                // 减少剩余待输出量
-                                remainingOutput -= inserted;
-                                // 标记已更新
-                                hasUpdated = true;
-                                // 累加能量消耗（每插入 1 个物品消耗 energyPerItem）
-                                actualEnergyNeeded += inserted * energyPerItem;
-
-                                // 主动输出只输出一个面就停止（找到第一个能接受的邻居就停止）
-                                break;
-                            }
+                        // 如果成功插入了物品
+                        if (inserted > 0) {
+                            // 累加到总输出量
+                            totalInserted += inserted;
+                            // 减少剩余待输出量
+                            remainingOutput -= inserted;
+                            // 标记已更新
+                            hasUpdated = true;
+                            // 累加能量消耗
+                            actualEnergyNeeded += inserted * energyPerItem;
                         }
                     }
                 }

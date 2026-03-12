@@ -478,44 +478,27 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         // 累加刻计数器，用于控制复制速度
         blockEntity.tickCounter++;
 
-        // 获取输入罐中的流体
-        FluidStack inputFluid = blockEntity.inputTank.getFluid();
+        // 当刻计数器达到处理速度时，执行复制操作
+        if (blockEntity.tickCounter >= blockEntity.tier.getProcessSpeed()) {
+            // 获取输入罐的流体
+            FluidStack inputFluid = blockEntity.inputTank.getFluid();
 
-        // 如果输入罐不为空（有流体）
-        if (!inputFluid.isEmpty()) {
-            // 检查当前等级的复制机是否能复制这种流体
-            // 如果不能复制，直接返回停止后续处理
-            if (!blockEntity.tier.canReplicateFluid(inputFluid)) {
-                return;
-            }
-
-            // 获取实际处理速度（不同流体可能有不同的速度倍率）
-            int actualSpeed = blockEntity.tier.getActualProcessSpeed(inputFluid);
-
-            // 当刻计数器达到处理速度时，执行复制操作
-            if (blockEntity.tickCounter >= actualSpeed) {
-                // 获取实际产出数量（不同流体可能有不同的产量倍率）
-                int actualOutput = blockEntity.tier.getActualOutputAmount(inputFluid);
-
-                // ========== 计算能量需求 ==========
-                // 每 1000mB 流体消耗的能量值（从 config 读取）
+            // 如果输入罐不为空（有流体）
+            if (!inputFluid.isEmpty()) {
+                // 获取目标产出数量（不同等级产量不同）
+                int actualOutput = blockEntity.tier.getOutputAmount();
+                // 计算能量消耗 (每 1000mB 消耗 config 中定义的能量)
                 int energyPer1000MB = blockEntity.energyConsumption;
-                // 根据产出量计算总能量需求：产出量 × 每 1000mB 能耗 ÷ 1000
                 int energyNeeded = (actualOutput * energyPer1000MB) / 1000;
-                // 如果计算结果小于 1 但产出量大于 0，则至少消耗 1 FE（避免零消耗）
                 if (energyNeeded < 1 && actualOutput > 0) {
                     energyNeeded = 1;
                 }
 
-                // 检查存储的能量是否足够
-                // 如果能量不足，直接返回，不进行复制
+                // ========== 预检查能量 ==========
+                // 先检查是否有足够的能量支持至少 1 次输出
                 if (blockEntity.energyStored < energyNeeded) {
                     return;
                 }
-
-                // ========== 自动输出逻辑 ==========
-                // 检查配置中是否启用了自动输出功能
-                boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
 
                 // 剩余待输出的流体数量（初始等于总产出量）
                 int remainingOutput = actualOutput;
@@ -524,29 +507,24 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 // 记录总共输出了多少流体
                 int totalOutput = 0;
 
+                // 检查配置中是否启用了自动输出功能
+                boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
+
                 // 如果启用了自动输出
                 if (autoOutputEnabled) {
-                    // 获取所有六个方向（上、下、东、西、南、北）
-                    Direction[] directions = Direction.values();
+                    // 从配置中获取输出方向
+                    Direction outputDirection = ServerConfig.getFluidReplicatorAutoOutputDirection();
 
-                    // 遍历每个方向
-                    for (Direction dir : directions) {
-                        // 如果已经不需要再输出了，提前结束循环
-                        if (remainingOutput <= 0) break;
+                    // 获取相邻方块的坐标
+                    BlockPos neighborPos = pos.relative(outputDirection);
 
-                        // 获取相邻方块的坐标
-                        BlockPos neighborPos = pos.relative(dir);
-                        // 获取相邻方块的方块状态
-                        BlockState neighborState = level.getBlockState(neighborPos);
+                    // 获取相邻方块的方块状态
+                    BlockState neighborState = level.getBlockState(neighborPos);
 
-                        // 如果相邻方块也是流体复制机，跳过（避免互相输入）
-                        if (neighborState.getBlock() instanceof FluidReplicatorBlock) {
-                            continue;
-                        }
-
+                    // 如果相邻方块也是流体复制机，跳过（避免互相输入）
+                    if (!(neighborState.getBlock() instanceof FluidReplicatorBlock)) {
                         // 获取相邻方块的流体处理能力（从相反方向访问）
-                        // 例如：从上方查询时，使用下方来访问邻居的能力
-                        IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, neighborPos, dir.getOpposite());
+                        IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, neighborPos, outputDirection.getOpposite());
 
                         // 如果邻居有流体处理能力
                         if (handler != null) {
@@ -563,9 +541,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                                 remainingOutput -= filled;
                                 // 标记已更新
                                 hasUpdated = true;
-
-                                // 主动输出只输出一个面（找到第一个能接受的邻居就停止）
-                                break;
                             }
                         }
                     }
