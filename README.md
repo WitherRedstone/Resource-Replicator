@@ -26,8 +26,8 @@ Place the items (or fluids, chemicals) to be duplicated into the block. As long 
 - Supports blacklist/whitelist. By default, mod items and admin items are added to the blacklist. Supports item ID/mod ID/tag.
 - Configurable processing speed and output multiplier for each tier. Default output amounts: T1: 4/20t, T2: 16/15t, T3: 32/10t, T4: 64/5t, T5: 128/1t.
 - Configurable destruction function. Items input via pipes will be destroyed, with destruction speed depending on the pipe's speed. Disabled by default.
-- Configurable number of output slots, with one cache slot by default.
-- Configurable automatic output. When enabled, items will be automatically output to containers on one adjacent face.
+- Configurable number of output slots per level, defaults to one cache slot.
+- Configurable auto-output, defaults to upward output, adjustable in the configuration file.
 - Configurable energy consumption.
 
 ## 2.Fluid Replicator
@@ -50,8 +50,8 @@ Place the items (or fluids, chemicals) to be duplicated into the block. As long 
 - Configurable special output for water, with unchanged tick rate and output amounts of 1K, 10K, 100K, 1M, 10M.
 - Configurable special output for lava, with unchanged tick rate and output amounts of 10, 50, 100, 500, 1K.
 - Configurable destruction function. Fluids input via pipes will be destroyed, with destruction speed depending on the pipe's speed. Disabled by default.
-- Configurable output tank buffer size, default is 8000mB.
-- Configurable automatic output. When enabled, fluids will be automatically output to containers on one adjacent face.
+- Configurable output tank buffer size per level, defaults to 8000mB.
+- Configurable auto-output, defaults to upward output, adjustable in the configuration file.
 - Configurable energy consumption.
 
 ## 3.Chemical Replicator (Mekanism Integration)
@@ -72,7 +72,8 @@ Place the items (or fluids, chemicals) to be duplicated into the block. As long 
 - Supports blacklist/whitelist. Supports item ID/mod ID.
 - Configurable processing speed and output multiplier for each tier. Default output amounts: T1: 10/20t, T2: 50/15t, T3: 100/10t, T4: 500/5t, T5: 1K/1t.
 - Configurable destruction function. Chemicals input via pipes will be destroyed, with destruction speed depending on the pipe's speed. Disabled by default.
-- Configurable output tank buffer size, default is 8000mB.
+- Configurable output tank buffer size per level, default is 8000mB.
+- Configurable auto-output, defaults to upward output, adjustable in the configuration file
 - Configurable energy consumption.
 
 ---
@@ -101,8 +102,8 @@ Place the items (or fluids, chemicals) to be duplicated into the block. As long 
 - 支持黑白名单，默认添加模组物品和管理员物品为黑名单，支持物品ID/模组ID/tag；
 - 可配置每个等级的处理速度和产量倍率，默认输出数量：T1：4/20t，T2：16/15t，T3：32/10t，T4：64/5t，T5：128/1t。
 - 可配置销毁功能，通过管道输入的物品会被销毁，销毁速度取决于管道的速度，默认关闭；
-- 可配置输出槽数量，默认为一个缓存槽；
-- 可配置是否自动输出，启用后向周围一个面的容器自动输出物品；
+- 可配置每个等级的输出槽数量，默认为一个缓存槽；
+- 可配置是否自动输出，默认向上输出，可在配置文件中调整；
 - 可配置能量消耗。
 
 ## 2.流体复制机
@@ -125,8 +126,8 @@ Place the items (or fluids, chemicals) to be duplicated into the block. As long 
 - 可配置水特殊输出，tick不变，输出量为1K、10K、100K、1M、10M；
 - 可配置岩浆特殊输出，tick不变，输出量为10、50、100、500、1K；
 - 可配置销毁功能，通过管道输入的流体会被销毁，销毁速度取决于管道的速度，默认关闭；
-- 可配置输出罐缓存大小，默认为8000mB；
-- 可配置是否自动输出，启用后向周围一个面的容器自动输出流体；
+- 可配置每个等级的输出罐缓存大小，默认为8000mB；
+- 可配置是否自动输出，默认向上输出，可在配置文件中调整；
 - 可配置能量消耗。
 
 ## 3.化学品复制机（Mekanism 联动）
@@ -147,7 +148,8 @@ Place the items (or fluids, chemicals) to be duplicated into the block. As long 
 - 支持黑白名单，支持物品ID/模组ID；
 - 可配置每个等级的处理速度和产量倍率，默认输出数量：T1：10/20t，T2：50/15t，T3：100/10t，T4：500/5t，T5：1K/1t。
 - 可配置销毁功能，通过管道输入的化学品会被销毁，销毁速度取决于管道的速度，默认关闭；
-- 可配置输出罐缓存大小，默认为8000mB；
+- 可配置每个等级的输出罐缓存大小，默认为8000mB；
+- 可配置是否自动输出，默认向上输出，可在配置文件中调整；
 - 可配置能量消耗。
 
 ---
