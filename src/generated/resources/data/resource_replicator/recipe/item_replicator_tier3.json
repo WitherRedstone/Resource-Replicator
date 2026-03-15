@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "resource_replicator:item_replicator_tier2",
+    "B": "#c:ingots/netherite",
+    "C": "#c:nether_stars",
+    "D": "#c:storage_blocks/diamond"
+  },
+  "pattern": [
+    "BDB",
+    "CAC",
+    "BDB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "resource_replicator:item_replicator_tier3"
+  }
+}

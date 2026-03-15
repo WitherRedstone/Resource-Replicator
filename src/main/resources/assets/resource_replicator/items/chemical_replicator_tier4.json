@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "resource_replicator:block/chemical_replicator_tier4"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "resource_replicator:block/fluid_replicator_tier1"
+    }
+  }
+}
