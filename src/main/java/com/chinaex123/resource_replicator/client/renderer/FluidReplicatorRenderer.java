@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
@@ -164,7 +165,8 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
         var stillTexture = IClientFluidTypeExtensions.of(fluid).getStillTexture(fluidStack);
 
         var textureManager = Minecraft.getInstance().getTextureManager();
-        var atlas = textureManager.getTexture(TextureAtlas.LOCATION_BLOCKS);
+        var blocksAtlasLocation = Identifier.withDefaultNamespace("textures/atlas/blocks.png");
+        var atlas = textureManager.getTexture(blocksAtlasLocation);
 
         if (atlas instanceof TextureAtlas textureAtlas) {
             return textureAtlas.getSprite(stillTexture);
