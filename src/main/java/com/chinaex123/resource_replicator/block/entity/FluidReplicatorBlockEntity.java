@@ -3,7 +3,7 @@ package com.chinaex123.resource_replicator.block.entity;
 import com.chinaex123.resource_replicator.block.FluidReplicatorBlock;
 import com.chinaex123.resource_replicator.block.enumTier.FluidReplicatorTier;
 import com.chinaex123.resource_replicator.config.ServerConfig;
-import com.chinaex123.resource_replicator.util.ReplicatorFilter;
+import com.chinaex123.resource_replicator.network.FluidSyncPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -13,76 +13,102 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
+/**
+ * 流体复制机方块实体类
+ * 负责处理流体复制机的所有逻辑，包括流体存储、能量管理、自动生产和网络同步
+ */
 public class FluidReplicatorBlockEntity extends BlockEntity {
     private static final Logger LOGGER = LoggerFactory.getLogger(FluidReplicatorBlockEntity.class);
-    private static final int INPUT_TANK_CAPACITY = 1000;
-    
+    private static final int INPUT_TANK_CAPACITY = 1000; // 输入罐容量
+
+    // ThreadLocal 变量：标记当前线程是否为玩家操作
     private static final ThreadLocal<Boolean> IS_PLAYER_OPERATION = ThreadLocal.withInitial(() -> false);
-    
+    // ThreadLocal 变量：标记当前是否为内部复制操作
     private static final ThreadLocal<Boolean> IS_INTERNAL_REPLICATION = ThreadLocal.withInitial(() -> false);
 
-    private long outputCapacity;
+    private long outputCapacity; // 输出罐容量（根据机器等级变化）
 
+    /**
+     * 设置当前是否为玩家操作
+     *
+     * @param isPlayer true 表示当前是玩家操作，false 表示是非玩家操作（如管道）
+     */
     public static void setPlayerOperation(boolean isPlayer) {
         IS_PLAYER_OPERATION.set(isPlayer);
     }
-    
+
+    /**
+     * 检查当前是否为玩家操作
+     *
+     * @return true 表示当前是玩家操作，false 表示是非玩家操作（如管道）
+     */
     public static boolean isPlayerOperation() {
         return IS_PLAYER_OPERATION.get();
     }
-    
+
+    /**
+     * 设置是否是内部复制操作
+     *
+     * @param isInternal true 表示当前是内部复制操作，false 表示是外部操作
+     */
     public static void setInternalReplication(boolean isInternal) {
         IS_INTERNAL_REPLICATION.set(isInternal);
     }
-    
+
+    /**
+     * 检查是否是内部复制操作
+     *
+     * @return true 表示当前是内部复制操作，false 表示是外部操作
+     */
     public static boolean isInternalReplication() {
         return IS_INTERNAL_REPLICATION.get();
     }
 
-    private boolean isPlayerInsertion() {
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-
-        for (StackTraceElement element : stackTrace) {
-            if (element.getClassName().contains("FluidReplicatorBlock")) {
-                String methodName = element.getMethodName();
-                if (methodName.contains("use") || methodName.contains("useItemOn")) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
+    // Tick 计数器，用于控制生产速度
     private int tickCounter = 0;
+    // 机器等级
     public FluidReplicatorTier tier = FluidReplicatorTier.FLUID_TIER_1;
+    // 当前存储的能量
     private long energyStored;
+    // 最大能量容量
     private long energyCapacity;
+    // 每次生产的能量消耗
     private long energyConsumption;
 
+    // 初始化代码块
     {
         updateEnergyStats();
         updateOutputCapacity();
         energyStored = 0;
     }
 
+    /**
+     * 更新能量统计信息（容量和消耗）
+     */
     private void updateEnergyStats() {
         switch (tier) {
             case FLUID_TIER_1:
@@ -108,6 +134,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
 
+    /**
+     * 更新输出罐容量
+     */
     private void updateOutputCapacity() {
         this.outputCapacity = switch (tier) {
             case FLUID_TIER_1 -> ServerConfig.getFluidTier1OutputTankCapacity();
@@ -118,15 +147,23 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         };
     }
 
+    /**
+     * 设置复制机的等级
+     * @param tierId 等级 ID
+     */
     public void setTier(int tierId) {
         this.tier = FluidReplicatorTier.fromId(tierId);
         updateEnergyStats();
         updateOutputCapacity();
     }
 
+    /**
+     * 能量处理器 - 处理流体能量的存储和提取
+     */
     private final EnergyHandler energyHandler = new EnergyHandler() {
         @Override
-        public int insert(int maxReceive, TransactionContext transaction) {
+        public int insert(int maxReceive, @NotNull TransactionContext transaction) {
+            // 计算可以接收的能量
             int canReceive = (int) Math.min(maxReceive, energyCapacity - energyStored);
             if (canReceive <= 0) {
                 return 0;
@@ -137,8 +174,8 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
 
         @Override
-        public int extract(int maxExtract, TransactionContext transaction) {
-            return 0;
+        public int extract(int maxExtract, @NotNull TransactionContext transaction) {
+            return 0; // 不支持能量提取
         }
 
         @Override
@@ -152,8 +189,13 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     };
 
+    /**
+     * 可清空的流体处理器 - 支持清空操作和输入罐保护
+     */
     private class ClearableFluidHandler extends FluidStacksResourceHandler {
+        // 是否允许清空模式
         private boolean allowClearing = false;
+        // 输入罐容量
         private final int inputTankCapacity;
         
         public ClearableFluidHandler(int size, int capacity, int inputTankCapacity) {
@@ -162,20 +204,25 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
         
         @Override
-        public int insert(int slot, FluidResource resource, int maxAmount, TransactionContext transaction) {
+        public int insert(int slot, FluidResource resource, int maxAmount, @NotNull TransactionContext transaction) {
+            // 槽位 1：输出罐
             if (slot == 1) {
+                // 输出罐只允许内部复制操作插入
                 if (!isInternalReplication()) {
                     return 0;
                 }
                 
                 FluidResource currentResource = getResource(1);
                 long currentAmount = getAmountAsLong(1);
-                
+
+                // 空罐子，直接放入
                 if (currentResource.isEmpty() || currentAmount == 0) {
                     set(1, resource, maxAmount);
                     markUpdated();
                     return maxAmount;
-                } else if (currentResource.equals(resource)) {
+                }
+                // 同种流体，合并
+                else if (currentResource.equals(resource)) {
                     int canAdd = Math.min((int) outputCapacity - (int)currentAmount, maxAmount);
                     if (canAdd > 0) {
                         set(1, resource, (int)(currentAmount + canAdd));
@@ -185,21 +232,26 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 }
                 return 0;
             }
-            
+
+            // 只能使用槽位 0（输入罐）
             if (slot != 0) {
                 return 0;
             }
-            
+
+            // 判断是否是管道插入
             boolean isPipeInsertion = !isPlayerOperation();
-            
+
+            // 管道插入且开启销毁模式：模拟成功（实际销毁）
             if (isPipeInsertion && ServerConfig.isFluidReplicatorDestroyEnabled()) {
                 return maxAmount;
             }
-            
+
+            // 管道插入但关闭销毁模式：拒绝
             if (isPipeInsertion) {
                 return 0;
             }
-            
+
+            // 玩家操作：正常插入逻辑
             FluidResource currentResource = getResource(0);
             long currentAmount = getAmountAsLong(0);
             
@@ -220,22 +272,34 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
         
         @Override
-        public int extract(int slot, FluidResource resource, int amount, TransactionContext transaction) {
+        public int extract(int slot, FluidResource resource, int amount, @NotNull TransactionContext transaction) {
+            // 非清空模式下，只允许从输出罐抽取
             if (!allowClearing && slot != 1) {
                 return 0;
             }
             return super.extract(slot, resource, amount, transaction);
         }
-        
+
+        /**
+         * 清空所有流体
+         * <p>
+         * 功能：清空输入罐和输出罐
+         *
+         * <li><strong> 使用 allowClearing 标志位临时允许从输入罐抽取
+         * <li><strong> 通过 set() 方法直接设置为空
+         * <li><strong> 需要事务上下文（在 Transaction 中使用）
+         */
         public void clearAll() {
             allowClearing = true;
             try {
+                // 清空输入罐
                 FluidResource inputResource = getResource(0);
                 long inputAmount = getAmountAsLong(0);
                 if (!inputResource.isEmpty() && inputAmount > 0) {
                     set(0, FluidResource.EMPTY, 0);
                 }
-                
+
+                // 清空输出罐
                 FluidResource outputResource = getResource(1);
                 long outputAmount = getAmountAsLong(1);
                 if (!outputResource.isEmpty() && outputAmount > 0) {
@@ -247,36 +311,54 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
         
         @Override
-        protected int getCapacity(int index, FluidResource resource) {
+        protected int getCapacity(int index, @NotNull FluidResource resource) {
             if (index == 0) return inputTankCapacity;
             if (index == 1) return (int) outputCapacity;
             return super.getCapacity(index, resource);
         }
     }
-    
-    private final ClearableFluidHandler fluidHandler = new ClearableFluidHandler(2, (int) outputCapacity, INPUT_TANK_CAPACITY);
 
+    // 流体处理器实例
+    private final ClearableFluidHandler fluidHandler =
+            new ClearableFluidHandler(2, (int) outputCapacity, INPUT_TANK_CAPACITY);
+
+    /**
+     * 清空所有流体
+     * <p>
+     * 功能：调用 fluidHandler.clearAll() 并标记更新
+     *
+     * <li><strong> 是 clearAll() 的封装层
+     * <li><strong> 添加了 markUpdated() 用于同步到客户端
+     * <li><strong> 供外部调用（如右键清空操作）
+     */
     public void clearAllFluids() {
         fluidHandler.clearAll();
         markUpdated();
     }
 
+    /**
+     * 服务器端 Tick 方法 - 处理流体复制逻辑
+     */
     public static void serverTick(Level level, BlockPos pos, BlockState state, FluidReplicatorBlockEntity blockEntity) {
         blockEntity.tickCounter++;
 
+        // 未达到生产时间，跳过
         if (blockEntity.tickCounter < blockEntity.tier.getProcessSpeed()) {
             return;
         }
         
         blockEntity.tickCounter = 0;
 
-        FluidResource inputResource = (FluidResource) blockEntity.fluidHandler.getResource(0);
+        // 获取输入罐的流体
+        FluidResource inputResource = blockEntity.fluidHandler.getResource(0);
         long inputAmount = blockEntity.fluidHandler.getAmountAsLong(0);
-        
+
+        // 没有输入流体，跳过
         if (inputResource.isEmpty() || inputAmount == 0) {
             return;
         }
 
+        // 计算实际输出量
         int actualOutput = blockEntity.tier.getActualOutputAmount(inputResource.toStack((int) inputAmount));
         
         long energyPer1000MB = blockEntity.energyConsumption;
@@ -285,6 +367,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             energyNeeded = 1;
         }
 
+        // 能量不足，跳过
         if (blockEntity.energyStored < energyNeeded) {
             return;
         }
@@ -295,6 +378,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
 
+        // 自动输出到相邻容器
         if (autoOutputEnabled) {
             Direction outputDirection = ServerConfig.getFluidReplicatorAutoOutputDirection();
             BlockPos neighborPos = pos.relative(outputDirection);
@@ -302,7 +386,13 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
             if (!(neighborState.getBlock() instanceof FluidReplicatorBlock)) {
                 var fluidCapability = Capabilities.Fluid.BLOCK;
-                ResourceHandler<FluidResource> handler = level.getCapability(fluidCapability, neighborPos, neighborState, level.getBlockEntity(neighborPos), outputDirection.getOpposite());
+                ResourceHandler<@NotNull FluidResource> handler = level.getCapability(
+                        fluidCapability,
+                        neighborPos,
+                        neighborState,
+                        level.getBlockEntity(neighborPos),
+                        outputDirection.getOpposite()
+                );
 
                 if (handler != null) {
                     try (Transaction transaction = Transaction.openRoot()) {
@@ -312,7 +402,8 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                             transaction.commit();
                             totalOutput += (int) filled;
                             remainingOutput -= (int) filled;
-                            
+
+                            // 从输入罐提取相应数量的流体
                             blockEntity.fluidHandler.extract(0, inputResource, (int) filled, transaction);
                             
                             hasUpdated = true;
@@ -322,10 +413,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             }
         }
 
+        // 将剩余流体放入输出罐
         if (remainingOutput > 0) {
             setInternalReplication(true);
             try (Transaction transaction = Transaction.openRoot()) {
-                int inserted = (int) blockEntity.fluidHandler.insert(1, inputResource, remainingOutput, transaction);
+                int inserted = blockEntity.fluidHandler.insert(1, inputResource, remainingOutput, transaction);
                 if (inserted > 0) {
                     transaction.commit();
                     totalOutput += inserted;
@@ -336,6 +428,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             }
         }
 
+        // 消耗能量并标记更新
         if (hasUpdated && totalOutput > 0) {
             long actualEnergyNeeded = (totalOutput * energyPer1000MB) / 1000;
             if (actualEnergyNeeded < 1) {
@@ -350,19 +443,25 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void setLevel(Level level) {
+    public void setLevel(@NotNull Level level) {
         super.setLevel(level);
-        if (level != null && level.isClientSide()) {
+        if (level.isClientSide()) {
             markUpdated();
         }
     }
 
+    /**
+     * 构造函数
+     */
     public FluidReplicatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.FLUID_REPLICATOR.get(), pos, state);
     }
 
+    /**
+     * 保存额外数据到 NBT
+     */
     @Override
-    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+    protected void saveAdditional(@NotNull ValueOutput output) {
         super.saveAdditional(output);
         
         CompoundTag customData = new CompoundTag();
@@ -371,8 +470,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         customData.putLong("energyStored", energyStored);
 
         CompoundTag tanksTag = new CompoundTag();
-        
-        FluidResource inputResource = (FluidResource) fluidHandler.getResource(0);
+
+        // 保存输入罐
+        FluidResource inputResource = fluidHandler.getResource(0);
         long inputAmount = fluidHandler.getAmountAsLong(0);
         
         if (!inputResource.isEmpty() && inputAmount > 0) {
@@ -381,8 +481,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             inputTag.putInt("amount", (int) inputAmount);
             tanksTag.put("inputTank", inputTag);
         }
-        
-        FluidResource outputResource = (FluidResource) fluidHandler.getResource(1);
+
+        // 保存输出罐
+        FluidResource outputResource = fluidHandler.getResource(1);
         long outputAmount = fluidHandler.getAmountAsLong(1);
         
         if (!outputResource.isEmpty() && outputAmount > 0) {
@@ -397,8 +498,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         output.store("custom_data", CompoundTag.CODEC, customData);
     }
 
+    /**
+     * 获取更新标签用于客户端同步
+     */
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
         
         tag.putInt("tickCounter", tickCounter);
@@ -407,7 +511,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         CompoundTag tanksTag = new CompoundTag();
         
-        FluidResource inputRes = (FluidResource) fluidHandler.getResource(0);
+        FluidResource inputRes = fluidHandler.getResource(0);
         long inputAmt = fluidHandler.getAmountAsLong(0);
         
         if (!inputRes.isEmpty() && inputAmt > 0) {
@@ -418,7 +522,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             tanksTag.put("inputTank", inputTag);
         }
         
-        FluidResource outputRes = (FluidResource) fluidHandler.getResource(1);
+        FluidResource outputRes = fluidHandler.getResource(1);
         long outputAmt = fluidHandler.getAmountAsLong(1);
         
         if (!outputRes.isEmpty() && outputAmt > 0) {
@@ -434,11 +538,14 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         return tag;
     }
 
+    /**
+     * 从 NBT 加载额外数据
+     */
     @Override
-    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+    protected void loadAdditional(@NotNull ValueInput input) {
         super.loadAdditional(input);
         
-        CompoundTag customData = (CompoundTag) input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
+        CompoundTag customData = input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
         
         tickCounter = customData.getInt("tickCounter").orElse(0);
         if (customData.contains("tier")) {
@@ -449,29 +556,31 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
 
         CompoundTag tanksTag = customData.getCompound("tanks").orElse(new CompoundTag());
-        
+
+        // 加载输入罐
         if (tanksTag.contains("inputTank")) {
             CompoundTag inputTag = tanksTag.getCompound("inputTank").orElse(new CompoundTag());
             String fluidName = inputTag.getString("fluid").orElse("");
             int amount = inputTag.getInt("amount").orElse(0);
             
             if (!fluidName.isEmpty() && amount > 0) {
-                net.minecraft.world.level.material.Fluid fluid = net.minecraft.core.registries.BuiltInRegistries.FLUID.getValue(net.minecraft.resources.Identifier.tryParse(fluidName));
-                if (fluid != null && !fluid.equals(net.minecraft.world.level.material.Fluids.EMPTY)) {
+                Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.tryParse(fluidName));
+                if (!fluid.equals(Fluids.EMPTY)) {
                     FluidResource resource = FluidResource.of(fluid);
                     fluidHandler.set(0, resource, amount);
                 }
             }
         }
-        
+
+        // 加载输出罐
         if (tanksTag.contains("outputTank")) {
             CompoundTag outputTag = tanksTag.getCompound("outputTank").orElse(new CompoundTag());
             String fluidName = outputTag.getString("fluid").orElse("");
             int amount = outputTag.getInt("amount").orElse(0);
             
             if (!fluidName.isEmpty() && amount > 0) {
-                net.minecraft.world.level.material.Fluid fluid = net.minecraft.core.registries.BuiltInRegistries.FLUID.getValue(net.minecraft.resources.Identifier.tryParse(fluidName));
-                if (fluid != null && !fluid.equals(net.minecraft.world.level.material.Fluids.EMPTY)) {
+                Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.tryParse(fluidName));
+                if (!fluid.equals(Fluids.EMPTY)) {
                     FluidResource resource = FluidResource.of(fluid);
                     fluidHandler.set(1, resource, amount);
                 }
@@ -482,57 +591,73 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         updateOutputCapacity();
     }
 
+    /**
+     * 从网络数据包加载流体数据（客户端）
+     */
     public void loadFluidFromPacket(CompoundTag tag) {
-        if (!getLevel().isClientSide()) {
+        if (getLevel() != null && !getLevel().isClientSide()) {
             return;
         }
-        
+
         CompoundTag tanksTag = tag.getCompound("tanks").orElse(new CompoundTag());
         
         clearFluidHandlerDirectly();
-        
+
+        // 加载输入罐
         if (tanksTag.contains("inputTank")) {
             CompoundTag inputTag = tanksTag.getCompound("inputTank").orElse(new CompoundTag());
-            var fluid = net.minecraft.core.registries.BuiltInRegistries.FLUID.get(
-                net.minecraft.resources.Identifier.tryParse(inputTag.getString("fluid").orElse(""))
+            var fluid = BuiltInRegistries.FLUID.get(
+                    Objects.requireNonNull(Identifier.tryParse(inputTag.getString("fluid").orElse("")))
             );
             int amount = inputTag.getInt("amount").orElse(0);
             
             if (fluid.isPresent() && amount > 0) {
-                var resource = net.neoforged.neoforge.transfer.fluid.FluidResource.of(fluid.get());
+                var resource = FluidResource.of(fluid.get());
                 fluidHandler.set(0, resource, amount);
             }
         }
-        
+
+        // 加载输出罐
         if (tanksTag.contains("outputTank")) {
             CompoundTag outputTag = tanksTag.getCompound("outputTank").orElse(new CompoundTag());
-            var fluid = net.minecraft.core.registries.BuiltInRegistries.FLUID.get(
-                net.minecraft.resources.Identifier.tryParse(outputTag.getString("fluid").orElse(""))
+            var fluid = BuiltInRegistries.FLUID.get(
+                    Objects.requireNonNull(Identifier.tryParse(outputTag.getString("fluid").orElse("")))
             );
             int amount = outputTag.getInt("amount").orElse(0);
             
             if (fluid.isPresent() && amount > 0) {
-                var resource = net.neoforged.neoforge.transfer.fluid.FluidResource.of(fluid.get());
+                var resource = FluidResource.of(fluid.get());
                 fluidHandler.set(1, resource, amount);
             }
         }
     }
-    
+
+    /**
+     * 直接清空流体处理器（不使用事务）
+     * <p>
+     * 功能：直接清空两个罐子
+     *
+     * <li><strong> 不使用事务，直接调用 set()
+     * <li><strong> 仅用于客户端从网络包同步数据时
+     * <li><strong> 避免客户端事务的复杂性
+     */
     private void clearFluidHandlerDirectly() {
         fluidHandler.set(0, FluidResource.EMPTY, 0);
         fluidHandler.set(1, FluidResource.EMPTY, 0);
     }
-    
-    private void insertFluidDirectly(int slot, FluidResource resource, int amount) {
-        fluidHandler.set(slot, resource, amount);
-    }
 
+    /**
+     * 获取更新数据包
+     */
     @Nullable
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
+    public Packet<@NotNull ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    /**
+     * 标记方块为已更新并发送同步包
+     */
     public void markUpdated() {
         setChanged();
         if (level != null) {
@@ -540,15 +665,15 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             
             if (!level.isClientSide()) {
                 var tag = getUpdateTag(level.registryAccess());
-                var packet = new com.chinaex123.resource_replicator.network.FluidSyncPacket(getBlockPos(), tag);
+                var packet = new FluidSyncPacket(getBlockPos(), tag);
                 
                 for (var player : level.players()) {
-                    if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    if (player instanceof ServerPlayer serverPlayer) {
                         double distance = Math.abs(serverPlayer.getX() - getBlockPos().getX()) +
                                 Math.abs(serverPlayer.getY() - getBlockPos().getY()) +
                                 Math.abs(serverPlayer.getZ() - getBlockPos().getZ());
                         if (distance < 64) {
-                            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(serverPlayer, packet);
+                            PacketDistributor.sendToPlayer(serverPlayer, packet);
                         }
                     }
                 }
@@ -556,10 +681,12 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
 
-
+    /**
+     * 获取输入罐的流体
+     */
     public FluidStack getInputFluid() {
-        FluidResource resource = (FluidResource) fluidHandler.getResource(0);
-        if (resource == null || resource.isEmpty()) {
+        FluidResource resource = fluidHandler.getResource(0);
+        if (resource.isEmpty()) {
             return FluidStack.EMPTY;
         }
         
@@ -572,9 +699,12 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         return resource.toStack((int) amount);
     }
 
+    /**
+     * 获取输出罐的流体
+     */
     public FluidStack getOutputFluid() {
-        FluidResource resource = (FluidResource) fluidHandler.getResource(1);
-        if (resource == null || resource.isEmpty()) {
+        FluidResource resource = fluidHandler.getResource(1);
+        if (resource.isEmpty()) {
             return FluidStack.EMPTY;
         }
         
@@ -586,20 +716,32 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         return resource.toStack((int) amount);
     }
 
+    /**
+     * 获取流体处理器
+     */
     @Nullable
-    public net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler getFluidHandler(@Nullable Direction side) {
+    public FluidStacksResourceHandler getFluidHandler(@Nullable Direction side) {
         return fluidHandler;
     }
 
+    /**
+     * 获取能量处理器
+     */
     @Nullable
     public EnergyHandler getEnergyHandler(@Nullable Direction side) {
         return energyHandler;
     }
 
+    /**
+     * 获取当前存储的能量
+     */
     public long getEnergyStored() {
         return energyStored;
     }
 
+    /**
+     * 获取最大能量容量
+     */
     public long getMaxEnergyStored() {
         return energyCapacity;
     }

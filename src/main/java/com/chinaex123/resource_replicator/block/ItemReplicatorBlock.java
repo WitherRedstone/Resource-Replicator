@@ -42,13 +42,13 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull RenderShape getRenderShape(BlockState state) {
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         ItemReplicatorBlockEntity blockEntity = new ItemReplicatorBlockEntity(pos, state);
         blockEntity.setTier(tier);
         return blockEntity;
@@ -68,7 +68,7 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
      */
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         return level.isClientSide() ? null : (lvl, pos, st, be) -> {
             if (be instanceof ItemReplicatorBlockEntity) {
                 ItemReplicatorBlockEntity.serverTick(lvl, pos, st, (ItemReplicatorBlockEntity) be);
@@ -87,7 +87,7 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
      * @return InteractionResult 交互结果，客户端返回 SUCCESS，服务端根据操作结果返回 CONSUME 或 SUCCESS
      */
     @Override
-    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, @NotNull Player player, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }

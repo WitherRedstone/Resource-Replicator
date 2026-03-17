@@ -11,6 +11,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ModBlocks {
@@ -27,7 +28,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier2 =
             registerBlock("item_replicator_tier2", 
                     properties -> new ItemReplicatorBlock(properties, 2),
@@ -36,7 +37,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier3 =
             registerBlock("item_replicator_tier3", 
                     properties -> new ItemReplicatorBlock(properties, 3),
@@ -45,7 +46,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier4 =
             registerBlock("item_replicator_tier4", 
                     properties -> new ItemReplicatorBlock(properties, 4),
@@ -54,7 +55,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier5 =
             registerBlock("item_replicator_tier5", 
                     properties -> new ItemReplicatorBlock(properties, 5),
@@ -63,7 +64,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
 
     // ======================= 流体资源复制机 =======================
     public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier1 =
@@ -74,7 +75,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier2 =
             registerBlock("fluid_replicator_tier2", 
                     properties -> new FluidReplicatorBlock(properties, 2),
@@ -83,7 +84,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier3 =
             registerBlock("fluid_replicator_tier3", 
                     properties -> new FluidReplicatorBlock(properties, 3),
@@ -92,7 +93,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier4 =
             registerBlock("fluid_replicator_tier4", 
                     properties -> new FluidReplicatorBlock(properties, 4),
@@ -101,7 +102,7 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
     public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier5 =
             registerBlock("fluid_replicator_tier5", 
                     properties -> new FluidReplicatorBlock(properties, 5),
@@ -110,16 +111,13 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .destroyTime(2.5f)
                             .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), true);
+                            .requiresCorrectToolForDrops());
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, 
-            java.util.function.Function<BlockBehaviour.Properties, T> func, 
-            Supplier<BlockBehaviour.Properties> properties, 
-            boolean shouldRegisterItem) {
+            Function<BlockBehaviour.Properties, T> func,
+            Supplier<BlockBehaviour.Properties> properties) {
         DeferredBlock<T> block = BLOCK_REGISTER.registerBlock(name, func, properties);
-        if (shouldRegisterItem) {
-            ModItems.ITEMS_REGISTER.registerSimpleBlockItem(block);
-        }
+        ModItems.ITEMS_REGISTER.registerSimpleBlockItem(block);
         return block;
     }
 
