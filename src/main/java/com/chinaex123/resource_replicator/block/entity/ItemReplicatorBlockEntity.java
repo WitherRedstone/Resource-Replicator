@@ -129,14 +129,33 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
             return ItemStack.EMPTY;
         }
 
-        public boolean isValid(int slot, ItemStack stack) {
-            if (slot == INPUT_SLOT) {
-                return ReplicatorFilter.canInsertItem(stack);
+        @Override
+        protected boolean isValid(ItemResource resource) {
+            // 检查是否是通过管道（非玩家操作）插入的物品
+            boolean isPipeInsertion = !isPlayerInsertion();
+            
+            // 如果是管道插入，根据配置决定行为
+            if (isPipeInsertion) {
+                return ServerConfig.isItemReplicatorDestroyEnabled();
             }
-            if (slot >= OUTPUT_SLOT_START && slot < TOTAL_SLOTS) {
-                return !items[slot].isEmpty();
+            
+            // 玩家操作：正常验证
+            ItemStack stack = resource.toStack(1);
+            return ReplicatorFilter.canInsertItem(stack);
+        }
+        
+        @Override
+        protected int getCapacity(ItemResource resource) {
+            // 检查是否是通过管道（非玩家操作）插入的物品
+            boolean isPipeInsertion = !isPlayerInsertion();
+            
+            // 如果是管道插入且启用了销毁功能，返回一个很大的值表示"可以全部接受"
+            if (isPipeInsertion && ServerConfig.isItemReplicatorDestroyEnabled()) {
+                return 999999; // 假装可以接受任意数量的物品
             }
-            return false;
+            
+            // 正常情况：返回最大堆叠数
+            return Math.min(resource.getMaxStackSize(), 99);
         }
 
         public int insert(int slot, ItemStack stack, int amount, TransactionContext transaction) {
@@ -144,6 +163,21 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 return 0;
             }
 
+            // 检查是否是通过管道（非玩家操作）插入的物品
+            boolean isPipeInsertion = !isPlayerInsertion();
+            
+            // 如果是管道插入
+            if (isPipeInsertion) {
+                if (ServerConfig.isItemReplicatorDestroyEnabled()) {
+                    // 启用销毁功能：瞬间销毁，返回 maxAmount 表示全部"消耗"掉了
+                    return amount;
+                } else {
+                    // 未启用销毁功能：拒绝输入，返回 0 表示不接受任何物品
+                    return 0;
+                }
+            }
+
+            // 玩家操作：正常插入逻辑
             ItemStack current = items[slot];
 
             if (current.isEmpty()) {
@@ -266,8 +300,14 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
         super.loadAdditional(input);
+        LOGGER.info("=== loadAdditional 被调用 ===");
+        
+        if (level != null) {
+            LOGGER.info("Level side: {}", level.isClientSide() ? "CLIENT" : "SERVER");
+        }
 
         CompoundTag customData = (CompoundTag) input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
+        LOGGER.info("customData: {}", customData);
 
         tickCounter = customData.getInt("tickCounter").orElse(0);
         if (customData.contains("tier")) {
@@ -281,17 +321,38 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         updateOutputSlots();
 
         CompoundTag itemsTag = customData.getCompound("items").orElse(new CompoundTag());
+        LOGGER.info("itemsTag: {}", itemsTag);
+        
         for (int i = 0; i < items.length; i++) {
             String key = "item" + i;
             int finalI = i;
-            itemsTag.getCompound(key).ifPresent(itemTag -> {
-                ItemStack.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, itemTag).result().ifPresent(stack -> items[finalI] = stack);
-            });
+            
+            // 使用 contains 方法检查标签是否存在（和流体复制机一致）
+            if (itemsTag.contains(key)) {
+                var itemTagOpt = itemsTag.getCompound(key);
+                itemTagOpt.ifPresent(itemTag -> {
+                    ItemStack.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, itemTag).result().ifPresent(stack -> {
+                        items[finalI] = stack;
+                        LOGGER.info("加载物品到槽位 {}: {}", finalI, stack.getItem());
+                    });
+                });
+            } else {
+                LOGGER.info("槽位 {} 没有 NBT 数据", i);
+            }
         }
+        
+        LOGGER.info("=== loadAdditional 结束 ===");
+    }
+
+    @Override
+    public void handleUpdateTag(net.minecraft.world.level.storage.ValueInput input) {
+        // 不再使用这个方法，改用自定义网络包
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        LOGGER.info("getUpdateTag 被调用，registries: {}", registries);
+        
         CompoundTag tag = new CompoundTag();
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
@@ -299,14 +360,80 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
         CompoundTag itemsTag = new CompoundTag();
         for (int i = 0; i < items.length; i++) {
-            if (!items[i].isEmpty()) {
-                int finalI = i;
-                ItemStack.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, items[i]).result().ifPresent(itemTag -> itemsTag.put("item" + finalI, itemTag));
-            }
+            int finalI = i;
+            // 即使槽位为空也要打包，确保客户端知道槽位是空的
+            ItemStack.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, items[i]).result().ifPresent(itemTag -> {
+                itemsTag.put("item" + finalI, itemTag);
+                LOGGER.info("打包物品到 NBT: 槽位 {}, 物品 {}", finalI, items[finalI].getItem());
+            });
         }
         tag.put("items", itemsTag);
+        
+        LOGGER.info("getUpdateTag 返回：{}", tag);
+
+        // 关键修改：同时调用 setChanged() 来强制保存和同步
+        setChanged();
 
         return tag;
+    }
+
+    /**
+     * 从网络数据包中更新物品数据
+     */
+    public void handleUpdateTagFromPacket(net.minecraft.nbt.CompoundTag tag) {
+        LOGGER.info("收到网络数据包更新");
+        
+        tickCounter = tag.getInt("tickCounter").orElse(0);
+        if (tag.contains("tier")) {
+            this.tier = ItemReplicatorTier.fromId(tag.getInt("tier").orElse(0));
+        }
+        if (tag.contains("energyStored")) {
+            this.energyStored = tag.getInt("energyStored").orElse(0);
+        }
+
+        updateEnergyStats();
+        updateOutputSlots();
+
+        CompoundTag itemsTag = tag.getCompound("items").orElse(new CompoundTag());
+        for (int i = 0; i < items.length; i++) {
+            String key = "item" + i;
+            int finalI = i;
+            
+            // 使用 contains 方法检查标签是否存在（和 loadAdditional 一致）
+            if (itemsTag.contains(key)) {
+                var itemTagOpt = itemsTag.getCompound(key);
+                itemTagOpt.ifPresent(itemTag -> {
+                    ItemStack.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, itemTag).result().ifPresent(stack -> {
+                        items[finalI] = stack;
+                        LOGGER.info("从网络加载物品到槽位 {}: {}", finalI, stack.getItem());
+                    });
+                });
+            } else {
+                // 关键修改：如果标签不存在，设置为空物品
+                items[finalI] = ItemStack.EMPTY;
+                LOGGER.info("槽位 {} 没有 NBT 数据，设置为空", i);
+            }
+        }
+    }
+
+    private void markUpdated() {
+        LOGGER.info("markUpdated 被调用");
+        setChanged();
+        if (level != null && !level.isClientSide()) {
+            CompoundTag tag = getUpdateTag(level.registryAccess());
+            
+            // 发送自定义网络包到客户端
+            var packet = new com.chinaex123.resource_replicator.network.ItemReplicatorSyncPacket(getBlockPos(), tag);
+            
+            // 发送给所有追踪这个方块的玩家
+            ((net.minecraft.server.level.ServerLevel) level).getChunkSource().chunkMap.getPlayers(new net.minecraft.world.level.ChunkPos(getBlockPos()), false)
+                .forEach(player -> net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, packet));
+            
+            LOGGER.info("已发送自定义数据包到客户端，位置={}", getBlockPos());
+            
+            // 关键修改：强制通知客户端方块实体已更新，需要重新渲染
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
     }
 
     /**
@@ -356,19 +483,18 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         // 1. 基础检查：输入槽是否有样板物品
         ItemStack inputStack = blockEntity.items[INPUT_SLOT];
         if (inputStack.isEmpty()) {
-            blockEntity.tickCounter = 0; // 如果没东西，重置计数器防止跳过下一次放入
+            blockEntity.tickCounter = 0;
             return;
         }
 
         // 2. 初始化参数
-        int targetOutput = blockEntity.tier.getOutputAmount();   // 本次循环理论产量
-        int energyPerItem = blockEntity.energyConsumption;      // 单个物品能耗
-        int remainingOutput = targetOutput;                    // 剩余待处理产量
-        int totalActuallyProduced = 0;                         // 本次 tick 实际产出的数量
+        int targetOutput = blockEntity.tier.getOutputAmount();
+        int energyPerItem = blockEntity.energyConsumption;
+        int remainingOutput = targetOutput;
+        int totalActuallyProduced = 0;
 
         // 3. 能量预检查：如果连 1 个物品的能量都不够，直接跳过
         if (blockEntity.energyStored < energyPerItem) {
-            LOGGER.warn("能量不足，无法开始复制操作");
             return;
         }
 
@@ -377,27 +503,21 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
             Direction outputDirection = ServerConfig.getItemReplicatorAutoOutputDirection();
             BlockPos neighborPos = pos.relative(outputDirection);
 
-            // 获取相邻方块的物品处理器 (使用 NeoForge Transfer API)
             var neighborHandler = level.getCapability(Capabilities.Item.BLOCK, neighborPos, outputDirection.getOpposite());
 
             if (neighborHandler != null) {
-                // 开启事务处理
                 try (var transaction = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
                     net.neoforged.neoforge.transfer.item.ItemResource resource = net.neoforged.neoforge.transfer.item.ItemResource.of(inputStack);
 
-                    // 计算基于当前剩余能量，最多还能自动输出多少个
                     int maxByEnergy = blockEntity.energyStored / energyPerItem;
                     int amountToTry = Math.min(remainingOutput, maxByEnergy);
 
-                    // 尝试插入
                     int inserted = (int) neighborHandler.insert(resource, amountToTry, transaction);
 
                     if (inserted > 0) {
-                        // 提交事务：只有在这里，物品才真正进入邻居容器
                         transaction.commit();
                         remainingOutput -= inserted;
                         totalActuallyProduced += inserted;
-                        LOGGER.debug("自动输出成功：插入了 {} 个物品", inserted);
                     }
                 }
             }
@@ -405,92 +525,65 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
         // ========== 第二步：尝试存入机器内部的缓存槽 (OUTPUT SLOTS) ==========
         if (remainingOutput > 0) {
-            // 确定当前等级允许访问的最大槽位索引
             int maxSlotIndex = Math.min(TOTAL_SLOTS, OUTPUT_SLOT_START + blockEntity.currentOutputSlots);
-            
-            LOGGER.info("=== 开始存入缓存槽 ===");
-            LOGGER.info("剩余待输出：{}, 输出槽数量：{}", remainingOutput, blockEntity.currentOutputSlots);
 
             for (int i = OUTPUT_SLOT_START; i < maxSlotIndex && remainingOutput > 0; i++) {
-                // 每次循环前再次检查能量：确保产出的每一个都有能量支撑
                 if (blockEntity.energyStored < (totalActuallyProduced + 1) * energyPerItem) {
-                    LOGGER.warn("能量不足，提前退出循环");
                     break;
                 }
 
                 ItemStack slotStack = blockEntity.items[i];
-                LOGGER.info("检查输出槽 {}: {}, 数量={}", 
-                    i, 
-                    slotStack.isEmpty() ? "空" : slotStack.getDisplayName().getString(),
-                    slotStack.getCount());
 
-                // 情况 A: 槽位为空
                 if (slotStack.isEmpty()) {
                     int addAmount = Math.min(remainingOutput, inputStack.getMaxStackSize());
                     blockEntity.items[i] = inputStack.copyWithCount(addAmount);
-                    
-                    LOGGER.info("✓ 放入输出槽 {}: {} 个 {}", i, addAmount, inputStack.getDisplayName().getString());
 
                     remainingOutput -= addAmount;
                     totalActuallyProduced += addAmount;
                 }
-                // 情况 B: 槽位已有相同物品，尝试堆叠
                 else if (ItemStack.isSameItemSameComponents(slotStack, inputStack)) {
                     int canAccept = slotStack.getMaxStackSize() - slotStack.getCount();
                     if (canAccept > 0) {
                         int addAmount = Math.min(remainingOutput, canAccept);
                         slotStack.grow(addAmount);
-                        
-                        LOGGER.info("✓ 堆叠到输出槽 {}: 添加 {} 个，现在总数 {}", i, addAmount, slotStack.getCount());
 
                         remainingOutput -= addAmount;
                         totalActuallyProduced += addAmount;
                     }
                 }
-                else {
-                    LOGGER.warn("输出槽 {} 的物品类型不匹配：期望={}, 实际={}", 
-                        i, inputStack.getDisplayName().getString(), slotStack.getDisplayName().getString());
-                }
             }
-            
-            LOGGER.info("缓存槽存入完成：剩余={}, 实际产出={}", remainingOutput, totalActuallyProduced);
         }
 
         // ========== 第三步：结算费用与状态更新 ==========
         if (totalActuallyProduced > 0) {
-            // 真正产生了物品，才扣除对应的能量
             int totalEnergyCost = totalActuallyProduced * energyPerItem;
             blockEntity.energyStored -= totalEnergyCost;
 
-            // 只有产出了才重置 tick 计时器
             blockEntity.tickCounter = 0;
             blockEntity.markUpdated();
-
-            LOGGER.info("复制循环完成：产出 {} 个，消耗 {} FE", totalActuallyProduced, totalEnergyCost);
         } else {
-            // 如果一整个 tick 下来一个物品都没能产出（可能因为输出槽全满且自动输出也满了）
-            // 我们将计数器重置为 0，让它进入下一个等待周期，防止在高频 tick 中造成不必要的性能浪费
             if (remainingOutput == targetOutput) {
                 blockEntity.tickCounter = 0;
-                LOGGER.warn("输出槽及外部容器已满，产出中止");
             }
         }
     }
 
     /**
      * 向物品复制机添加物品
-     *
-     * @param stack 要添加的物品堆
-     * @return boolean 如果物品成功添加则返回 true，否则返回 false
      */
     public boolean addItem(ItemStack stack) {
+        LOGGER.info("addItem 被调用，物品：{}, 数量：{}", stack.getItem(), stack.getCount());
+        
         if (!ReplicatorFilter.canInsertItem(stack)) {
+            LOGGER.info("物品不能放入输入槽");
             return false;
         }
 
         if (items[INPUT_SLOT].isEmpty()) {
             ItemStack singleItem = stack.copyWithCount(1);
             items[INPUT_SLOT] = singleItem;
+            LOGGER.info("放入物品到输入槽：{}", singleItem.getItem());
+            
             markUpdated();
             return true;
         }
@@ -498,10 +591,14 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
             int canAdd = items[INPUT_SLOT].getMaxStackSize() - items[INPUT_SLOT].getCount();
             if (canAdd > 0 && stack.getCount() > 0) {
                 items[INPUT_SLOT].grow(1);
+                LOGGER.info("增加输入槽物品数量：{}", items[INPUT_SLOT].getCount());
+                
                 markUpdated();
                 return true;
             }
         }
+        
+        LOGGER.info("添加失败，输入槽已有不同物品或已满");
         return false;
     }
 
@@ -511,32 +608,35 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      * @return ItemStack 输入槽中的物品堆，如果为空则返回 EMPTY
      */
     public ItemStack extractItem() {
+        LOGGER.info("=== extractItem 被调用 ===");
+        LOGGER.info("提取前 - 输入槽：{}, 数量：{}", items[INPUT_SLOT].getItem(), items[INPUT_SLOT].getCount());
+        
         if (!items[INPUT_SLOT].isEmpty()) {
-            ItemStack extracted = items[INPUT_SLOT].copyWithCount(1);
-            items[INPUT_SLOT].shrink(1);
+            // 取出整个输入槽的物品，而不是只取 1 个
+            ItemStack extracted = items[INPUT_SLOT].copy();
+            LOGGER.info("准备提取物品：{}, 数量：{}", extracted.getItem(), extracted.getCount());
+            
+            // 清空输入槽
+            items[INPUT_SLOT] = ItemStack.EMPTY;
+            LOGGER.info("输入槽已清空");
+            
+            // 同时清空所有输出槽/缓存槽
+            for (int i = OUTPUT_SLOT_START; i < TOTAL_SLOTS; i++) {
+                if (!items[i].isEmpty()) {
+                    LOGGER.info("清空输出槽 {}: {}, 数量：{}", i, items[i].getItem(), items[i].getCount());
+                    items[i] = ItemStack.EMPTY;
+                }
+            }
+            
+            // 标记更新，发送同步包
             markUpdated();
+            LOGGER.info("已调用 markUpdated");
+            
             return extracted;
         }
+        
+        LOGGER.info("输入槽为空，返回 EMPTY");
         return ItemStack.EMPTY;
-    }
-
-    /**
-     * 标记方块实体已更新
-     */
-    private void markUpdated() {
-        setChanged();
-        if (level != null && !level.isClientSide()) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-        }
-    }
-
-    /**
-     * 获取物品复制机当前显示的物品
-     *
-     * @return ItemStack 输入槽中的物品堆，如果为空则返回 EMPTY
-     */
-    public ItemStack getDisplayedItem() {
-        return items[INPUT_SLOT];
     }
 
     /**
@@ -546,7 +646,16 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      * @return ItemStackResourceHandler 物品处理器实例
      */
     public net.neoforged.neoforge.transfer.item.ItemStackResourceHandler getItemHandler(@Nullable Direction side) {
+        // 直接返回 itemHandler，它已经有管道检测逻辑了
         return itemHandler;
+    }
+
+    /**
+     * 获取用于渲染的显示物品（从输入槽获取）
+     */
+    public ItemStack getDisplayedItem() {
+        // 移除日志，直接返回物品
+        return items[INPUT_SLOT];
     }
 
     @Nullable

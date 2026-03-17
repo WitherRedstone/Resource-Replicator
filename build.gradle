@@ -135,6 +135,8 @@ dependencies {
     implementation "curse.maven:solargeneration-336538:7335850"
     implementation "curse.maven:edivadlib-638508:7335710"
     implementation "curse.maven:storage-drawers-223852:7335085"
+    implementation "curse.maven:dimstorage-353882:7381543"
+    implementation "curse.maven:edivadlib-638508:7335710"
 
     //implementation "curse.maven:pipez-443900:5609056"
     // Example optional mod dependency with JEI

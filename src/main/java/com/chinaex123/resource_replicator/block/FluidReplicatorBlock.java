@@ -1,6 +1,7 @@
 package com.chinaex123.resource_replicator.block;
 
 import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
+import com.chinaex123.resource_replicator.client.renderer.FluidReplicatorRenderer;
 import com.chinaex123.resource_replicator.config.ServerConfig;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
@@ -32,10 +33,14 @@ import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 public class FluidReplicatorBlock extends BaseEntityBlock {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FluidReplicatorBlock.class);
+
     private final int tier;
 
     public static final MapCodec<FluidReplicatorBlock> CODEC = simpleCodec(FluidReplicatorBlock::new);
@@ -154,7 +159,7 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
             var fluidHandler = replicator.getFluidHandler(null);
             if (fluidHandler != null) {
                 // 获取物品中的流体
-                FluidStack fluidStack = net.neoforged.neoforge.transfer.fluid.FluidUtil.getFirstStackContained(stack);
+                FluidStack fluidStack = FluidUtil.getFirstStackContained(stack);
                 
                 // 特殊处理牛奶桶（因为 FluidUtil 可能无法识别）
                 if (fluidStack.isEmpty() && stack.getItem() == Items.MILK_BUCKET) {
@@ -162,7 +167,7 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
                     var milkOpt = net.minecraft.core.registries.BuiltInRegistries.FLUID.get(net.minecraft.resources.Identifier.withDefaultNamespace("milk"));
                     if (milkOpt.isPresent()) {
                         net.minecraft.world.level.material.Fluid milkFluid = milkOpt.get().value();
-                        if (milkFluid != null && !milkFluid.equals(net.minecraft.world.level.material.Fluids.EMPTY)) {
+                        if (!milkFluid.equals(net.minecraft.world.level.material.Fluids.EMPTY)) {
                             fluidStack = new FluidStack(milkFluid, 1000);
                         }
                     }
@@ -173,10 +178,20 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
                     FluidResource resource = FluidResource.of(fluidStack.getFluid());
                     int actualAmount = fluidStack.getAmount();
                     
+                    LOGGER.info("尝试插入流体：{}, 数量：{}", fluidStack.getFluid(), actualAmount);
+                    
                     // 开启事务
                     try (var transaction = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                        // 标记为玩家操作（在 insert 之前）
+                        FluidReplicatorBlockEntity.setPlayerOperation(true);
+                        
                         // 尝试插入到复制机的输入罐
                         var inserted = fluidHandler.insert(0, resource, actualAmount, transaction);
+                        
+                        // 立即清除标记（在 commit 之前）
+                        FluidReplicatorBlockEntity.setPlayerOperation(false);
+                        
+                        LOGGER.info("尝试插入结果：{}", inserted);
                         
                         if (inserted > 0) {
                             // 提交事务
@@ -203,17 +218,25 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
                             }
                             
                             // 播放流体倾倒声音
-                            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_EMPTY, player.getSoundSource(), 1.0F, 1.0F);
+                            level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, player.getSoundSource(), 1.0F, 1.0F);
+
+                            replicator.markUpdated();
+                            
+                            LOGGER.info("✅ 流体已插入！位置：{}, 流体：{}, 数量：{}", pos, fluidStack.getFluid(), inserted);
                             
                             player.displayClientMessage(Component.translatable("message.fluid_replicator.inserted",
                                     fluidStack.getFluid().getFluidType().getDescription())
                                     .withStyle(style -> style.withColor(ChatFormatting.GOLD)), true);
                             return InteractionResult.CONSUME;
+                        } else {
+                            LOGGER.error("❌ 流体插入失败！可能原因：输入罐已满或不兼容");
                         }
                     }
+                } else {
+                    LOGGER.warn("⚠️ 物品中不包含流体！物品：{}", stack.getItem());
                 }
             }
-            
+
             // 如果物品不能倒入流体，显示当前复制机状态
             if (replicator.getInputFluid().isEmpty() && replicator.getOutputFluid().isEmpty()) {
                 player.displayClientMessage(Component.translatable("message.fluid_replicator.empty"), true);

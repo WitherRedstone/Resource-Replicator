@@ -53,9 +53,6 @@ public class ServerConfig {
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_ENABLE_DESTROY;
     private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_AUTO_OUTPUT;
     private static final ModConfigSpec.EnumValue<Direction> FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION;
-    
-    // 牛奶流体支持
-    private static final ModConfigSpec.BooleanValue ENABLE_MILK_FLUID;
 
     // 流体黑白名单配置
     private static final ModConfigSpec.BooleanValue FLUID_BLACKLIST_MODE;
@@ -237,12 +234,6 @@ public class ServerConfig {
 
 
         BUILDER.push("流体复制机设置");
-
-        BUILDER.push("通用设置");
-        ENABLE_MILK_FLUID = BUILDER
-                .comment("是否启用 NeoForge 的牛奶流体支持（默认：true）。启用后可以使用牛奶桶右键复制流体。")
-                .define("enableMilkFluid", true);
-        BUILDER.pop();
 
         BUILDER.push("销毁功能设置");
         FLUID_REPLICATOR_ENABLE_DESTROY = BUILDER
@@ -472,8 +463,6 @@ public class ServerConfig {
 
 
     // ======================= 流体复制机配置获取方法 =======================
-    public static boolean isEnableMilkFluid() {return ENABLE_MILK_FLUID.get();}
-    
     public static boolean isFluidReplicatorDestroyEnabled() {return FLUID_REPLICATOR_ENABLE_DESTROY.get();}
 
     // 流体复制机的自动输出
