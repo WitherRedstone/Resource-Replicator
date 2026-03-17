@@ -20,7 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
-// 导入 IntelliJ 的可空注解
+
 import org.jetbrains.annotations.Nullable;
 
 /**
