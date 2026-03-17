@@ -34,54 +34,32 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     private static final Logger LOGGER = LoggerFactory.getLogger(FluidReplicatorBlockEntity.class);
     private static final int INPUT_TANK_CAPACITY = 1000;
     
-    /**
-     * 使用 ThreadLocal 标记当前线程是否是玩家操作
-     */
     private static final ThreadLocal<Boolean> IS_PLAYER_OPERATION = ThreadLocal.withInitial(() -> false);
     
-    /**
-     * 使用 ThreadLocal 标记是否是内部复制操作
-     */
     private static final ThreadLocal<Boolean> IS_INTERNAL_REPLICATION = ThreadLocal.withInitial(() -> false);
 
     private long outputCapacity;
 
-    /**
-     * 设置当前是否为玩家操作
-     */
     public static void setPlayerOperation(boolean isPlayer) {
         IS_PLAYER_OPERATION.set(isPlayer);
     }
     
-    /**
-     * 检查当前是否为玩家操作
-     */
     public static boolean isPlayerOperation() {
         return IS_PLAYER_OPERATION.get();
     }
     
-    /**
-     * 设置是否是内部复制操作
-     */
     public static void setInternalReplication(boolean isInternal) {
         IS_INTERNAL_REPLICATION.set(isInternal);
     }
     
-    /**
-     * 检查是否是内部复制操作
-     */
     public static boolean isInternalReplication() {
         return IS_INTERNAL_REPLICATION.get();
     }
 
-    /**
-     * 判断是否是玩家插入（通过检查调用栈）
-     */
     private boolean isPlayerInsertion() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
         for (StackTraceElement element : stackTrace) {
-            // 检查是否来自 FluidReplicatorBlock 的 use 或 useItemOn 方法
             if (element.getClassName().contains("FluidReplicatorBlock")) {
                 String methodName = element.getMethodName();
                 if (methodName.contains("use") || methodName.contains("useItemOn")) {
@@ -140,18 +118,12 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         };
     }
 
-    /**
-     * 设置复制机的等级
-     */
     public void setTier(int tierId) {
         this.tier = FluidReplicatorTier.fromId(tierId);
         updateEnergyStats();
         updateOutputCapacity();
     }
 
-    /**
-     * 使用新 Transfer API 的能量处理器
-     */
     private final EnergyHandler energyHandler = new EnergyHandler() {
         @Override
         public int insert(int maxReceive, TransactionContext transaction) {
@@ -166,7 +138,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         @Override
         public int extract(int maxExtract, TransactionContext transaction) {
-            return 0; // 不支持能量提取
+            return 0;
         }
 
         @Override
@@ -180,10 +152,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     };
 
-    /**
-     * 自定义的流体处理器，支持清空操作和输入罐保护
-     */
-    private class ClearableFluidHandler extends net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler {
+    private class ClearableFluidHandler extends FluidStacksResourceHandler {
         private boolean allowClearing = false;
         private final int inputTankCapacity;
         
@@ -194,17 +163,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         
         @Override
         public int insert(int slot, FluidResource resource, int maxAmount, TransactionContext transaction) {
-            // 内部复制逻辑使用槽位 1（输出罐），外部玩家/管道只能使用槽位 0（输入罐）
             if (slot == 1) {
-                // 输出罐：只允许内部复制产生的流体插入
-                // 检查是否是内部复制操作
                 if (!isInternalReplication()) {
-                    // 不是内部复制，拒绝插入
-                    LOGGER.debug("非内部复制尝试插入到输出槽：拒绝");
                     return 0;
                 }
                 
-                // 内部复制：允许插入到输出罐
                 FluidResource currentResource = getResource(1);
                 long currentAmount = getAmountAsLong(1);
                 
@@ -223,31 +186,20 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 return 0;
             }
             
-            // 槽位 0：输入罐
             if (slot != 0) {
                 return 0;
             }
             
-            // 检查是否是通过管道（非玩家操作）插入的流体
             boolean isPipeInsertion = !isPlayerOperation();
             
-            LOGGER.debug("槽位 0 插入检查 - 是否是管道输入：{}, 销毁功能开启：{}", isPipeInsertion, ServerConfig.isFluidReplicatorDestroyEnabled());
-            
-            // 如果是管道插入且启用了销毁
             if (isPipeInsertion && ServerConfig.isFluidReplicatorDestroyEnabled()) {
-                LOGGER.debug("管道输入 + 销毁开启：模拟成功（销毁流体）");
-                // 模拟成功插入（实际上销毁流体）
                 return maxAmount;
             }
             
-            // 如果是管道插入但没有启用销毁，拒绝插入
             if (isPipeInsertion) {
-                LOGGER.debug("管道输入 + 销毁关闭：拒绝插入");
                 return 0;
             }
             
-            // 玩家操作：正常插入逻辑
-            LOGGER.debug("玩家操作：允许插入到输入槽");
             FluidResource currentResource = getResource(0);
             long currentAmount = getAmountAsLong(0);
             
@@ -269,27 +221,21 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         
         @Override
         public int extract(int slot, FluidResource resource, int amount, TransactionContext transaction) {
-            // 如果不是在清空模式下，只允许从输出罐（槽位 1）抽取流体
             if (!allowClearing && slot != 1) {
                 return 0;
             }
             return super.extract(slot, resource, amount, transaction);
         }
         
-        /**
-         * 清空所有流体
-         */
         public void clearAll() {
             allowClearing = true;
             try {
-                // 清空输入罐
                 FluidResource inputResource = getResource(0);
                 long inputAmount = getAmountAsLong(0);
                 if (!inputResource.isEmpty() && inputAmount > 0) {
                     set(0, FluidResource.EMPTY, 0);
                 }
                 
-                // 清空输出罐
                 FluidResource outputResource = getResource(1);
                 long outputAmount = getAmountAsLong(1);
                 if (!outputResource.isEmpty() && outputAmount > 0) {
@@ -308,13 +254,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
     
-    /**
-     * 使用自定义的流体处理器
-     */
     private final ClearableFluidHandler fluidHandler = new ClearableFluidHandler(2, (int) outputCapacity, INPUT_TANK_CAPACITY);
 
     public void clearAllFluids() {
-        // 调用内部的 clearAll 方法
         fluidHandler.clearAll();
         markUpdated();
     }
@@ -328,7 +270,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         
         blockEntity.tickCounter = 0;
 
-        // 从 fluidHandler 获取输入罐的流体
         FluidResource inputResource = (FluidResource) blockEntity.fluidHandler.getResource(0);
         long inputAmount = blockEntity.fluidHandler.getAmountAsLong(0);
         
@@ -336,7 +277,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             return;
         }
 
-        // 根据流体类型确定输出量（水和岩浆使用特殊倍率）
         int actualOutput = blockEntity.tier.getActualOutputAmount(inputResource.toStack((int) inputAmount));
         
         long energyPer1000MB = blockEntity.energyConsumption;
@@ -373,7 +313,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                             totalOutput += (int) filled;
                             remainingOutput -= (int) filled;
                             
-                            // 从输入罐提取相应数量的流体
                             blockEntity.fluidHandler.extract(0, inputResource, (int) filled, transaction);
                             
                             hasUpdated = true;
@@ -384,7 +323,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
 
         if (remainingOutput > 0) {
-            // 将产生的流体"插入"到输出罐 - 标记为内部复制操作
             setInternalReplication(true);
             try (Transaction transaction = Transaction.openRoot()) {
                 int inserted = (int) blockEntity.fluidHandler.insert(1, inputResource, remainingOutput, transaction);
@@ -414,7 +352,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     @Override
     public void setLevel(Level level) {
         super.setLevel(level);
-        // 客户端设置等级时，标记为需要同步
         if (level != null && level.isClientSide()) {
             markUpdated();
         }
@@ -433,14 +370,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         customData.putInt("tier", tier.getId());
         customData.putLong("energyStored", energyStored);
 
-        // 保存流体处理器的数据 - 直接读取底层数据，不使用 insert 逻辑
         CompoundTag tanksTag = new CompoundTag();
         
-        // 保存输入罐（槽位 0）
         FluidResource inputResource = (FluidResource) fluidHandler.getResource(0);
         long inputAmount = fluidHandler.getAmountAsLong(0);
-        LOGGER.info("保存时 - 输入罐：流体={}, 数量={}", 
-            inputResource != null && !inputResource.isEmpty() ? BuiltInRegistries.FLUID.getKey(inputResource.toStack(1).getFluid()) : "空", inputAmount);
         
         if (!inputResource.isEmpty() && inputAmount > 0) {
             CompoundTag inputTag = new CompoundTag();
@@ -449,11 +382,8 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             tanksTag.put("inputTank", inputTag);
         }
         
-        // 保存输出罐（槽位 1）
         FluidResource outputResource = (FluidResource) fluidHandler.getResource(1);
         long outputAmount = fluidHandler.getAmountAsLong(1);
-        LOGGER.info("保存时 - 输出罐：流体={}, 数量={}", 
-            outputResource != null && !outputResource.isEmpty() ? BuiltInRegistries.FLUID.getKey(outputResource.toStack(1).getFluid()) : "空", outputAmount);
         
         if (!outputResource.isEmpty() && outputAmount > 0) {
             CompoundTag outputTag = new CompoundTag();
@@ -475,7 +405,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         tag.putInt("tier", tier.getId());
         tag.putLong("energyStored", energyStored);
 
-        // 保存流体处理器的数据
         CompoundTag tanksTag = new CompoundTag();
         
         FluidResource inputRes = (FluidResource) fluidHandler.getResource(0);
@@ -521,25 +450,16 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         CompoundTag tanksTag = customData.getCompound("tanks").orElse(new CompoundTag());
         
-        LOGGER.info("加载时 - tanksTag 内容：{}", tanksTag);
-        
-        // 直接设置流体数据，不使用 insert 逻辑（避免被 ThreadLocal 检查拦截）
         if (tanksTag.contains("inputTank")) {
             CompoundTag inputTag = tanksTag.getCompound("inputTank").orElse(new CompoundTag());
             String fluidName = inputTag.getString("fluid").orElse("");
             int amount = inputTag.getInt("amount").orElse(0);
             
-            LOGGER.info("加载输入罐 - 流体：{}, 数量：{}", fluidName, amount);
-            
             if (!fluidName.isEmpty() && amount > 0) {
                 net.minecraft.world.level.material.Fluid fluid = net.minecraft.core.registries.BuiltInRegistries.FLUID.getValue(net.minecraft.resources.Identifier.tryParse(fluidName));
                 if (fluid != null && !fluid.equals(net.minecraft.world.level.material.Fluids.EMPTY)) {
                     FluidResource resource = FluidResource.of(fluid);
-                    // 直接使用 set 方法，绕过 insert 检查
                     fluidHandler.set(0, resource, amount);
-                    LOGGER.info("输入罐直接设置成功 - 流体：{}, 数量：{}", fluidName, amount);
-                } else {
-                    LOGGER.error("流体注册表查找失败：{}", fluidName);
                 }
             }
         }
@@ -549,17 +469,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             String fluidName = outputTag.getString("fluid").orElse("");
             int amount = outputTag.getInt("amount").orElse(0);
             
-            LOGGER.info("加载输出罐 - 流体：{}, 数量：{}", fluidName, amount);
-            
             if (!fluidName.isEmpty() && amount > 0) {
                 net.minecraft.world.level.material.Fluid fluid = net.minecraft.core.registries.BuiltInRegistries.FLUID.getValue(net.minecraft.resources.Identifier.tryParse(fluidName));
                 if (fluid != null && !fluid.equals(net.minecraft.world.level.material.Fluids.EMPTY)) {
                     FluidResource resource = FluidResource.of(fluid);
-                    // 直接使用 set 方法，绕过 insert 检查
                     fluidHandler.set(1, resource, amount);
-                    LOGGER.info("输出罐直接设置成功 - 流体：{}, 数量：{}", fluidName, amount);
-                } else {
-                    LOGGER.error("流体注册表查找失败：{}", fluidName);
                 }
             }
         }
@@ -575,9 +489,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         
         CompoundTag tanksTag = tag.getCompound("tanks").orElse(new CompoundTag());
         
-        LOGGER.info("客户端同步 - tanksTag: {}", tanksTag);
-        
-        // 先清空现有流体（不需要事务，直接修改底层数组）
         clearFluidHandlerDirectly();
         
         if (tanksTag.contains("inputTank")) {
@@ -587,11 +498,8 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             );
             int amount = inputTag.getInt("amount").orElse(0);
             
-            LOGGER.info("客户端输入罐 - 流体：{}, 数量：{}", fluid, amount);
-            
             if (fluid.isPresent() && amount > 0) {
                 var resource = net.neoforged.neoforge.transfer.fluid.FluidResource.of(fluid.get());
-                // 直接设置，不使用事务
                 fluidHandler.set(0, resource, amount);
             }
         }
@@ -603,31 +511,18 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             );
             int amount = outputTag.getInt("amount").orElse(0);
             
-            LOGGER.info("客户端输出罐 - 流体：{}, 数量：{}", fluid, amount);
-            
             if (fluid.isPresent() && amount > 0) {
                 var resource = net.neoforged.neoforge.transfer.fluid.FluidResource.of(fluid.get());
-                // 直接设置，不使用事务
                 fluidHandler.set(1, resource, amount);
             }
         }
-        
-        LOGGER.info("客户端同步完成 - 输入罐：{} ({}), 输出罐：{} ({})", 
-            fluidHandler.getResource(0), fluidHandler.getAmountAsLong(0),
-            fluidHandler.getResource(1), fluidHandler.getAmountAsLong(1));
     }
     
-    /**
-     * 直接清空流体处理器（不使用事务，用于客户端）
-     */
     private void clearFluidHandlerDirectly() {
         fluidHandler.set(0, FluidResource.EMPTY, 0);
         fluidHandler.set(1, FluidResource.EMPTY, 0);
     }
     
-    /**
-     * 直接插入流体（不使用事务，用于客户端）
-     */
     private void insertFluidDirectly(int slot, FluidResource resource, int amount) {
         fluidHandler.set(slot, resource, amount);
     }
@@ -635,7 +530,6 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
-        // 让 Minecraft 使用默认的方式创建数据包
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
@@ -644,12 +538,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         if (level != null) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             
-            // 手动发送流体同步包给附近玩家
             if (!level.isClientSide()) {
                 var tag = getUpdateTag(level.registryAccess());
                 var packet = new com.chinaex123.resource_replicator.network.FluidSyncPacket(getBlockPos(), tag);
-                
-                LOGGER.info("准备发送流体同步包：位置={}, 流体数据={}", getBlockPos(), tag);
                 
                 for (var player : level.players()) {
                     if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
@@ -657,10 +548,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                                 Math.abs(serverPlayer.getY() - getBlockPos().getY()) +
                                 Math.abs(serverPlayer.getZ() - getBlockPos().getZ());
                         if (distance < 64) {
-                            LOGGER.info("发送流体同步包给玩家：{}, 距离={}", serverPlayer.getName().getString(), distance);
                             net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(serverPlayer, packet);
-                        } else {
-                            LOGGER.info("跳过玩家 {}，距离太远：{}", serverPlayer.getName().getString(), distance);
                         }
                     }
                 }
