@@ -248,7 +248,6 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
                 // 虚拟槽位数量为无限，直接返回请求的数量
                 // 但限制为不超过当前等级的生产速率相关的值
-                // 这里我们允许管道按照配置的速率抽取，即每次操作最多抽取 config 中设置的输出量
                 int maxExtract = tier.getOutputAmount();
                 int toExtract = Math.min(amount, maxExtract);
 
