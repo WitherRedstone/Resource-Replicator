@@ -54,8 +54,9 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
     private boolean virtualSlotActive = false;
     private ItemResource virtualSlotResource = ItemResource.EMPTY;
-    private int virtualSlotAmount = 0;
+    private long virtualSlotAmount = Long.MAX_VALUE; // 虚拟槽位数量改为无限
     private int virtualSlotAccumulator = 0;
+    private int productionRatePerTick; // 每 tick 的生产速率（根据等级配置）
 
     // 初始化代码块，在构造函数执行前运行
     {
@@ -63,6 +64,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         energyStored = 0;  // 初始化能量为 0
         updateOutputSlots();  // 更新输出槽数量
         items[VIRTUAL_SLOT] = ItemStack.EMPTY;  // 初始化虚拟槽位为空
+        updateProductionRate(); // 初始化生产速率
     }
 
     /**
@@ -104,6 +106,20 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
             case ITEM_TIER_4 -> ServerConfig.getItemTier4OutputSlots();
             case ITEM_TIER_5 -> ServerConfig.getItemTier5OutputSlots();
         };
+    }
+
+    /**
+     * 更新生产速率（根据机器等级）
+     */
+    private void updateProductionRate() {
+        int outputAmount = tier.getOutputAmount();
+        int processSpeed = tier.getProcessSpeed();
+        // 计算每秒产量，然后转换为每 tick 产量
+        // 例如：一次生产 64 个物品，需要 5 tick，则每 tick 生产 12.8 个，向下取整为 12
+        this.productionRatePerTick = (int) Math.floor((double) outputAmount / processSpeed);
+        if (this.productionRatePerTick < 1) {
+            this.productionRatePerTick = 1; // 至少每 tick 生产 1 个
+        }
     }
 
     /**
@@ -160,9 +176,9 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
          */
         @Override
         public long getCapacityAsLong(int index, ItemResource resource) {
-            // 虚拟槽位的容量等于一次生产的数量
+            // 虚拟槽位的容量为无限
             if (index == VIRTUAL_SLOT) {
-                return tier.getOutputAmount();
+                return Long.MAX_VALUE;
             }
             // 其他槽位容量为 64
             return 64L;
@@ -230,10 +246,16 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                     return 0;
                 }
 
-                int toExtract = Math.min(amount, virtualSlotAmount);
+                // 虚拟槽位数量为无限，直接返回请求的数量
+                // 但限制为不超过当前等级的生产速率相关的值
+                // 这里我们允许管道按照配置的速率抽取，即每次操作最多抽取 config 中设置的输出量
+                int maxExtract = tier.getOutputAmount();
+                int toExtract = Math.min(amount, maxExtract);
 
                 if (toExtract > 0) {
-                    virtualSlotAmount -= toExtract;
+                    // 虚拟槽位数量保持无限
+                    virtualSlotAmount = Long.MAX_VALUE;
+                    markUpdated();
                     return toExtract;
                 }
                 return 0;
@@ -463,6 +485,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         this.tier = ItemReplicatorTier.fromId(tierId);
         updateEnergyStats();
         updateOutputSlots();
+        updateProductionRate();
     }
 
     /**
@@ -492,7 +515,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
             if (blockEntity.virtualSlotActive) {
                 blockEntity.virtualSlotActive = false;
                 blockEntity.virtualSlotResource = ItemResource.EMPTY;
-                blockEntity.virtualSlotAmount = 0;
+                blockEntity.virtualSlotAmount = Long.MAX_VALUE;
                 blockEntity.virtualSlotAccumulator = 0;
             }
         } else {
@@ -508,15 +531,15 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                     if (!blockEntity.virtualSlotActive) {
                         blockEntity.virtualSlotActive = true;
                         blockEntity.virtualSlotResource = ItemResource.of(inputStack);
-                        blockEntity.virtualSlotAmount = 0;
+                        blockEntity.virtualSlotAmount = Long.MAX_VALUE;
                     }
 
-                    blockEntity.virtualSlotAmount += itemsPerProduction;
+                    blockEntity.virtualSlotAmount = Long.MAX_VALUE;
                 }
             } else {
                 blockEntity.virtualSlotActive = false;
                 blockEntity.virtualSlotResource = ItemResource.EMPTY;
-                blockEntity.virtualSlotAmount = 0;
+                blockEntity.virtualSlotAmount = Long.MAX_VALUE;
                 blockEntity.virtualSlotAccumulator = 0;
             }
         }
