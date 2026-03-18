@@ -114,8 +114,6 @@ public class ModBlocks {
                             .explosionResistance(6.0f)
                             .requiresCorrectToolForDrops(), Rarity.EPIC);
 
-    // ======================= 流体资源复制机 =======================
-
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, 
             Function<BlockBehaviour.Properties, T> func,
             Supplier<BlockBehaviour.Properties> properties,
