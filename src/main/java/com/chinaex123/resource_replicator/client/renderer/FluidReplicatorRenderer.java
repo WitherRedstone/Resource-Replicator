@@ -18,6 +18,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.fluid.FluidTintSource;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull FluidReplicatorBlockEntity, FluidReplicatorRenderer.@NotNull FluidReplicatorRenderState> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FluidReplicatorRenderer.class);
+
     /**
      * 构造函数
      */
@@ -76,14 +78,17 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
 
             try {
                 renderState.sprite = getFluidTexture(inputFluid);
+                renderState.fluidColor = getColor(inputFluid.getFluid());
                 renderState.pendingRender = true;
             } catch (Exception e) {
                 renderState.sprite = null;
+                renderState.fluidColor = 0xFFFFFFFF;
                 renderState.pendingRender = false;
             }
         } else {
             renderState.fluidStack = FluidStack.EMPTY;
             renderState.sprite = null;
+            renderState.fluidColor = 0xFFFFFFFF;
             renderState.pendingRender = false;
         }
     }
@@ -142,31 +147,35 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
      * 获取流体的颜色
      */
     private int getColor(Fluid fluid) {
+        // 直接根据流体类型返回颜色
+        var fluidName = BuiltInRegistries.FLUID.getKey(fluid).getPath();
+
+        // 水返回蓝色
+        if (fluidName.equals("water") || fluidName.equals("flowing_water")) {
+            return 0xFF3F76E4; // 水的蓝色
+        }
+
+        // 其他流体返回白色（让纹理自己显示颜色）
         return 0xFFFFFFFF;
     }
 
     /**
      * 获取流体的纹理图集精灵
      */
+
     private TextureAtlasSprite getFluidTexture(FluidStack fluidStack) {
         var fluid = fluidStack.getFluid();
 
         try {
-            // 尝试多种纹理路径格式
             Identifier textureLocation = null;
             String modId = BuiltInRegistries.FLUID.getKey(fluid).getNamespace();
             String fluidName = BuiltInRegistries.FLUID.getKey(fluid).getPath();
 
-            LOGGER.info("流体模组 ID: {}, 名称：{}", modId, fluidName);
-
-            // 处理名称，确保有 _still 后缀
             if (!fluidName.endsWith("_still")) {
                 fluidName = fluidName + "_still";
             }
 
-            // 尝试 block/ 前缀
             textureLocation = Identifier.fromNamespaceAndPath(modId, "block/" + fluidName);
-            LOGGER.info("尝试纹理路径 1: {}", textureLocation);
 
             var textureManager = Minecraft.getInstance().getTextureManager();
             var blocksAtlasLocation = Identifier.withDefaultNamespace("textures/atlas/blocks.png");
@@ -175,24 +184,20 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
             if (atlas instanceof TextureAtlas textureAtlas) {
                 var sprite = textureAtlas.getSprite(textureLocation);
                 if (sprite != null) {
-                    LOGGER.info("找到有效纹理：{}", textureLocation);
                     return sprite;
                 }
             }
 
-            // 尝试 fluid/ 前缀
             textureLocation = Identifier.fromNamespaceAndPath(modId, "fluid/" + fluidName);
-            LOGGER.info("尝试纹理路径 2: {}", textureLocation);
 
             if (atlas instanceof TextureAtlas textureAtlas) {
                 var sprite = textureAtlas.getSprite(textureLocation);
                 if (sprite != null) {
-                    LOGGER.info("找到有效纹理：{}", textureLocation);
                     return sprite;
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("获取流体纹理时出错", e);
+            // 忽略错误
         }
 
         return null;
