@@ -183,9 +183,7 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
 
             if (atlas instanceof TextureAtlas textureAtlas) {
                 var sprite = textureAtlas.getSprite(textureLocation);
-                if (sprite != null) {
-                    return sprite;
-                }
+                return sprite;
             }
 
             textureLocation = Identifier.fromNamespaceAndPath(modId, "fluid/" + fluidName);
