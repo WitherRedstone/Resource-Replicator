@@ -16,6 +16,9 @@
   "block.resource_replicator.chemical_replicator_tier3": "Chemical Replicator T3",
   "block.resource_replicator.chemical_replicator_tier4": "Chemical Replicator T4",
   "block.resource_replicator.chemical_replicator_tier5": "Chemical Replicator T5",
+  "block.resource_replicator.coal_fired_generator": "Coal-fired Generator",
+
+  "container.resource_replicator.coal_fired_generator": "Coal-fired Generator",
 
   "_comment.auto_output": "Auto Output Tooltip",
   "tooltip.resource_replicator.auto_output_direction": "Auto Output Direction: %s",

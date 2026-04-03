@@ -197,12 +197,12 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         private boolean allowClearing = false;
         // 输入罐容量
         private final int inputTankCapacity;
-        
+
         public ClearableFluidHandler(int size, int capacity, int inputTankCapacity) {
             super(size, capacity);
             this.inputTankCapacity = inputTankCapacity;
         }
-        
+
         @Override
         public int insert(int slot, FluidResource resource, int maxAmount, @NotNull TransactionContext transaction) {
             // 槽位 1：输出罐
@@ -211,7 +211,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 if (!isInternalReplication()) {
                     return 0;
                 }
-                
+
                 FluidResource currentResource = getResource(1);
                 long currentAmount = getAmountAsLong(1);
 
@@ -254,7 +254,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             // 玩家操作：正常插入逻辑
             FluidResource currentResource = getResource(0);
             long currentAmount = getAmountAsLong(0);
-            
+
             if (currentResource.isEmpty() || currentAmount == 0) {
                 set(0, resource, maxAmount);
                 markUpdated();
@@ -267,10 +267,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 }
                 return canAdd;
             }
-            
+
             return 0;
         }
-        
+
         @Override
         public int extract(int slot, FluidResource resource, int amount, @NotNull TransactionContext transaction) {
             // 非清空模式下，只允许从输出罐抽取
@@ -309,7 +309,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 allowClearing = false;
             }
         }
-        
+
         @Override
         protected int getCapacity(int index, @NotNull FluidResource resource) {
             if (index == 0) return inputTankCapacity;
@@ -340,14 +340,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
      * 服务器端 Tick 方法 - 处理流体复制逻辑
      */
     public static void serverTick(Level level, BlockPos pos, BlockState state, FluidReplicatorBlockEntity blockEntity) {
-        blockEntity.tickCounter++;
+        boolean hasFluidChanged = false;
 
-        // 未达到生产时间，跳过
-        if (blockEntity.tickCounter < blockEntity.tier.getProcessSpeed()) {
-            return;
-        }
-        
-        blockEntity.tickCounter = 0;
+        blockEntity.tickCounter++;
 
         // 获取输入罐的流体
         FluidResource inputResource = blockEntity.fluidHandler.getResource(0);
@@ -355,12 +350,29 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         // 没有输入流体，跳过
         if (inputResource.isEmpty() || inputAmount == 0) {
+            if (blockEntity.fluidHandler.getAmountAsLong(1) > 0) {
+                blockEntity.clearFluidHandlerDirectly();
+                hasFluidChanged = true;
+            }
+            if (hasFluidChanged) {
+                blockEntity.markUpdated();
+            }
             return;
         }
 
+        // 未达到生产时间，跳过
+        if (blockEntity.tickCounter < blockEntity.tier.getProcessSpeed()) {
+            if (hasFluidChanged) {
+                blockEntity.markUpdated();
+            }
+            return;
+        }
+
+        blockEntity.tickCounter = 0;
+
         // 计算实际输出量
         int actualOutput = blockEntity.tier.getActualOutputAmount(inputResource.toStack((int) inputAmount));
-        
+
         long energyPer1000MB = blockEntity.energyConsumption;
         long energyNeeded = (actualOutput * energyPer1000MB) / 1000;
         if (energyNeeded < 1 && actualOutput > 0) {
@@ -369,6 +381,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         // 能量不足，跳过
         if (blockEntity.energyStored < energyNeeded) {
+            if (hasFluidChanged) {
+                blockEntity.markUpdated();
+            }
             return;
         }
 
@@ -397,7 +412,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 if (handler != null) {
                     try (Transaction transaction = Transaction.openRoot()) {
                         long filled = handler.insert(inputResource, remainingOutput, transaction);
-                        
+
                         if (filled > 0) {
                             transaction.commit();
                             totalOutput += (int) filled;
@@ -405,8 +420,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
                             // 从输入罐提取相应数量的流体
                             blockEntity.fluidHandler.extract(0, inputResource, (int) filled, transaction);
-                            
+
                             hasUpdated = true;
+                            hasFluidChanged = true;
                         }
                     }
                 }
@@ -422,6 +438,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     transaction.commit();
                     totalOutput += inserted;
                     hasUpdated = true;
+                    hasFluidChanged = true;
                 }
             } finally {
                 setInternalReplication(false);
@@ -437,8 +454,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
             if (blockEntity.energyStored >= actualEnergyNeeded) {
                 blockEntity.energyStored -= actualEnergyNeeded;
-                blockEntity.markUpdated();
             }
+        }
+
+        if (hasFluidChanged) {
+            blockEntity.markUpdated();
         }
     }
 
@@ -463,7 +483,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(@NotNull ValueOutput output) {
         super.saveAdditional(output);
-        
+
         CompoundTag customData = new CompoundTag();
         customData.putInt("tickCounter", tickCounter);
         customData.putInt("tier", tier.getId());
@@ -474,7 +494,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         // 保存输入罐
         FluidResource inputResource = fluidHandler.getResource(0);
         long inputAmount = fluidHandler.getAmountAsLong(0);
-        
+
         if (!inputResource.isEmpty() && inputAmount > 0) {
             CompoundTag inputTag = new CompoundTag();
             inputTag.putString("fluid", BuiltInRegistries.FLUID.getKey(inputResource.toStack(1).getFluid()).toString());
@@ -485,16 +505,16 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         // 保存输出罐
         FluidResource outputResource = fluidHandler.getResource(1);
         long outputAmount = fluidHandler.getAmountAsLong(1);
-        
+
         if (!outputResource.isEmpty() && outputAmount > 0) {
             CompoundTag outputTag = new CompoundTag();
             outputTag.putString("fluid", BuiltInRegistries.FLUID.getKey(outputResource.toStack(1).getFluid()).toString());
             outputTag.putInt("amount", (int) outputAmount);
             tanksTag.put("outputTank", outputTag);
         }
-        
+
         customData.put("tanks", tanksTag);
-        
+
         output.store("custom_data", CompoundTag.CODEC, customData);
     }
 
@@ -503,17 +523,17 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
      */
     @Override
     public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        
+        CompoundTag tag = new CompoundTag();
+
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
         tag.putLong("energyStored", energyStored);
 
         CompoundTag tanksTag = new CompoundTag();
-        
+
         FluidResource inputRes = fluidHandler.getResource(0);
         long inputAmt = fluidHandler.getAmountAsLong(0);
-        
+
         if (!inputRes.isEmpty() && inputAmt > 0) {
             CompoundTag inputTag = new CompoundTag();
             FluidStack stack = inputRes.toStack((int) inputAmt);
@@ -521,10 +541,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             inputTag.putInt("amount", stack.getAmount());
             tanksTag.put("inputTank", inputTag);
         }
-        
+
         FluidResource outputRes = fluidHandler.getResource(1);
         long outputAmt = fluidHandler.getAmountAsLong(1);
-        
+
         if (!outputRes.isEmpty() && outputAmt > 0) {
             CompoundTag outputTag = new CompoundTag();
             FluidStack stack = outputRes.toStack((int) outputAmt);
@@ -532,7 +552,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             outputTag.putInt("amount", stack.getAmount());
             tanksTag.put("outputTank", outputTag);
         }
-        
+
         tag.put("tanks", tanksTag);
 
         return tag;
@@ -544,9 +564,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(@NotNull ValueInput input) {
         super.loadAdditional(input);
-        
+
         CompoundTag customData = input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
-        
+
         tickCounter = customData.getInt("tickCounter").orElse(0);
         if (customData.contains("tier")) {
             this.tier = FluidReplicatorTier.fromId(customData.getInt("tier").orElse(0));
@@ -562,7 +582,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             CompoundTag inputTag = tanksTag.getCompound("inputTank").orElse(new CompoundTag());
             String fluidName = inputTag.getString("fluid").orElse("");
             int amount = inputTag.getInt("amount").orElse(0);
-            
+
             if (!fluidName.isEmpty() && amount > 0) {
                 Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.tryParse(fluidName));
                 if (!fluid.equals(Fluids.EMPTY)) {
@@ -577,7 +597,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             CompoundTag outputTag = tanksTag.getCompound("outputTank").orElse(new CompoundTag());
             String fluidName = outputTag.getString("fluid").orElse("");
             int amount = outputTag.getInt("amount").orElse(0);
-            
+
             if (!fluidName.isEmpty() && amount > 0) {
                 Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.tryParse(fluidName));
                 if (!fluid.equals(Fluids.EMPTY)) {
@@ -589,6 +609,56 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
         updateEnergyStats();
         updateOutputCapacity();
+
+        setChanged();
+    }
+
+
+    @Override
+    public void handleUpdateTag(@NotNull ValueInput input) {
+        CompoundTag customData = input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
+
+        tickCounter = customData.getInt("tickCounter").orElse(0);
+        if (customData.contains("tier")) {
+            this.tier = FluidReplicatorTier.fromId(customData.getInt("tier").orElse(0));
+        }
+        if (customData.contains("energyStored")) {
+            this.energyStored = customData.getLong("energyStored").orElse(0L);
+        }
+
+        CompoundTag tanksTag = customData.getCompound("tanks").orElse(new CompoundTag());
+
+        clearFluidHandlerDirectly();
+
+        // 加载输入罐
+        if (tanksTag.contains("inputTank")) {
+            CompoundTag inputTag = tanksTag.getCompound("inputTank").orElse(new CompoundTag());
+            String fluidName = inputTag.getString("fluid").orElse("");
+            int amount = inputTag.getInt("amount").orElse(0);
+
+            if (!fluidName.isEmpty() && amount > 0) {
+                Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.tryParse(fluidName));
+                if (!fluid.equals(Fluids.EMPTY)) {
+                    FluidResource resource = FluidResource.of(fluid);
+                    fluidHandler.set(0, resource, amount);
+                }
+            }
+        }
+
+        // 加载输出罐
+        if (tanksTag.contains("outputTank")) {
+            CompoundTag outputTag = tanksTag.getCompound("outputTank").orElse(new CompoundTag());
+            String fluidName = outputTag.getString("fluid").orElse("");
+            int amount = outputTag.getInt("amount").orElse(0);
+
+            if (!fluidName.isEmpty() && amount > 0) {
+                Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.tryParse(fluidName));
+                if (!fluid.equals(Fluids.EMPTY)) {
+                    FluidResource resource = FluidResource.of(fluid);
+                    fluidHandler.set(1, resource, amount);
+                }
+            }
+        }
     }
 
     /**
@@ -600,7 +670,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
 
         CompoundTag tanksTag = tag.getCompound("tanks").orElse(new CompoundTag());
-        
+
         clearFluidHandlerDirectly();
 
         // 加载输入罐
@@ -610,7 +680,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     Objects.requireNonNull(Identifier.tryParse(inputTag.getString("fluid").orElse("")))
             );
             int amount = inputTag.getInt("amount").orElse(0);
-            
+
             if (fluid.isPresent() && amount > 0) {
                 var resource = FluidResource.of(fluid.get());
                 fluidHandler.set(0, resource, amount);
@@ -624,7 +694,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     Objects.requireNonNull(Identifier.tryParse(outputTag.getString("fluid").orElse("")))
             );
             int amount = outputTag.getInt("amount").orElse(0);
-            
+
             if (fluid.isPresent() && amount > 0) {
                 var resource = FluidResource.of(fluid.get());
                 fluidHandler.set(1, resource, amount);
@@ -662,11 +732,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         setChanged();
         if (level != null) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            
+
             if (!level.isClientSide()) {
                 var tag = getUpdateTag(level.registryAccess());
                 var packet = new FluidSyncPacket(getBlockPos(), tag);
-                
+
                 for (var player : level.players()) {
                     if (player instanceof ServerPlayer serverPlayer) {
                         double distance = Math.abs(serverPlayer.getX() - getBlockPos().getX()) +
@@ -689,13 +759,13 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         if (resource.isEmpty()) {
             return FluidStack.EMPTY;
         }
-        
+
         long amount = fluidHandler.getAmountAsLong(0);
-        
+
         if (amount <= 0) {
             return FluidStack.EMPTY;
         }
-        
+
         return resource.toStack((int) amount);
     }
 
@@ -707,12 +777,12 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         if (resource.isEmpty()) {
             return FluidStack.EMPTY;
         }
-        
+
         long amount = fluidHandler.getAmountAsLong(1);
         if (amount <= 0) {
             return FluidStack.EMPTY;
         }
-        
+
         return resource.toStack((int) amount);
     }
 

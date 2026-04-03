@@ -16,6 +16,9 @@
   "block.resource_replicator.chemical_replicator_tier3": "化学品复制机T3",
   "block.resource_replicator.chemical_replicator_tier4": "化学品复制机T4",
   "block.resource_replicator.chemical_replicator_tier5": "化学品复制机T5",
+  "block.resource_replicator.coal_fired_generator": "火力发电机",
+
+  "container.resource_replicator.coal_fired_generator": "火力发电机",
 
   "_comment.auto_output": "自动输出提示",
   "tooltip.resource_replicator.auto_output_direction": "自动输出方向：%s",

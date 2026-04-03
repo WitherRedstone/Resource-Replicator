@@ -33,7 +33,6 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.FLUID_REPLICATOR_Tier3.get());
                         output.accept(ModBlocks.FLUID_REPLICATOR_Tier4.get());
                         output.accept(ModBlocks.FLUID_REPLICATOR_Tier5.get());
-
                     })
                     .build());
 

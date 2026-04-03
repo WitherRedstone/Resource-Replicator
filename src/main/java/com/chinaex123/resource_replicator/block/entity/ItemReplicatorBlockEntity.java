@@ -215,7 +215,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 // 玩家插入：正常处理
                 ItemStack stack = resource.toStack(1);
                 ItemStack current = items[index];
-                
+
                 if (current.isEmpty()) {
                     int toInsert = Math.min(amount, stack.getMaxStackSize());
                     items[index] = stack.copyWithCount(toInsert);
@@ -345,15 +345,21 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         customData.putInt("tier", tier.getId());
         customData.putInt("energyStored", energyStored);
         customData.putBoolean("virtualSlotActive", virtualSlotActive);
+
         if (virtualSlotActive && !virtualSlotResource.isEmpty()) {
-            customData.putString("virtualSlotResource", virtualSlotResource.toStack(1).getItem().toString());
+            ItemStack virtualStack = virtualSlotResource.toStack(1);
+            ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, virtualStack)
+                    .result()
+                    .ifPresent(tag -> customData.put("virtualSlotResourceStack", tag));
         }
 
         CompoundTag itemsTag = new CompoundTag();
         for (int i = 0; i < items.length; i++) {
             if (!items[i].isEmpty()) {
                 int finalI = i;
-                ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, items[i]).result().ifPresent(tag -> itemsTag.put("item" + finalI, tag));
+                ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, items[i])
+                        .result()
+                        .ifPresent(tag -> itemsTag.put("item" + finalI, tag));
             }
         }
         customData.put("items", itemsTag);
@@ -370,8 +376,16 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
         CompoundTag customData = input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
         virtualSlotActive = customData.getBoolean("virtualSlotActive").orElse(false);
-        if (virtualSlotActive && customData.contains("virtualSlotResource")) {
-            String resourceName = customData.getString("virtualSlotResource").orElse("");
+
+        if (virtualSlotActive && customData.contains("virtualSlotResourceStack")) {
+            customData.getCompound("virtualSlotResourceStack")
+                    .flatMap(tag -> ItemStack.CODEC.parse(NbtOps.INSTANCE, tag).result())
+                    .ifPresent(stack -> {
+                        if (!stack.isEmpty()) {
+                            virtualSlotResource = ItemResource.of(stack);
+                            virtualSlotAmount = Long.MAX_VALUE;
+                        }
+                    });
         }
 
         tickCounter = customData.getInt("tickCounter").orElse(0);
@@ -391,13 +405,13 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
             String key = "item" + i;
             int finalI = i;
 
-            if (itemsTag.contains(key)) {
-                var itemTagOpt = itemsTag.getCompound(key);
-                itemTagOpt.flatMap(itemTag -> ItemStack.CODEC.parse(NbtOps.INSTANCE, itemTag)
-                        .result()).ifPresent(stack -> items[finalI] = stack);
-            }
+            itemsTag.getCompound(key).ifPresent(itemTag ->
+                    ItemStack.CODEC.parse(NbtOps.INSTANCE, itemTag)
+                            .result().ifPresent(stack -> items[finalI] = stack)
+            );
         }
 
+        setChanged();
     }
 
     /**
@@ -405,6 +419,42 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      */
     @Override
     public void handleUpdateTag(@NotNull ValueInput input) {
+        CompoundTag customData = input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
+        virtualSlotActive = customData.getBoolean("virtualSlotActive").orElse(false);
+
+        if (virtualSlotActive && customData.contains("virtualSlotResourceStack")) {
+            customData.getCompound("virtualSlotResourceStack")
+                    .flatMap(tag -> ItemStack.CODEC.parse(NbtOps.INSTANCE, tag).result())
+                    .ifPresent(stack -> {
+                        if (!stack.isEmpty()) {
+                            virtualSlotResource = ItemResource.of(stack);
+                            virtualSlotAmount = Long.MAX_VALUE;
+                        }
+                    });
+        }
+
+        tickCounter = customData.getInt("tickCounter").orElse(0);
+        if (customData.contains("tier")) {
+            this.tier = ItemReplicatorTier.fromId(customData.getInt("tier").orElse(0));
+        }
+        if (customData.contains("energyStored")) {
+            this.energyStored = customData.getInt("energyStored").orElse(0);
+        }
+
+        updateEnergyStats();
+        updateOutputSlots();
+
+        CompoundTag itemsTag = customData.getCompound("items").orElse(new CompoundTag());
+
+        for (int i = 0; i < items.length; i++) {
+            String key = "item" + i;
+            int finalI = i;
+
+            itemsTag.getCompound(key).ifPresent(itemTag ->
+                    ItemStack.CODEC.parse(NbtOps.INSTANCE, itemTag)
+                            .result().ifPresent(stack -> items[finalI] = stack)
+            );
+        }
     }
 
     /**
@@ -417,15 +467,23 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         tag.putInt("tickCounter", tickCounter);
         tag.putInt("tier", tier.getId());
         tag.putInt("energyStored", energyStored);
+        tag.putBoolean("virtualSlotActive", virtualSlotActive);
+
+        if (virtualSlotActive && !virtualSlotResource.isEmpty()) {
+            ItemStack virtualStack = virtualSlotResource.toStack(1);
+            ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, virtualStack)
+                    .result()
+                    .ifPresent(tagData -> tag.put("virtualSlotResourceStack", tagData));
+        }
 
         CompoundTag itemsTag = new CompoundTag();
         for (int i = 0; i < items.length; i++) {
             int finalI = i;
-            ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, items[i]).result().ifPresent(itemTag -> itemsTag.put("item" + finalI, itemTag));
+            ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, items[i])
+                    .result()
+                    .ifPresent(itemTag -> itemsTag.put("item" + finalI, itemTag));
         }
         tag.put("items", itemsTag);
-
-        setChanged();
 
         return tag;
     }
@@ -440,6 +498,22 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         }
         if (tag.contains("energyStored")) {
             this.energyStored = tag.getInt("energyStored").orElse(0);
+        }
+
+        virtualSlotActive = tag.getBoolean("virtualSlotActive").orElse(false);
+        if (virtualSlotActive && tag.contains("virtualSlotResourceStack")) {
+            tag.getCompound("virtualSlotResourceStack")
+                    .flatMap(tagData -> ItemStack.CODEC.parse(NbtOps.INSTANCE, tagData).result())
+                    .ifPresent(stack -> {
+                        if (!stack.isEmpty()) {
+                            virtualSlotResource = ItemResource.of(stack);
+                            virtualSlotAmount = Long.MAX_VALUE;
+                        }
+                    });
+        } else if (!virtualSlotActive) {
+            virtualSlotResource = ItemResource.EMPTY;
+            virtualSlotAmount = Long.MAX_VALUE;
+            virtualSlotAccumulator = 0;
         }
 
         updateEnergyStats();
@@ -498,6 +572,8 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      * 服务器端的方块实体更新逻辑
      */
     public static void serverTick(Level level, BlockPos pos, BlockState state, ItemReplicatorBlockEntity blockEntity) {
+        boolean hasItemChanged = false;
+
         blockEntity.tickCounter++;
 
         ItemStack inputStack = blockEntity.items[INPUT_SLOT];
@@ -516,6 +592,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 blockEntity.virtualSlotResource = ItemResource.EMPTY;
                 blockEntity.virtualSlotAmount = Long.MAX_VALUE;
                 blockEntity.virtualSlotAccumulator = 0;
+                hasItemChanged = true;
             }
         } else {
             if (!inputStack.isEmpty()) {
@@ -531,19 +608,26 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                         blockEntity.virtualSlotActive = true;
                         blockEntity.virtualSlotResource = ItemResource.of(inputStack);
                         blockEntity.virtualSlotAmount = Long.MAX_VALUE;
+                        hasItemChanged = true;
                     }
 
                     blockEntity.virtualSlotAmount = Long.MAX_VALUE;
                 }
             } else {
-                blockEntity.virtualSlotActive = false;
-                blockEntity.virtualSlotResource = ItemResource.EMPTY;
-                blockEntity.virtualSlotAmount = Long.MAX_VALUE;
-                blockEntity.virtualSlotAccumulator = 0;
+                if (blockEntity.virtualSlotActive) {
+                    blockEntity.virtualSlotActive = false;
+                    blockEntity.virtualSlotResource = ItemResource.EMPTY;
+                    blockEntity.virtualSlotAmount = Long.MAX_VALUE;
+                    blockEntity.virtualSlotAccumulator = 0;
+                    hasItemChanged = true;
+                }
             }
         }
 
         if (blockEntity.tickCounter < blockEntity.tier.getProcessSpeed()) {
+            if (hasItemChanged) {
+                blockEntity.markUpdated();
+            }
             return;
         }
 
@@ -619,9 +703,10 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
             if (blockEntity.energyStored >= actualEnergyNeeded) {
                 blockEntity.energyStored -= actualEnergyNeeded;
-                blockEntity.markUpdated();
             }
         }
+
+        blockEntity.markUpdated();
     }
 
     /**
