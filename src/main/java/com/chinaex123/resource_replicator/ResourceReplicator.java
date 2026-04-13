@@ -3,7 +3,7 @@ package com.chinaex123.resource_replicator;
 import com.chinaex123.resource_replicator.init.ModBlocks;
 import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
-import com.chinaex123.resource_replicator.block.entity.ModBlockEntities;
+import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.config.ServerConfig;
 import com.chinaex123.resource_replicator.init.ModItems;
 import com.chinaex123.resource_replicator.network.FluidSyncPacket;

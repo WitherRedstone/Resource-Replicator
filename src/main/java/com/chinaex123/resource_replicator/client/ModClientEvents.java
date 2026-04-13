@@ -1,7 +1,7 @@
 package com.chinaex123.resource_replicator.client;
 
 import com.chinaex123.resource_replicator.ResourceReplicator;
-import com.chinaex123.resource_replicator.block.entity.ModBlockEntities;
+import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.client.renderer.ItemReplicatorRenderer;
 import com.chinaex123.resource_replicator.client.renderer.FluidReplicatorRenderer;
 import net.neoforged.bus.api.SubscribeEvent;
