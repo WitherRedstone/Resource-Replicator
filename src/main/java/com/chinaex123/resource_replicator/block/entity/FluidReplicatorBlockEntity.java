@@ -3,6 +3,7 @@ package com.chinaex123.resource_replicator.block.entity;
 import com.chinaex123.resource_replicator.block.FluidReplicatorBlock;
 import com.chinaex123.resource_replicator.block.enumTier.FluidReplicatorTier;
 import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.network.FluidSyncPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

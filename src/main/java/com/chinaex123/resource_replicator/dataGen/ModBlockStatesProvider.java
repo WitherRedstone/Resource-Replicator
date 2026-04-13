@@ -1,7 +1,7 @@
 //package com.chinaex123.resource_replicator.dataGen;
 //
 //import com.chinaex123.resource_replicator.ResourceReplicator;
-//import com.chinaex123.resource_replicator.block.ModBlocks;
+//import com.chinaex123.resource_replicator.init.ModBlocks;
 //import net.minecraft.data.PackOutput;
 //import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 //import net.neoforged.neoforge.common.data.ExistingFileHelper;

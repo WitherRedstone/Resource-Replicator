@@ -1,4 +1,4 @@
-package com.chinaex123.resource_replicator.item;
+package com.chinaex123.resource_replicator.init;
 
 import com.chinaex123.resource_replicator.ResourceReplicator;
 import net.neoforged.bus.api.IEventBus;

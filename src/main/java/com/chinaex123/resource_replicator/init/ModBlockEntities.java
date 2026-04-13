@@ -1,7 +1,8 @@
-package com.chinaex123.resource_replicator.block.entity;
+package com.chinaex123.resource_replicator.init;
 
 import com.chinaex123.resource_replicator.ResourceReplicator;
-import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
+import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
