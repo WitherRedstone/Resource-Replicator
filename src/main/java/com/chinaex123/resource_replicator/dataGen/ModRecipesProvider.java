@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.dataGen;
 
-import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.init.ModBlocks;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import mekanism.common.registries.MekanismItems;
 import net.minecraft.core.HolderLookup;

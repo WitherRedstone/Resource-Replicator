@@ -2,6 +2,7 @@ package com.chinaex123.resource_replicator.block.entity;
 
 import com.chinaex123.resource_replicator.block.enumTier.ItemReplicatorTier;
 import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.util.ReplicatorFilter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

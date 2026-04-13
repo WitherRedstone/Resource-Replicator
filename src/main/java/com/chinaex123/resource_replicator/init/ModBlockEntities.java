@@ -1,7 +1,8 @@
-package com.chinaex123.resource_replicator.block.entity;
+package com.chinaex123.resource_replicator.init;
 
 import com.chinaex123.resource_replicator.ResourceReplicator;
-import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
+import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.ChemicalReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import net.minecraft.core.registries.Registries;

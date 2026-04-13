@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:sponge"
+    },
+    "B": {
+      "tag": "c:ingots/netherite"
+    },
+    "C": {
+      "item": "minecraft:dragon_breath"
+    },
+    "D": {
+      "tag": "c:storage_blocks/diamond"
+    }
+  },
+  "pattern": [
+    "BDB",
+    "CAC",
+    "BDB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "resource_replicator:fluid_replicator_tier1"
+  }
+}

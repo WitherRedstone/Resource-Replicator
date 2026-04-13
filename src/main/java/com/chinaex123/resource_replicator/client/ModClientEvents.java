@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.client;
 
-import com.chinaex123.resource_replicator.block.entity.ModBlockEntities;
+import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.client.renderer.ItemReplicatorRenderer;
 import com.chinaex123.resource_replicator.client.renderer.FluidReplicatorRenderer;
 import com.chinaex123.resource_replicator.client.renderer.ChemicalReplicatorRenderer;

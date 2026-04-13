@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_replicator:chemical_replicator_tier3"
+    },
+    "B": {
+      "tag": "c:ingots/netherite"
+    },
+    "C": {
+      "item": "mekanism:pellet_plutonium"
+    },
+    "D": {
+      "tag": "c:storage_blocks/diamond"
+    }
+  },
+  "pattern": [
+    "BDB",
+    "CAC",
+    "BDB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "resource_replicator:chemical_replicator_tier4"
+  }
+}

@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.block.compat.Mekanism;
 
-import com.chinaex123.resource_replicator.block.entity.ModBlockEntities;
+import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.config.ServerConfig;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;

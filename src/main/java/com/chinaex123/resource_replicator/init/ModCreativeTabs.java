@@ -1,6 +1,6 @@
-package com.chinaex123.resource_replicator;
+package com.chinaex123.resource_replicator.init;
 
-import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.ResourceReplicator;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;

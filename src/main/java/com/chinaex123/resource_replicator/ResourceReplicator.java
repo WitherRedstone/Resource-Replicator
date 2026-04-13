@@ -1,13 +1,14 @@
 package com.chinaex123.resource_replicator;
 
-import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.init.ModBlocks;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.ChemicalReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
-import com.chinaex123.resource_replicator.block.entity.ModBlockEntities;
+import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import com.chinaex123.resource_replicator.config.ServerConfig;
-import com.chinaex123.resource_replicator.item.ModItems;
+import com.chinaex123.resource_replicator.init.ModCreativeTabs;
+import com.chinaex123.resource_replicator.init.ModItems;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
