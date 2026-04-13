@@ -25,13 +25,13 @@ public class ResourceReplicator {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public ResourceReplicator(IEventBus modEventBus, ModContainer modContainer) {
-        modEventBus.addListener(this::registerCapabilities); // 能力注册事件
+        modEventBus.addListener(this::registerCapabilities);
         modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.CONFIG_SPEC);
 
-        ModCreativeTabs.register(modEventBus); // 注册自定义创造模式物品栏
-        ModBlocks.register(modEventBus); // 注册方块
-        ModItems.register(modEventBus); // 注册物品
-        ModBlockEntities.register(modEventBus); // 注册方块实体
+        ModCreativeTabs.register(modEventBus);
+        ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
 
         // 模组兼容 - 通用机械
         if (ModList.get().isLoaded("mekanism")) {
@@ -76,7 +76,6 @@ public class ResourceReplicator {
 
                 var blockEntityType = ModBlockEntities.CHEMICAL_REPLICATOR.get();
                 if (blockEntityType == null) {
-                    LOGGER.warn("化学复制器方块实体类型为空，跳过能力注册");
                     return;
                 }
 
@@ -93,7 +92,6 @@ public class ResourceReplicator {
                             return null;
                         }
                 );
-                LOGGER.info("已注册 Mekanism 化学物质处理能力");
 
                 // 为化学品复制机注册能量处理能力 - 使用双重注册确保兼容性
                 event.registerBlockEntity(
@@ -106,7 +104,6 @@ public class ResourceReplicator {
                             return null;
                         }
                 );
-                LOGGER.info("已注册化学品复制机能量处理能力");
             } catch (Exception e) {
                 LOGGER.error("注册 Mekanism 相关能力失败：{}", e.getMessage(), e);
             }
