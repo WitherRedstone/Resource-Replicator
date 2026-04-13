@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.dataGen;
 
-import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.init.ModBlocks;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;

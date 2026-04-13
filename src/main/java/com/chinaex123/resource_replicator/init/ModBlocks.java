@@ -1,7 +1,8 @@
-package com.chinaex123.resource_replicator.block;
+package com.chinaex123.resource_replicator.init;
 
 import com.chinaex123.resource_replicator.ResourceReplicator;
-import com.chinaex123.resource_replicator.item.ModItems;
+import com.chinaex123.resource_replicator.block.FluidReplicatorBlock;
+import com.chinaex123.resource_replicator.block.ItemReplicatorBlock;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;

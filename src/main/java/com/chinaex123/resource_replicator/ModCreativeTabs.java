@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator;
 
-import com.chinaex123.resource_replicator.block.ModBlocks;
+import com.chinaex123.resource_replicator.init.ModBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
