@@ -1,0 +1,15 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mekanism"
+    }
+  ],
+  "values": [
+    "resource_replicator:chemical_replicator_tier1",
+    "resource_replicator:chemical_replicator_tier2",
+    "resource_replicator:chemical_replicator_tier3",
+    "resource_replicator:chemical_replicator_tier4",
+    "resource_replicator:chemical_replicator_tier5"
+  ]
+}

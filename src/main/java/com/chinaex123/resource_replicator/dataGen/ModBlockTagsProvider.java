@@ -2,10 +2,13 @@ package com.chinaex123.resource_replicator.dataGen;
 
 import com.chinaex123.resource_replicator.init.ModBlocks;
 import com.chinaex123.resource_replicator.ResourceReplicator;
-import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +17,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public class ModBlockTagsProvider extends BlockTagsProvider {
+
+    private static final TagKey<Block> CHEMICAL_REPLICATORS = TagKey.create(
+            Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(ResourceReplicator.MOD_ID, "chemical_replicators")
+    );
 
     /**
      * 构造函数，初始化方块标签提供器
@@ -48,13 +55,7 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
                 .add(ModBlocks.FLUID_REPLICATOR_Tier3.get())
                 .add(ModBlocks.FLUID_REPLICATOR_Tier4.get())
                 .add(ModBlocks.FLUID_REPLICATOR_Tier5.get())
-
-                // ======================= 化学品资源复制机 =======================
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier1.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier2.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier3.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier4.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier5.get());
+                .addOptionalTag(CHEMICAL_REPLICATORS.location());
 
         // 需要铁等级的工具
         tag(BlockTags.NEEDS_IRON_TOOL)
@@ -70,12 +71,6 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
                 .add(ModBlocks.FLUID_REPLICATOR_Tier3.get())
                 .add(ModBlocks.FLUID_REPLICATOR_Tier4.get())
                 .add(ModBlocks.FLUID_REPLICATOR_Tier5.get())
-
-                // ======================= 化学品资源复制机 =======================
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier1.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier2.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier3.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier4.get())
-                .add(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier5.get());
+                .addOptionalTag(CHEMICAL_REPLICATORS.location());
     }
 }

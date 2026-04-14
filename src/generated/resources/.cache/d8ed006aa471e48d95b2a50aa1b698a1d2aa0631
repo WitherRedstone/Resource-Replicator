@@ -1,3 +1,3 @@
-// 1.21.1	2026-03-10T09:51:01.7898118	Tags for minecraft:block mod id resource_replicator
-07d0882794916d45ca40b46830393089a2895da9 data/minecraft/tags/block/mineable/pickaxe.json
-07d0882794916d45ca40b46830393089a2895da9 data/minecraft/tags/block/needs_iron_tool.json
+// 1.21.1	2026-04-14T13:50:16.0481871	Tags for minecraft:block mod id resource_replicator
+9573eb84e633343361ad3d5c503c4f260ef894af data/minecraft/tags/block/mineable/pickaxe.json
+9573eb84e633343361ad3d5c503c4f260ef894af data/minecraft/tags/block/needs_iron_tool.json
