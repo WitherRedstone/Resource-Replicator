@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_fluid_replicator_tier5": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_replicator:fluid_replicator_tier4"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_replicator:fluid_replicator_tier5"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_fluid_replicator_tier5"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_replicator:fluid_replicator_tier5"
+    ]
+  }
+}
