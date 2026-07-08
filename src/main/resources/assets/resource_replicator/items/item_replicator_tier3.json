@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "resource_replicator:block/item_replicator_tier3"
+  }
+}

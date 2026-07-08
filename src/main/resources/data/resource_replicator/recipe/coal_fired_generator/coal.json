@@ -1,0 +1,8 @@
+{
+  "type": "resource_replicator:coal_fired_generator",
+  "ingredient": {
+    "item": "minecraft:coal"
+  },
+  "burn_time": 160,
+  "energy_per_tick": 800
+}
