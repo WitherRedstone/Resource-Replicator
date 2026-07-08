@@ -34,14 +34,6 @@ public class ResourceReplicator {
         modEventBus.addListener(this::registerPayloadHandlers);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.CONFIG_SPEC);
-
-        // 直接启用 NeoForge 的牛奶流体支持
-//        try {
-//            net.neoforged.neoforge.common.NeoForgeMod.enableMilkFluid();
-//            LOGGER.info("[Resource Replicator] 牛奶流体支持已启用");
-//        } catch (Exception e) {
-//            LOGGER.warn("[Resource Replicator] 无法启用牛奶流体支持", e);
-//        }
     }
 
     private void registerPayloadHandlers(RegisterPayloadHandlersEvent event) {

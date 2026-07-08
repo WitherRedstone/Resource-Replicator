@@ -18,11 +18,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.fluid.FluidTintSource;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
  * 负责在客户端渲染流体复制机中的流体
  */
 public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull FluidReplicatorBlockEntity, FluidReplicatorRenderer.@NotNull FluidReplicatorRenderState> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FluidReplicatorRenderer.class);
 
     /**
      * 构造函数

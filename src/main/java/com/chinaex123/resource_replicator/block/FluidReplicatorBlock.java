@@ -24,16 +24,12 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 流体复制机方块类
  * 继承自 BaseEntityBlock，支持方块实体功能
  */
 public class FluidReplicatorBlock extends BaseEntityBlock {
-    // 创建日志记录器实例
-    private static final Logger LOGGER = LoggerFactory.getLogger(FluidReplicatorBlock.class);
 
     // 机器等级（默认为 1 级）
     private final int tier;

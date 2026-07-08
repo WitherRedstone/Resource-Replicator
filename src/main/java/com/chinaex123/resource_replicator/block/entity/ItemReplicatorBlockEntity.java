@@ -29,13 +29,10 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 public class ItemReplicatorBlockEntity extends BlockEntity {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ItemReplicatorBlockEntity.class);
 
     private static final int INPUT_SLOT = 0; // 定义输入槽的索引（第 0 个槽位）
     private static final int OUTPUT_SLOT_START = 1; // 定义输出槽的起始索引（第 1 个槽位）
@@ -243,6 +240,17 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         public int extract(int index, ItemResource resource, int amount, @NotNull TransactionContext transaction) {
             // 虚拟槽位的处理
             if (index == VIRTUAL_SLOT && virtualSlotActive) {
+                // 检查能量是否足够
+                if (energyStored < energyConsumption) {
+                    // 能量不足，关闭虚拟槽位
+                    virtualSlotActive = false;
+                    virtualSlotResource = ItemResource.EMPTY;
+                    virtualSlotAmount = Long.MAX_VALUE;
+                    virtualSlotAccumulator = 0;
+                    markUpdated();
+                    return 0;
+                }
+
                 if (!resource.equals(virtualSlotResource)) {
                     return 0;
                 }
@@ -253,6 +261,8 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 int toExtract = Math.min(amount, maxExtract);
 
                 if (toExtract > 0) {
+                    // 消耗能量
+                    energyStored -= energyConsumption;
                     // 虚拟槽位数量保持无限
                     virtualSlotAmount = Long.MAX_VALUE;
                     markUpdated();
@@ -665,15 +675,21 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 );
 
                 if (handler != null) {
-                    try (Transaction transaction = Transaction.openRoot()) {
-                        ItemResource resource = ItemResource.of(inputStack);
-                        long inserted = handler.insert(resource, remainingToOutput, transaction);
+                    // 计算可以输出的数量（受能量限制）
+                    int maxOutputByEnergy = blockEntity.energyStored / energyPerItem;
+                    int canOutput = Math.min((int) remainingToOutput, maxOutputByEnergy);
+                    
+                    if (canOutput > 0) {
+                        try (Transaction transaction = Transaction.openRoot()) {
+                            ItemResource resource = ItemResource.of(inputStack);
+                            long inserted = handler.insert(resource, canOutput, transaction);
 
-                        if (inserted > 0) {
-                            transaction.commit();
-                            totalOutput += (int) inserted;
-                            remainingToOutput -= (int) inserted;
-                            hasProduced = true;
+                            if (inserted > 0) {
+                                transaction.commit();
+                                totalOutput += (int) inserted;
+                                remainingToOutput -= (int) inserted;
+                                hasProduced = true;
+                            }
                         }
                     }
                 }

@@ -33,8 +33,6 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -43,7 +41,6 @@ import java.util.Objects;
  * 负责处理流体复制机的所有逻辑，包括流体存储、能量管理、自动生产和网络同步
  */
 public class FluidReplicatorBlockEntity extends BlockEntity {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FluidReplicatorBlockEntity.class);
     private static final int INPUT_TANK_CAPACITY = 1000; // 输入罐容量
 
     // ThreadLocal 变量：标记当前线程是否为玩家操作
