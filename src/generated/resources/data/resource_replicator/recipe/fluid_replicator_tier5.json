@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "A": "resource_replicator:fluid_replicator_tier4",
+    "B": "#c:ingots/netherite",
+    "C": "#c:nether_stars",
+    "D": "#c:storage_blocks/netherite"
+  },
+  "pattern": [
+    "BDB",
+    "CAC",
+    "BDB"
+  ],
+  "result": {
+    "id": "resource_replicator:fluid_replicator_tier5"
+  }
+}
