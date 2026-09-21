@@ -22,98 +22,28 @@ public class ModBlocks {
             DeferredRegister.createBlocks(ResourceReplicator.MOD_ID);
 
     // ======================= 物品资源复制机 =======================
-    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier1 =
-            registerBlock("item_replicator_tier1", 
-                    properties -> new ItemReplicatorBlock(properties, 1),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.COMMON);
-    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier2 =
-            registerBlock("item_replicator_tier2", 
-                    properties -> new ItemReplicatorBlock(properties, 2),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.UNCOMMON);
-    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier3 =
-            registerBlock("item_replicator_tier3", 
-                    properties -> new ItemReplicatorBlock(properties, 3),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.RARE);
-    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier4 =
-            registerBlock("item_replicator_tier4", 
-                    properties -> new ItemReplicatorBlock(properties, 4),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.EPIC);
-    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier5 =
-            registerBlock("item_replicator_tier5", 
-                    properties -> new ItemReplicatorBlock(properties, 5),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.EPIC);
+    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier1 = registerBlock("item_replicator_tier1", p -> new ItemReplicatorBlock(p, 1),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.COMMON);
+    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier2 = registerBlock("item_replicator_tier2", p -> new ItemReplicatorBlock(p, 2),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.UNCOMMON);
+    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier3 = registerBlock("item_replicator_tier3", p -> new ItemReplicatorBlock(p, 3),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.RARE);
+    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier4 = registerBlock("item_replicator_tier4", p -> new ItemReplicatorBlock(p, 4),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.EPIC);
+    public static final DeferredBlock<@NotNull ItemReplicatorBlock> ITEM_REPLICATOR_Tier5 = registerBlock("item_replicator_tier5", p -> new ItemReplicatorBlock(p, 5),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.EPIC);
 
     // ======================= 流体资源复制机 =======================
-    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier1 =
-            registerBlock("fluid_replicator_tier1", 
-                    properties -> new FluidReplicatorBlock(properties, 1),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.COMMON);
-    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier2 =
-            registerBlock("fluid_replicator_tier2", 
-                    properties -> new FluidReplicatorBlock(properties, 2),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.UNCOMMON);
-    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier3 =
-            registerBlock("fluid_replicator_tier3", 
-                    properties -> new FluidReplicatorBlock(properties, 3),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.RARE);
-    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier4 =
-            registerBlock("fluid_replicator_tier4", 
-                    properties -> new FluidReplicatorBlock(properties, 4),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.EPIC);
-    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier5 =
-            registerBlock("fluid_replicator_tier5", 
-                    properties -> new FluidReplicatorBlock(properties, 5),
-                    () -> BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.STONE)
-                            .sound(SoundType.STONE)
-                            .destroyTime(2.5f)
-                            .explosionResistance(6.0f)
-                            .requiresCorrectToolForDrops(), Rarity.EPIC);
+    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier1 = registerBlock("fluid_replicator_tier1", p -> new FluidReplicatorBlock(p, 1),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.COMMON);
+    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier2 = registerBlock("fluid_replicator_tier2", p -> new FluidReplicatorBlock(p, 2),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.UNCOMMON);
+    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier3 = registerBlock("fluid_replicator_tier3", p -> new FluidReplicatorBlock(p, 3),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.RARE);
+    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier4 = registerBlock("fluid_replicator_tier4", p -> new FluidReplicatorBlock(p, 4),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.EPIC);
+    public static final DeferredBlock<@NotNull FluidReplicatorBlock> FLUID_REPLICATOR_Tier5 = registerBlock("fluid_replicator_tier5", p -> new FluidReplicatorBlock(p, 5),
+                    () -> BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.STONE).destroyTime(2.5f).explosionResistance(6.0f).requiresCorrectToolForDrops(), Rarity.EPIC);
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, 
             Function<BlockBehaviour.Properties, T> func,

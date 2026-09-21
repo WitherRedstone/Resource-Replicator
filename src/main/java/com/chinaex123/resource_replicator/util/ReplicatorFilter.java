@@ -12,8 +12,13 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.List;
 
+/**
+ * 复制机过滤工具。
+ * <p>
+ * 根据固定管理员列表及配置的白/黑名单，判定物品、流体、化学品能否被复制。
+ */
 public class ReplicatorFilter {
-    // 固定的管理员物品（无法被复制）
+    /** 固定的管理员物品（无法被复制） */
     private static final String[] ADMIN_ITEMS = {
             "minecraft:command_block",
             "minecraft:chain_command_block",
@@ -33,7 +38,7 @@ public class ReplicatorFilter {
             "resource_replicator:*"
     };
 
-    // 固定的管理员流体（无法被复制）
+    /** 固定的管理员流体（无法被复制） */
     private static final String[] ADMIN_FLUIDS = {};
 
     /**

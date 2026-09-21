@@ -1,4 +1,4 @@
-package com.chinaex123.resource_replicator.dataGen;
+package com.chinaex123.resource_replicator.data;
 
 import com.chinaex123.resource_replicator.init.ModBlocks;
 import net.minecraft.core.Holder;
