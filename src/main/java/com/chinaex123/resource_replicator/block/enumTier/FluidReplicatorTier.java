@@ -26,34 +26,34 @@ public enum FluidReplicatorTier {
     public void updateFromConfig() {
         switch (this) {
             case FLUID_TIER_1:
-                this.processSpeed = RRServerConfig.getFluidTier1OutputTime();
-                this.outputAmount = RRServerConfig.getFluidTier1OutputAmount();
-                this.waterOutputAmount = RRServerConfig.getFluidTier1WaterAmount();
-                this.lavaOutputAmount = RRServerConfig.getFluidTier1LavaAmount();
+                this.processSpeed = RRServerConfig.FLUID_TIER1_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.FLUID_TIER1_OUTPUT_AMOUNT.get();
+                this.waterOutputAmount = RRServerConfig.FLUID_TIER1_WATER_AMOUNT.get();
+                this.lavaOutputAmount = RRServerConfig.FLUID_TIER1_LAVA_AMOUNT.get();
                 break;
             case FLUID_TIER_2:
-                this.processSpeed = RRServerConfig.getFluidTier2OutputTime();
-                this.outputAmount = RRServerConfig.getFluidTier2OutputAmount();
-                this.waterOutputAmount = RRServerConfig.getFluidTier2WaterAmount();
-                this.lavaOutputAmount = RRServerConfig.getFluidTier2LavaAmount();
+                this.processSpeed = RRServerConfig.FLUID_TIER2_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.FLUID_TIER2_OUTPUT_AMOUNT.get();
+                this.waterOutputAmount = RRServerConfig.FLUID_TIER2_WATER_AMOUNT.get();
+                this.lavaOutputAmount = RRServerConfig.FLUID_TIER2_LAVA_AMOUNT.get();
                 break;
             case FLUID_TIER_3:
-                this.processSpeed = RRServerConfig.getFluidTier3OutputTime();
-                this.outputAmount = RRServerConfig.getFluidTier3OutputAmount();
-                this.waterOutputAmount = RRServerConfig.getFluidTier3WaterAmount();
-                this.lavaOutputAmount = RRServerConfig.getFluidTier3LavaAmount();
+                this.processSpeed = RRServerConfig.FLUID_TIER3_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.FLUID_TIER3_OUTPUT_AMOUNT.get();
+                this.waterOutputAmount = RRServerConfig.FLUID_TIER3_WATER_AMOUNT.get();
+                this.lavaOutputAmount = RRServerConfig.FLUID_TIER3_LAVA_AMOUNT.get();
                 break;
             case FLUID_TIER_4:
-                this.processSpeed = RRServerConfig.getFluidTier4OutputTime();
-                this.outputAmount = RRServerConfig.getFluidTier4OutputAmount();
-                this.waterOutputAmount = RRServerConfig.getFluidTier4WaterAmount();
-                this.lavaOutputAmount = RRServerConfig.getFluidTier4LavaAmount();
+                this.processSpeed = RRServerConfig.FLUID_TIER4_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.FLUID_TIER4_OUTPUT_AMOUNT.get();
+                this.waterOutputAmount = RRServerConfig.FLUID_TIER4_WATER_AMOUNT.get();
+                this.lavaOutputAmount = RRServerConfig.FLUID_TIER4_LAVA_AMOUNT.get();
                 break;
             case FLUID_TIER_5:
-                this.processSpeed = RRServerConfig.getFluidTier5OutputTime();
-                this.outputAmount = RRServerConfig.getFluidTier5OutputAmount();
-                this.waterOutputAmount = RRServerConfig.getFluidTier5WaterAmount();
-                this.lavaOutputAmount = RRServerConfig.getFluidTier5LavaAmount();
+                this.processSpeed = RRServerConfig.FLUID_TIER5_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.FLUID_TIER5_OUTPUT_AMOUNT.get();
+                this.waterOutputAmount = RRServerConfig.FLUID_TIER5_WATER_AMOUNT.get();
+                this.lavaOutputAmount = RRServerConfig.FLUID_TIER5_LAVA_AMOUNT.get();
                 break;
         }
     }

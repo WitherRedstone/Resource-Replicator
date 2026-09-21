@@ -10,93 +10,93 @@ public class RRServerConfig {
     public static final ModConfigSpec CONFIG_SPEC;
 
     // ======================= 物品复制机配置 =======================
-    private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_ENABLE_DESTROY;
-    private static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_AUTO_OUTPUT;
-    private static final ModConfigSpec.EnumValue<Direction> ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION;
+    public static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_ENABLE_DESTROY;
+    public static final ModConfigSpec.BooleanValue ITEM_REPLICATOR_AUTO_OUTPUT;
+    public static final ModConfigSpec.EnumValue<Direction> ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION;
 
     // 黑白名单配置
-    private static final ModConfigSpec.BooleanValue BLACKLIST_MODE;
-    private static final ModConfigSpec.ConfigValue<List<?>> BLACKLIST_ITEMS;
-    private static final ModConfigSpec.ConfigValue<List<?>> WHITELIST_ITEMS;
+    public static final ModConfigSpec.BooleanValue BLACKLIST_MODE;
+    public static final ModConfigSpec.ConfigValue<List<?>> BLACKLIST_ITEMS;
+    public static final ModConfigSpec.ConfigValue<List<?>> WHITELIST_ITEMS;
 
     // T1-T5 物品复制机配置 - 输出槽、输出数量、输出时间
-    private static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_SLOTS;
-    private static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_SLOTS;
-    private static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_SLOTS;
-    private static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_SLOTS;
-    private static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_SLOTS;
-    private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_SLOTS;
+    public static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue ITEM_TIER1_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_SLOTS;
+    public static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue ITEM_TIER2_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_SLOTS;
+    public static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue ITEM_TIER3_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_SLOTS;
+    public static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue ITEM_TIER4_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_SLOTS;
+    public static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue ITEM_TIER5_OUTPUT_TIME;
 
     // T1-T5 物品复制机能量配置
-    private static final ModConfigSpec.IntValue ITEM_TIER1_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue ITEM_TIER1_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue ITEM_TIER2_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue ITEM_TIER2_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue ITEM_TIER3_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue ITEM_TIER3_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue ITEM_TIER4_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue ITEM_TIER4_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue ITEM_TIER1_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue ITEM_TIER1_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue ITEM_TIER2_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue ITEM_TIER2_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue ITEM_TIER3_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue ITEM_TIER3_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue ITEM_TIER4_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue ITEM_TIER4_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue ITEM_TIER5_ENERGY_CONSUMPTION;
 
 
     // ======================= 流体复制机配置 =======================
-    private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_ENABLE_DESTROY;
-    private static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_AUTO_OUTPUT;
-    private static final ModConfigSpec.EnumValue<Direction> FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION;
+    public static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_ENABLE_DESTROY;
+    public static final ModConfigSpec.BooleanValue FLUID_REPLICATOR_AUTO_OUTPUT;
+    public static final ModConfigSpec.EnumValue<Direction> FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION;
 
     // 流体黑白名单配置
-    private static final ModConfigSpec.BooleanValue FLUID_BLACKLIST_MODE;
-    private static final ModConfigSpec.ConfigValue<List<?>> FLUID_BLACKLIST_ITEMS;
-    private static final ModConfigSpec.ConfigValue<List<?>> FLUID_WHITELIST_ITEMS;
+    public static final ModConfigSpec.BooleanValue FLUID_BLACKLIST_MODE;
+    public static final ModConfigSpec.ConfigValue<List<?>> FLUID_BLACKLIST_ITEMS;
+    public static final ModConfigSpec.ConfigValue<List<?>> FLUID_WHITELIST_ITEMS;
 
     // T1-T5 流体复制机配置 - 输出槽、输出数量、输出时间
-    private static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_TANK_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER1_WATER_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER1_LAVA_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_TANK_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER2_WATER_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER2_LAVA_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_TANK_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER3_WATER_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER3_LAVA_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_TANK_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER4_WATER_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER4_LAVA_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_TIME;
-    private static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_TANK_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER5_WATER_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER5_LAVA_AMOUNT;
-    private static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_TANK_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER1_WATER_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER1_LAVA_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER1_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_TANK_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER2_WATER_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER2_LAVA_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER2_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_TANK_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER3_WATER_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER3_LAVA_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER3_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_TANK_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER4_WATER_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER4_LAVA_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER4_OUTPUT_TIME;
+    public static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_TANK_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER5_WATER_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER5_LAVA_AMOUNT;
+    public static final ModConfigSpec.IntValue FLUID_TIER5_OUTPUT_TIME;
 
     // T1-T5 流体复制机能量配置
-    private static final ModConfigSpec.IntValue FLUID_TIER1_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER1_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue FLUID_TIER2_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER2_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue FLUID_TIER3_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER3_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue FLUID_TIER4_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER4_ENERGY_CONSUMPTION;
-    private static final ModConfigSpec.IntValue FLUID_TIER5_ENERGY_CAPACITY;
-    private static final ModConfigSpec.IntValue FLUID_TIER5_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue FLUID_TIER1_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER1_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue FLUID_TIER2_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER2_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue FLUID_TIER3_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER3_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue FLUID_TIER4_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER4_ENERGY_CONSUMPTION;
+    public static final ModConfigSpec.IntValue FLUID_TIER5_ENERGY_CAPACITY;
+    public static final ModConfigSpec.IntValue FLUID_TIER5_ENERGY_CONSUMPTION;
 
     static {
         BUILDER.comment("物品复制机").push("Item Replicator");
@@ -435,82 +435,17 @@ public class RRServerConfig {
         CONFIG_SPEC = BUILDER.build();
     }
 
-    // ======================= 物品复制机配置获取方法 =======================
-    public static boolean isItemReplicatorDestroyEnabled() {return ITEM_REPLICATOR_ENABLE_DESTROY.get();}
-    // 物品复制机的自动输出
-    public static boolean isItemReplicatorAutoOutputEnabled() {return ITEM_REPLICATOR_AUTO_OUTPUT.get();}
-
-    // 物品复制机的自动输出方向
-    public static Direction getItemReplicatorAutoOutputDirection() {return ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();}
-
-    // 物品复制机的黑白名单配置
-    public static boolean isBlacklistMode() {
-        return BLACKLIST_MODE.get();
-    }
-
     // 物品复制机的黑名单列表
     public static List<String> getBlacklistItems() {
         return BLACKLIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
                 .toList();
     }
-
     // 物品复制机的白名单列表
     public static List<String> getWhitelistItems() {
         return WHITELIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
                 .toList();
-    }
-
-    // Tier 1
-    public static int getItemTier1OutputSlots() {return ITEM_TIER1_OUTPUT_SLOTS.get();}
-    public static int getItemTier1OutputAmount() {return ITEM_TIER1_OUTPUT_AMOUNT.get();}
-    public static int getItemTier1OutputTime() {return ITEM_TIER1_OUTPUT_TIME.get();}
-    public static int getItemTier1EnergyCapacity() {return ITEM_TIER1_ENERGY_CAPACITY.get();}
-    public static int getItemTier1EnergyConsumption() {return ITEM_TIER1_ENERGY_CONSUMPTION.get();}
-
-    // Tier 2
-    public static int getItemTier2OutputSlots() {return ITEM_TIER2_OUTPUT_SLOTS.get();}
-    public static int getItemTier2OutputAmount() {return ITEM_TIER2_OUTPUT_AMOUNT.get();}
-    public static int getItemTier2OutputTime() {return ITEM_TIER2_OUTPUT_TIME.get();}
-    public static int getItemTier2EnergyCapacity() {return ITEM_TIER2_ENERGY_CAPACITY.get();}
-    public static int getItemTier2EnergyConsumption() {return ITEM_TIER2_ENERGY_CONSUMPTION.get();}
-
-    // Tier 3
-    public static int getItemTier3OutputSlots() {return ITEM_TIER3_OUTPUT_SLOTS.get();}
-    public static int getItemTier3OutputAmount() {return ITEM_TIER3_OUTPUT_AMOUNT.get();}
-    public static int getItemTier3OutputTime() {return ITEM_TIER3_OUTPUT_TIME.get();}
-    public static int getItemTier3EnergyCapacity() {return ITEM_TIER3_ENERGY_CAPACITY.get();}
-    public static int getItemTier3EnergyConsumption() {return ITEM_TIER3_ENERGY_CONSUMPTION.get();}
-
-    // Tier 4
-    public static int getItemTier4OutputSlots() {return ITEM_TIER4_OUTPUT_SLOTS.get();}
-    public static int getItemTier4OutputAmount() {return ITEM_TIER4_OUTPUT_AMOUNT.get();}
-
-    public static int getItemTier4OutputTime() {return ITEM_TIER4_OUTPUT_TIME.get();}
-    public static int getItemTier4EnergyCapacity() {return ITEM_TIER4_ENERGY_CAPACITY.get();}
-    public static int getItemTier4EnergyConsumption() {return ITEM_TIER4_ENERGY_CONSUMPTION.get();}
-
-    // Tier 5
-    public static int getItemTier5OutputSlots() {return ITEM_TIER5_OUTPUT_SLOTS.get();}
-    public static int getItemTier5OutputAmount() {return ITEM_TIER5_OUTPUT_AMOUNT.get();}
-    public static int getItemTier5OutputTime() {return ITEM_TIER5_OUTPUT_TIME.get();}
-    public static int getItemTier5EnergyCapacity() {return ITEM_TIER5_ENERGY_CAPACITY.get();}
-    public static int getItemTier5EnergyConsumption() {return ITEM_TIER5_ENERGY_CONSUMPTION.get();}
-
-
-    // ======================= 流体复制机配置获取方法 =======================
-    public static boolean isFluidReplicatorDestroyEnabled() {return FLUID_REPLICATOR_ENABLE_DESTROY.get();}
-
-    // 流体复制机的自动输出
-    public static boolean isFluidReplicatorAutoOutputEnabled() {return FLUID_REPLICATOR_AUTO_OUTPUT.get();}
-
-    // 流体复制机的自动输出方向
-    public static Direction getFluidReplicatorAutoOutputDirection() {return FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();}
-
-    // 流体复制机黑白名单配置
-    public static boolean isFluidBlacklistMode() {
-        return FLUID_BLACKLIST_MODE.get();
     }
 
     // 流体复制机黑名单列表
@@ -519,56 +454,10 @@ public class RRServerConfig {
                 .map(obj -> (String) obj)
                 .toList();
     }
-
     // 流体复制机白名单列表
     public static List<String> getFluidWhitelistItems() {
         return FLUID_WHITELIST_ITEMS.get().stream()
                 .map(obj -> (String) obj)
                 .toList();
     }
-
-    // Tier 1 Fluid
-    public static int getFluidTier1OutputTankCapacity() {return FLUID_TIER1_OUTPUT_TANK_CAPACITY.get();}
-    public static int getFluidTier1OutputAmount() {return FLUID_TIER1_OUTPUT_AMOUNT.get();}
-    public static int getFluidTier1OutputTime() {return FLUID_TIER1_OUTPUT_TIME.get();}
-    public static int getFluidTier1WaterAmount() {return FLUID_TIER1_WATER_AMOUNT.get();}
-    public static int getFluidTier1LavaAmount() {return FLUID_TIER1_LAVA_AMOUNT.get();}
-    public static int getFluidTier1EnergyCapacity() {return FLUID_TIER1_ENERGY_CAPACITY.get();}
-    public static int getFluidTier1EnergyConsumption() {return FLUID_TIER1_ENERGY_CONSUMPTION.get();}
-
-    // Tier 2 Fluid
-    public static int getFluidTier2OutputTankCapacity() {return FLUID_TIER2_OUTPUT_TANK_CAPACITY.get();}
-    public static int getFluidTier2OutputAmount() {return FLUID_TIER2_OUTPUT_AMOUNT.get();}
-    public static int getFluidTier2OutputTime() {return FLUID_TIER2_OUTPUT_TIME.get();}
-    public static int getFluidTier2WaterAmount() {return FLUID_TIER2_WATER_AMOUNT.get();}
-    public static int getFluidTier2LavaAmount() {return FLUID_TIER2_LAVA_AMOUNT.get();}
-    public static int getFluidTier2EnergyCapacity() {return FLUID_TIER2_ENERGY_CAPACITY.get();}
-    public static int getFluidTier2EnergyConsumption() {return FLUID_TIER2_ENERGY_CONSUMPTION.get();}
-
-    // Tier 3 Fluid
-    public static int getFluidTier3OutputTankCapacity() {return FLUID_TIER3_OUTPUT_TANK_CAPACITY.get();}
-    public static int getFluidTier3OutputAmount() {return FLUID_TIER3_OUTPUT_AMOUNT.get();}
-    public static int getFluidTier3OutputTime() {return FLUID_TIER3_OUTPUT_TIME.get();}
-    public static int getFluidTier3WaterAmount() {return FLUID_TIER3_WATER_AMOUNT.get();}
-    public static int getFluidTier3LavaAmount() {return FLUID_TIER3_LAVA_AMOUNT.get();}
-    public static int getFluidTier3EnergyCapacity() {return FLUID_TIER3_ENERGY_CAPACITY.get();}
-    public static int getFluidTier3EnergyConsumption() {return FLUID_TIER3_ENERGY_CONSUMPTION.get();}
-
-    // Tier 4 Fluid
-    public static int getFluidTier4OutputTankCapacity() {return FLUID_TIER4_OUTPUT_TANK_CAPACITY.get();}
-    public static int getFluidTier4OutputAmount() {return FLUID_TIER4_OUTPUT_AMOUNT.get();}
-    public static int getFluidTier4OutputTime() {return FLUID_TIER4_OUTPUT_TIME.get();}
-    public static int getFluidTier4WaterAmount() {return FLUID_TIER4_WATER_AMOUNT.get();}
-    public static int getFluidTier4LavaAmount() {return FLUID_TIER4_LAVA_AMOUNT.get();}
-    public static int getFluidTier4EnergyCapacity() {return FLUID_TIER4_ENERGY_CAPACITY.get();}
-    public static int getFluidTier4EnergyConsumption() {return FLUID_TIER4_ENERGY_CONSUMPTION.get();}
-
-    // Tier 5 Fluid
-    public static int getFluidTier5OutputTankCapacity() {return FLUID_TIER5_OUTPUT_TANK_CAPACITY.get();}
-    public static int getFluidTier5OutputAmount() {return FLUID_TIER5_OUTPUT_AMOUNT.get();}
-    public static int getFluidTier5OutputTime() {return FLUID_TIER5_OUTPUT_TIME.get();}
-    public static int getFluidTier5WaterAmount() {return FLUID_TIER5_WATER_AMOUNT.get();}
-    public static int getFluidTier5LavaAmount() {return FLUID_TIER5_LAVA_AMOUNT.get();}
-    public static int getFluidTier5EnergyCapacity() {return FLUID_TIER5_ENERGY_CAPACITY.get();}
-    public static int getFluidTier5EnergyConsumption() {return FLUID_TIER5_ENERGY_CONSUMPTION.get();}
 }
