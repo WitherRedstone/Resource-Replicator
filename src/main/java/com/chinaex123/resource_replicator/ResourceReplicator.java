@@ -35,7 +35,6 @@ public class ResourceReplicator {
 
         // 模组兼容 - 通用机械
         if (ModList.get().isLoaded("mekanism")) {
-            LOGGER.info("检测到Mekanism模组，正在注册兼容性...");
             CompatMekBlocks.register(modEventBus);
         }
     }

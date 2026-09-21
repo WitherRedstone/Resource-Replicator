@@ -1,4 +1,4 @@
-package com.chinaex123.resource_replicator.tooltip;
+package com.chinaex123.resource_replicator.client.tooltip;
 
 import com.chinaex123.resource_replicator.config.ServerConfig;
 import net.minecraft.ChatFormatting;

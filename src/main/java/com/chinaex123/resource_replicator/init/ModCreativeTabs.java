@@ -37,7 +37,6 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.FLUID_REPLICATOR_Tier5.get());
 
                         // ======================= 化学品资源复制机 =======================
-                        // 加载 通用机械 时添加
                         if (ModList.get().isLoaded("mekanism")) {
                             output.accept(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier1.get());
                             output.accept(CompatMekBlocks.CHEMICAL_REPLICATOR_Tier2.get());
