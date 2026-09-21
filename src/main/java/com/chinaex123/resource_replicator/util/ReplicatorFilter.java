@@ -73,7 +73,7 @@ public class ReplicatorFilter {
             }
         }
 
-        boolean isBlacklistMode = RRServerConfig.isBlacklistMode();
+        boolean isBlacklistMode = RRServerConfig.BLACKLIST_MODE.get();
 
         if (isBlacklistMode) {
             // 黑名单模式：检查是否在黑名单中
@@ -115,7 +115,7 @@ public class ReplicatorFilter {
             }
         }
 
-        boolean isBlacklistMode = RRServerConfig.isFluidBlacklistMode();
+        boolean isBlacklistMode = RRServerConfig.FLUID_BLACKLIST_MODE.get();
 
         if (isBlacklistMode) {
             // 黑名单模式：检查是否在黑名单中
