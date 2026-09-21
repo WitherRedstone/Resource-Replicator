@@ -71,24 +71,24 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     private void updateEnergyStats() {
         switch (tier) {
             case ITEM_TIER_1:
-                energyCapacity = RRServerConfig.getItemTier1EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier1EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER1_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER1_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_2:
-                energyCapacity = RRServerConfig.getItemTier2EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier2EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER2_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER2_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_3:
-                energyCapacity = RRServerConfig.getItemTier3EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier3EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER3_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER3_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_4:
-                energyCapacity = RRServerConfig.getItemTier4EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier4EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER4_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER4_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_5:
-                energyCapacity = RRServerConfig.getItemTier5EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier5EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER5_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER5_ENERGY_CONSUMPTION.get();
                 break;
         }
     }
@@ -98,11 +98,11 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      */
     private void updateOutputSlots() {
         this.currentOutputSlots = switch (tier) {
-            case ITEM_TIER_1 -> RRServerConfig.getItemTier1OutputSlots();
-            case ITEM_TIER_2 -> RRServerConfig.getItemTier2OutputSlots();
-            case ITEM_TIER_3 -> RRServerConfig.getItemTier3OutputSlots();
-            case ITEM_TIER_4 -> RRServerConfig.getItemTier4OutputSlots();
-            case ITEM_TIER_5 -> RRServerConfig.getItemTier5OutputSlots();
+            case ITEM_TIER_1 -> RRServerConfig.ITEM_TIER1_OUTPUT_SLOTS.get();
+            case ITEM_TIER_2 -> RRServerConfig.ITEM_TIER2_OUTPUT_SLOTS.get();
+            case ITEM_TIER_3 -> RRServerConfig.ITEM_TIER3_OUTPUT_SLOTS.get();
+            case ITEM_TIER_4 -> RRServerConfig.ITEM_TIER4_OUTPUT_SLOTS.get();
+            case ITEM_TIER_5 -> RRServerConfig.ITEM_TIER5_OUTPUT_SLOTS.get();
         };
     }
 
@@ -203,7 +203,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
                 // 管道插入时，根据配置决定是否销毁
                 if (isPipeInsertion) {
-                    if (RRServerConfig.isItemReplicatorDestroyEnabled()) {
+                    if (RRServerConfig.ITEM_REPLICATOR_ENABLE_DESTROY.get()) {
                         return amount;  // 开启销毁模式：接受并销毁
                     } else {
                         return 0;  // 关闭销毁模式：拒绝插入
@@ -659,9 +659,9 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         boolean hasProduced = false;
         int totalOutput = 0;
 
-        boolean autoOutputEnabled = RRServerConfig.isItemReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.ITEM_REPLICATOR_AUTO_OUTPUT.get();
         if (autoOutputEnabled) {
-            Direction outputDirection = RRServerConfig.getItemReplicatorAutoOutputDirection();
+            Direction outputDirection = RRServerConfig.ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();
             BlockPos neighborPos = pos.relative(outputDirection);
             BlockState neighborState = level.getBlockState(neighborPos);
 

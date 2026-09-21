@@ -22,24 +22,24 @@ public enum ItemReplicatorTier {
     public void updateFromConfig() {
         switch (this) {
             case ITEM_TIER_1:
-                this.processSpeed = RRServerConfig.getItemTier1OutputTime();
-                this.outputAmount = RRServerConfig.getItemTier1OutputAmount();
+                this.processSpeed = RRServerConfig.ITEM_TIER1_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.ITEM_TIER1_OUTPUT_AMOUNT.get();
                 break;
             case ITEM_TIER_2:
-                this.processSpeed = RRServerConfig.getItemTier2OutputTime();
-                this.outputAmount = RRServerConfig.getItemTier2OutputAmount();
+                this.processSpeed = RRServerConfig.ITEM_TIER2_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.ITEM_TIER2_OUTPUT_AMOUNT.get();
                 break;
             case ITEM_TIER_3:
-                this.processSpeed = RRServerConfig.getItemTier3OutputTime();
-                this.outputAmount = RRServerConfig.getItemTier3OutputAmount();
+                this.processSpeed = RRServerConfig.ITEM_TIER3_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.ITEM_TIER3_OUTPUT_AMOUNT.get();
                 break;
             case ITEM_TIER_4:
-                this.processSpeed = RRServerConfig.getItemTier4OutputTime();
-                this.outputAmount = RRServerConfig.getItemTier4OutputAmount();
+                this.processSpeed = RRServerConfig.ITEM_TIER4_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.ITEM_TIER4_OUTPUT_AMOUNT.get();
                 break;
             case ITEM_TIER_5:
-                this.processSpeed = RRServerConfig.getItemTier5OutputTime();
-                this.outputAmount = RRServerConfig.getItemTier5OutputAmount();
+                this.processSpeed = RRServerConfig.ITEM_TIER5_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.ITEM_TIER5_OUTPUT_AMOUNT.get();
                 break;
         }
     }
