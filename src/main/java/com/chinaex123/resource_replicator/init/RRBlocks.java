@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ModBlocks {
+public class RRBlocks {
     // 创建方块注册器实例
     public static final DeferredRegister.Blocks BLOCK_REGISTER =
             DeferredRegister.createBlocks(ResourceReplicator.MOD_ID);
@@ -50,7 +50,7 @@ public class ModBlocks {
             Supplier<BlockBehaviour.Properties> properties,
             net.minecraft.world.item.Rarity rarity) {
         DeferredBlock<T> block = BLOCK_REGISTER.registerBlock(name, func, properties);
-        ModItems.ITEMS_REGISTER.registerSimpleBlockItem(name, block, p -> p.rarity(rarity));
+        RRItems.ITEMS_REGISTER.registerSimpleBlockItem(name, block, p -> p.rarity(rarity));
         return block;
     }
 
@@ -59,7 +59,7 @@ public class ModBlocks {
             boolean shouldRegisterItem) {
         DeferredBlock<T> block = BLOCK_REGISTER.registerBlock(name, func);
         if (shouldRegisterItem) {
-            ModItems.ITEMS_REGISTER.registerSimpleBlockItem(block);
+            RRItems.ITEMS_REGISTER.registerSimpleBlockItem(block);
         }
         return block;
     }

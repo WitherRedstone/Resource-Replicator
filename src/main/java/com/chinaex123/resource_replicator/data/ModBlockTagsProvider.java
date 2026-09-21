@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.data;
 
-import com.chinaex123.resource_replicator.init.ModBlocks;
+import com.chinaex123.resource_replicator.init.RRBlocks;
 import com.chinaex123.resource_replicator.ResourceReplicator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -20,31 +20,31 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
         // 镐挖掘
         tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 // ======================= 物品资源复制机 =======================
-                .add(ModBlocks.ITEM_REPLICATOR_Tier1.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier2.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier3.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier4.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier5.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier1.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier2.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier3.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier4.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier5.get())
                 // ======================= 流体资源复制机 =======================
-                .add(ModBlocks.FLUID_REPLICATOR_Tier1.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier2.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier3.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier4.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier5.get());
+                .add(RRBlocks.FLUID_REPLICATOR_Tier1.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier2.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier3.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier4.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier5.get());
 
         // 需要铁等级的工具
         tag(BlockTags.NEEDS_IRON_TOOL)
                 // ======================= 物品资源复制机 =======================
-                .add(ModBlocks.ITEM_REPLICATOR_Tier1.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier2.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier3.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier4.get())
-                .add(ModBlocks.ITEM_REPLICATOR_Tier5.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier1.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier2.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier3.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier4.get())
+                .add(RRBlocks.ITEM_REPLICATOR_Tier5.get())
                 // ======================= 流体资源复制机 =======================
-                .add(ModBlocks.FLUID_REPLICATOR_Tier1.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier2.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier3.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier4.get())
-                .add(ModBlocks.FLUID_REPLICATOR_Tier5.get());
+                .add(RRBlocks.FLUID_REPLICATOR_Tier1.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier2.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier3.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier4.get())
+                .add(RRBlocks.FLUID_REPLICATOR_Tier5.get());
     }
 }

@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.util;
 
-import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -73,16 +73,16 @@ public class ReplicatorFilter {
             }
         }
 
-        boolean isBlacklistMode = ServerConfig.isBlacklistMode();
+        boolean isBlacklistMode = RRServerConfig.isBlacklistMode();
 
         if (isBlacklistMode) {
             // 黑名单模式：检查是否在黑名单中
-            if (isInList(itemId, modId, stack, ServerConfig.getBlacklistItems())) {
+            if (isInList(itemId, modId, stack, RRServerConfig.getBlacklistItems())) {
                 return new FilterResult(false, Component.translatable("message.item_replicator.filter.denied"));
             }
         } else {
             // 白名单模式：检查是否在白名单中
-            if (!isInList(itemId, modId, stack, ServerConfig.getWhitelistItems())) {
+            if (!isInList(itemId, modId, stack, RRServerConfig.getWhitelistItems())) {
                 return new FilterResult(false, Component.translatable("message.item_replicator.filter.denied"));
             }
         }
@@ -115,16 +115,16 @@ public class ReplicatorFilter {
             }
         }
 
-        boolean isBlacklistMode = ServerConfig.isFluidBlacklistMode();
+        boolean isBlacklistMode = RRServerConfig.isFluidBlacklistMode();
 
         if (isBlacklistMode) {
             // 黑名单模式：检查是否在黑名单中
-            if (isFluidInList(fluidId, modId, fluidStack, ServerConfig.getFluidBlacklistItems())) {
+            if (isFluidInList(fluidId, modId, fluidStack, RRServerConfig.getFluidBlacklistItems())) {
                 return new FilterResult(false, Component.translatable("message.fluid_replicator.filter.denied"));
             }
         } else {
             // 白名单模式：检查是否在白名单中
-            if (!isFluidInList(fluidId, modId, fluidStack, ServerConfig.getFluidWhitelistItems())) {
+            if (!isFluidInList(fluidId, modId, fluidStack, RRServerConfig.getFluidWhitelistItems())) {
                 return new FilterResult(false, Component.translatable("message.fluid_replicator.filter.denied"));
             }
         }

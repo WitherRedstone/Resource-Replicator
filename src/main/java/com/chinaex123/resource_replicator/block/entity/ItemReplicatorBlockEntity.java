@@ -2,8 +2,8 @@ package com.chinaex123.resource_replicator.block.entity;
 
 import com.chinaex123.resource_replicator.block.ItemReplicatorBlock;
 import com.chinaex123.resource_replicator.block.enumTier.ItemReplicatorTier;
-import com.chinaex123.resource_replicator.config.ServerConfig;
-import com.chinaex123.resource_replicator.init.ModBlockEntities;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
+import com.chinaex123.resource_replicator.init.RRBlockEntities;
 import com.chinaex123.resource_replicator.network.ItemReplicatorSyncPacket;
 import com.chinaex123.resource_replicator.util.ReplicatorFilter;
 import net.minecraft.core.BlockPos;
@@ -74,24 +74,24 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     private void updateEnergyStats() {
         switch (tier) {
             case ITEM_TIER_1:
-                energyCapacity = ServerConfig.getItemTier1EnergyCapacity();
-                energyConsumption = ServerConfig.getItemTier1EnergyConsumption();
+                energyCapacity = RRServerConfig.getItemTier1EnergyCapacity();
+                energyConsumption = RRServerConfig.getItemTier1EnergyConsumption();
                 break;
             case ITEM_TIER_2:
-                energyCapacity = ServerConfig.getItemTier2EnergyCapacity();
-                energyConsumption = ServerConfig.getItemTier2EnergyConsumption();
+                energyCapacity = RRServerConfig.getItemTier2EnergyCapacity();
+                energyConsumption = RRServerConfig.getItemTier2EnergyConsumption();
                 break;
             case ITEM_TIER_3:
-                energyCapacity = ServerConfig.getItemTier3EnergyCapacity();
-                energyConsumption = ServerConfig.getItemTier3EnergyConsumption();
+                energyCapacity = RRServerConfig.getItemTier3EnergyCapacity();
+                energyConsumption = RRServerConfig.getItemTier3EnergyConsumption();
                 break;
             case ITEM_TIER_4:
-                energyCapacity = ServerConfig.getItemTier4EnergyCapacity();
-                energyConsumption = ServerConfig.getItemTier4EnergyConsumption();
+                energyCapacity = RRServerConfig.getItemTier4EnergyCapacity();
+                energyConsumption = RRServerConfig.getItemTier4EnergyConsumption();
                 break;
             case ITEM_TIER_5:
-                energyCapacity = ServerConfig.getItemTier5EnergyCapacity();
-                energyConsumption = ServerConfig.getItemTier5EnergyConsumption();
+                energyCapacity = RRServerConfig.getItemTier5EnergyCapacity();
+                energyConsumption = RRServerConfig.getItemTier5EnergyConsumption();
                 break;
         }
     }
@@ -101,11 +101,11 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      */
     private void updateOutputSlots() {
         this.currentOutputSlots = switch (tier) {
-            case ITEM_TIER_1 -> ServerConfig.getItemTier1OutputSlots();
-            case ITEM_TIER_2 -> ServerConfig.getItemTier2OutputSlots();
-            case ITEM_TIER_3 -> ServerConfig.getItemTier3OutputSlots();
-            case ITEM_TIER_4 -> ServerConfig.getItemTier4OutputSlots();
-            case ITEM_TIER_5 -> ServerConfig.getItemTier5OutputSlots();
+            case ITEM_TIER_1 -> RRServerConfig.getItemTier1OutputSlots();
+            case ITEM_TIER_2 -> RRServerConfig.getItemTier2OutputSlots();
+            case ITEM_TIER_3 -> RRServerConfig.getItemTier3OutputSlots();
+            case ITEM_TIER_4 -> RRServerConfig.getItemTier4OutputSlots();
+            case ITEM_TIER_5 -> RRServerConfig.getItemTier5OutputSlots();
         };
     }
 
@@ -206,7 +206,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
                 // 管道插入时，根据配置决定是否销毁
                 if (isPipeInsertion) {
-                    if (ServerConfig.isItemReplicatorDestroyEnabled()) {
+                    if (RRServerConfig.isItemReplicatorDestroyEnabled()) {
                         return amount;  // 开启销毁模式：接受并销毁
                     } else {
                         return 0;  // 关闭销毁模式：拒绝插入
@@ -330,7 +330,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
      * 构造函数
      */
     public ItemReplicatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.ITEM_REPLICATOR.get(), pos, state);
+        super(RRBlockEntities.ITEM_REPLICATOR.get(), pos, state);
         Arrays.fill(items, ItemStack.EMPTY);
     }
 
@@ -649,9 +649,9 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
         boolean hasProduced = false;
         int totalOutput = 0;
 
-        boolean autoOutputEnabled = ServerConfig.isItemReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.isItemReplicatorAutoOutputEnabled();
         if (autoOutputEnabled) {
-            Direction outputDirection = ServerConfig.getItemReplicatorAutoOutputDirection();
+            Direction outputDirection = RRServerConfig.getItemReplicatorAutoOutputDirection();
             BlockPos neighborPos = pos.relative(outputDirection);
             BlockState neighborState = level.getBlockState(neighborPos);
 

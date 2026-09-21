@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.client.tooltip;
 
-import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -89,9 +89,9 @@ public class ModTooltips {
         }
 
         // 显示自动输出状态
-        boolean autoOutputEnabled = ServerConfig.isItemReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.isItemReplicatorAutoOutputEnabled();
         if (autoOutputEnabled) {
-            String directionName = ServerConfig.getItemReplicatorAutoOutputDirection().getName();
+            String directionName = RRServerConfig.getItemReplicatorAutoOutputDirection().getName();
             toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
                             Component.literal(directionName).withStyle(ChatFormatting.AQUA))
                     .withStyle(ChatFormatting.GRAY));
@@ -156,9 +156,9 @@ public class ModTooltips {
         }
 
         // 显示自动输出状态
-        boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.isFluidReplicatorAutoOutputEnabled();
         if (autoOutputEnabled) {
-            String directionName = ServerConfig.getFluidReplicatorAutoOutputDirection().getName();
+            String directionName = RRServerConfig.getFluidReplicatorAutoOutputDirection().getName();
             toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
                             Component.literal(directionName).withStyle(ChatFormatting.AQUA))
                     .withStyle(ChatFormatting.GRAY));
@@ -170,110 +170,110 @@ public class ModTooltips {
 
     private static int getItemTierOutputAmount(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getItemTier1OutputAmount();
-            case 2 -> ServerConfig.getItemTier2OutputAmount();
-            case 3 -> ServerConfig.getItemTier3OutputAmount();
-            case 4 -> ServerConfig.getItemTier4OutputAmount();
-            case 5 -> ServerConfig.getItemTier5OutputAmount();
+            case 1 -> RRServerConfig.getItemTier1OutputAmount();
+            case 2 -> RRServerConfig.getItemTier2OutputAmount();
+            case 3 -> RRServerConfig.getItemTier3OutputAmount();
+            case 4 -> RRServerConfig.getItemTier4OutputAmount();
+            case 5 -> RRServerConfig.getItemTier5OutputAmount();
             default -> 1;
         };
     }
 
     private static int getItemTierOutputSlots(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getItemTier1OutputSlots();
-            case 2 -> ServerConfig.getItemTier2OutputSlots();
-            case 3 -> ServerConfig.getItemTier3OutputSlots();
-            case 4 -> ServerConfig.getItemTier4OutputSlots();
-            case 5 -> ServerConfig.getItemTier5OutputSlots();
+            case 1 -> RRServerConfig.getItemTier1OutputSlots();
+            case 2 -> RRServerConfig.getItemTier2OutputSlots();
+            case 3 -> RRServerConfig.getItemTier3OutputSlots();
+            case 4 -> RRServerConfig.getItemTier4OutputSlots();
+            case 5 -> RRServerConfig.getItemTier5OutputSlots();
             default -> 1;
         };
     }
 
     private static int getItemTierOutputTime(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getItemTier1OutputTime();
-            case 2 -> ServerConfig.getItemTier2OutputTime();
-            case 3 -> ServerConfig.getItemTier3OutputTime();
-            case 4 -> ServerConfig.getItemTier4OutputTime();
-            case 5 -> ServerConfig.getItemTier5OutputTime();
+            case 1 -> RRServerConfig.getItemTier1OutputTime();
+            case 2 -> RRServerConfig.getItemTier2OutputTime();
+            case 3 -> RRServerConfig.getItemTier3OutputTime();
+            case 4 -> RRServerConfig.getItemTier4OutputTime();
+            case 5 -> RRServerConfig.getItemTier5OutputTime();
             default -> 20;
         };
     }
 
     private static int getItemTierEnergyConsumption(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getItemTier1EnergyConsumption();
-            case 2 -> ServerConfig.getItemTier2EnergyConsumption();
-            case 3 -> ServerConfig.getItemTier3EnergyConsumption();
-            case 4 -> ServerConfig.getItemTier4EnergyConsumption();
-            case 5 -> ServerConfig.getItemTier5EnergyConsumption();
+            case 1 -> RRServerConfig.getItemTier1EnergyConsumption();
+            case 2 -> RRServerConfig.getItemTier2EnergyConsumption();
+            case 3 -> RRServerConfig.getItemTier3EnergyConsumption();
+            case 4 -> RRServerConfig.getItemTier4EnergyConsumption();
+            case 5 -> RRServerConfig.getItemTier5EnergyConsumption();
             default -> 0;
         };
     }
 
     private static int getFluidTierOutputAmount(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getFluidTier1OutputAmount();
-            case 2 -> ServerConfig.getFluidTier2OutputAmount();
-            case 3 -> ServerConfig.getFluidTier3OutputAmount();
-            case 4 -> ServerConfig.getFluidTier4OutputAmount();
-            case 5 -> ServerConfig.getFluidTier5OutputAmount();
+            case 1 -> RRServerConfig.getFluidTier1OutputAmount();
+            case 2 -> RRServerConfig.getFluidTier2OutputAmount();
+            case 3 -> RRServerConfig.getFluidTier3OutputAmount();
+            case 4 -> RRServerConfig.getFluidTier4OutputAmount();
+            case 5 -> RRServerConfig.getFluidTier5OutputAmount();
             default -> 1000;
         };
     }
 
     private static int getFluidTierOutputTankCapacity(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getFluidTier1OutputTankCapacity();
-            case 2 -> ServerConfig.getFluidTier2OutputTankCapacity();
-            case 3 -> ServerConfig.getFluidTier3OutputTankCapacity();
-            case 4 -> ServerConfig.getFluidTier4OutputTankCapacity();
-            case 5 -> ServerConfig.getFluidTier5OutputTankCapacity();
+            case 1 -> RRServerConfig.getFluidTier1OutputTankCapacity();
+            case 2 -> RRServerConfig.getFluidTier2OutputTankCapacity();
+            case 3 -> RRServerConfig.getFluidTier3OutputTankCapacity();
+            case 4 -> RRServerConfig.getFluidTier4OutputTankCapacity();
+            case 5 -> RRServerConfig.getFluidTier5OutputTankCapacity();
             default -> 4000;
         };
     }
 
     private static int getFluidTierOutputTime(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getFluidTier1OutputTime();
-            case 2 -> ServerConfig.getFluidTier2OutputTime();
-            case 3 -> ServerConfig.getFluidTier3OutputTime();
-            case 4 -> ServerConfig.getFluidTier4OutputTime();
-            case 5 -> ServerConfig.getFluidTier5OutputTime();
+            case 1 -> RRServerConfig.getFluidTier1OutputTime();
+            case 2 -> RRServerConfig.getFluidTier2OutputTime();
+            case 3 -> RRServerConfig.getFluidTier3OutputTime();
+            case 4 -> RRServerConfig.getFluidTier4OutputTime();
+            case 5 -> RRServerConfig.getFluidTier5OutputTime();
             default -> 20;
         };
     }
 
     private static int getFluidTierWaterOutput(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getFluidTier1WaterAmount();
-            case 2 -> ServerConfig.getFluidTier2WaterAmount();
-            case 3 -> ServerConfig.getFluidTier3WaterAmount();
-            case 4 -> ServerConfig.getFluidTier4WaterAmount();
-            case 5 -> ServerConfig.getFluidTier5WaterAmount();
+            case 1 -> RRServerConfig.getFluidTier1WaterAmount();
+            case 2 -> RRServerConfig.getFluidTier2WaterAmount();
+            case 3 -> RRServerConfig.getFluidTier3WaterAmount();
+            case 4 -> RRServerConfig.getFluidTier4WaterAmount();
+            case 5 -> RRServerConfig.getFluidTier5WaterAmount();
             default -> 1000;
         };
     }
 
     private static int getFluidTierLavaOutput(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getFluidTier1LavaAmount();
-            case 2 -> ServerConfig.getFluidTier2LavaAmount();
-            case 3 -> ServerConfig.getFluidTier3LavaAmount();
-            case 4 -> ServerConfig.getFluidTier4LavaAmount();
-            case 5 -> ServerConfig.getFluidTier5LavaAmount();
+            case 1 -> RRServerConfig.getFluidTier1LavaAmount();
+            case 2 -> RRServerConfig.getFluidTier2LavaAmount();
+            case 3 -> RRServerConfig.getFluidTier3LavaAmount();
+            case 4 -> RRServerConfig.getFluidTier4LavaAmount();
+            case 5 -> RRServerConfig.getFluidTier5LavaAmount();
             default -> 1000;
         };
     }
 
     private static int getFluidTierEnergyConsumption(int tier) {
         return switch (tier) {
-            case 1 -> ServerConfig.getFluidTier1EnergyConsumption();
-            case 2 -> ServerConfig.getFluidTier2EnergyConsumption();
-            case 3 -> ServerConfig.getFluidTier3EnergyConsumption();
-            case 4 -> ServerConfig.getFluidTier4EnergyConsumption();
-            case 5 -> ServerConfig.getFluidTier5EnergyConsumption();
+            case 1 -> RRServerConfig.getFluidTier1EnergyConsumption();
+            case 2 -> RRServerConfig.getFluidTier2EnergyConsumption();
+            case 3 -> RRServerConfig.getFluidTier3EnergyConsumption();
+            case 4 -> RRServerConfig.getFluidTier4EnergyConsumption();
+            case 5 -> RRServerConfig.getFluidTier5EnergyConsumption();
             default -> 0;
         };
     }

@@ -2,8 +2,8 @@ package com.chinaex123.resource_replicator.block.entity;
 
 import com.chinaex123.resource_replicator.block.FluidReplicatorBlock;
 import com.chinaex123.resource_replicator.block.enumTier.FluidReplicatorTier;
-import com.chinaex123.resource_replicator.config.ServerConfig;
-import com.chinaex123.resource_replicator.init.ModBlockEntities;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
+import com.chinaex123.resource_replicator.init.RRBlockEntities;
 import com.chinaex123.resource_replicator.network.FluidSyncPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -113,24 +113,24 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     private void updateEnergyStats() {
         switch (tier) {
             case FLUID_TIER_1:
-                energyCapacity = ServerConfig.getFluidTier1EnergyCapacity();
-                energyConsumption = ServerConfig.getFluidTier1EnergyConsumption();
+                energyCapacity = RRServerConfig.getFluidTier1EnergyCapacity();
+                energyConsumption = RRServerConfig.getFluidTier1EnergyConsumption();
                 break;
             case FLUID_TIER_2:
-                energyCapacity = ServerConfig.getFluidTier2EnergyCapacity();
-                energyConsumption = ServerConfig.getFluidTier2EnergyConsumption();
+                energyCapacity = RRServerConfig.getFluidTier2EnergyCapacity();
+                energyConsumption = RRServerConfig.getFluidTier2EnergyConsumption();
                 break;
             case FLUID_TIER_3:
-                energyCapacity = ServerConfig.getFluidTier3EnergyCapacity();
-                energyConsumption = ServerConfig.getFluidTier3EnergyConsumption();
+                energyCapacity = RRServerConfig.getFluidTier3EnergyCapacity();
+                energyConsumption = RRServerConfig.getFluidTier3EnergyConsumption();
                 break;
             case FLUID_TIER_4:
-                energyCapacity = ServerConfig.getFluidTier4EnergyCapacity();
-                energyConsumption = ServerConfig.getFluidTier4EnergyConsumption();
+                energyCapacity = RRServerConfig.getFluidTier4EnergyCapacity();
+                energyConsumption = RRServerConfig.getFluidTier4EnergyConsumption();
                 break;
             case FLUID_TIER_5:
-                energyCapacity = ServerConfig.getFluidTier5EnergyCapacity();
-                energyConsumption = ServerConfig.getFluidTier5EnergyConsumption();
+                energyCapacity = RRServerConfig.getFluidTier5EnergyCapacity();
+                energyConsumption = RRServerConfig.getFluidTier5EnergyConsumption();
                 break;
         }
     }
@@ -140,11 +140,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
      */
     private void updateOutputCapacity() {
         this.outputCapacity = switch (tier) {
-            case FLUID_TIER_1 -> ServerConfig.getFluidTier1OutputTankCapacity();
-            case FLUID_TIER_2 -> ServerConfig.getFluidTier2OutputTankCapacity();
-            case FLUID_TIER_3 -> ServerConfig.getFluidTier3OutputTankCapacity();
-            case FLUID_TIER_4 -> ServerConfig.getFluidTier4OutputTankCapacity();
-            case FLUID_TIER_5 -> ServerConfig.getFluidTier5OutputTankCapacity();
+            case FLUID_TIER_1 -> RRServerConfig.getFluidTier1OutputTankCapacity();
+            case FLUID_TIER_2 -> RRServerConfig.getFluidTier2OutputTankCapacity();
+            case FLUID_TIER_3 -> RRServerConfig.getFluidTier3OutputTankCapacity();
+            case FLUID_TIER_4 -> RRServerConfig.getFluidTier4OutputTankCapacity();
+            case FLUID_TIER_5 -> RRServerConfig.getFluidTier5OutputTankCapacity();
         };
     }
 
@@ -243,7 +243,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             boolean isPipeInsertion = !isPlayerOperation();
 
             // 管道插入且开启销毁模式：模拟成功（实际销毁）
-            if (isPipeInsertion && ServerConfig.isFluidReplicatorDestroyEnabled()) {
+            if (isPipeInsertion && RRServerConfig.isFluidReplicatorDestroyEnabled()) {
                 return maxAmount;
             }
 
@@ -392,11 +392,11 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         boolean hasUpdated = false;
         int totalOutput = 0;
 
-        boolean autoOutputEnabled = ServerConfig.isFluidReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.isFluidReplicatorAutoOutputEnabled();
 
         // 自动输出到相邻容器
         if (autoOutputEnabled) {
-            Direction outputDirection = ServerConfig.getFluidReplicatorAutoOutputDirection();
+            Direction outputDirection = RRServerConfig.getFluidReplicatorAutoOutputDirection();
             BlockPos neighborPos = pos.relative(outputDirection);
             BlockState neighborState = level.getBlockState(neighborPos);
 
@@ -475,7 +475,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
      * 构造函数
      */
     public FluidReplicatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.FLUID_REPLICATOR.get(), pos, state);
+        super(RRBlockEntities.FLUID_REPLICATOR.get(), pos, state);
     }
 
     /**
