@@ -4,7 +4,7 @@ import com.chinaex123.resource_replicator.ResourceReplicator;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class ModItems {
+public class RRItems {
     public static final DeferredRegister.Items ITEMS_REGISTER =
             DeferredRegister.createItems(ResourceReplicator.MOD_ID);
 

@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.block.enumTier;
 
-import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
 
 public enum ItemReplicatorTier {
     ITEM_TIER_1(1),
@@ -22,24 +22,24 @@ public enum ItemReplicatorTier {
     public void updateFromConfig() {
         switch (this) {
             case ITEM_TIER_1:
-                this.processSpeed = ServerConfig.getItemTier1OutputTime();
-                this.outputAmount = ServerConfig.getItemTier1OutputAmount();
+                this.processSpeed = RRServerConfig.getItemTier1OutputTime();
+                this.outputAmount = RRServerConfig.getItemTier1OutputAmount();
                 break;
             case ITEM_TIER_2:
-                this.processSpeed = ServerConfig.getItemTier2OutputTime();
-                this.outputAmount = ServerConfig.getItemTier2OutputAmount();
+                this.processSpeed = RRServerConfig.getItemTier2OutputTime();
+                this.outputAmount = RRServerConfig.getItemTier2OutputAmount();
                 break;
             case ITEM_TIER_3:
-                this.processSpeed = ServerConfig.getItemTier3OutputTime();
-                this.outputAmount = ServerConfig.getItemTier3OutputAmount();
+                this.processSpeed = RRServerConfig.getItemTier3OutputTime();
+                this.outputAmount = RRServerConfig.getItemTier3OutputAmount();
                 break;
             case ITEM_TIER_4:
-                this.processSpeed = ServerConfig.getItemTier4OutputTime();
-                this.outputAmount = ServerConfig.getItemTier4OutputAmount();
+                this.processSpeed = RRServerConfig.getItemTier4OutputTime();
+                this.outputAmount = RRServerConfig.getItemTier4OutputAmount();
                 break;
             case ITEM_TIER_5:
-                this.processSpeed = ServerConfig.getItemTier5OutputTime();
-                this.outputAmount = ServerConfig.getItemTier5OutputAmount();
+                this.processSpeed = RRServerConfig.getItemTier5OutputTime();
+                this.outputAmount = RRServerConfig.getItemTier5OutputAmount();
                 break;
         }
     }

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-public class ModBlockEntities {
+public class RRBlockEntities {
     public static DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ResourceReplicator.MOD_ID);
 
@@ -19,21 +19,21 @@ public class ModBlockEntities {
     public static final Supplier<BlockEntityType<@NotNull ItemReplicatorBlockEntity>> ITEM_REPLICATOR =
             BLOCK_ENTITY_TYPES.register("item_replicator", () ->
                     new BlockEntityType<>(ItemReplicatorBlockEntity::new,
-                            ModBlocks.ITEM_REPLICATOR_Tier1.get(),
-                            ModBlocks.ITEM_REPLICATOR_Tier2.get(),
-                            ModBlocks.ITEM_REPLICATOR_Tier3.get(),
-                            ModBlocks.ITEM_REPLICATOR_Tier4.get(),
-                            ModBlocks.ITEM_REPLICATOR_Tier5.get()));
+                            RRBlocks.ITEM_REPLICATOR_Tier1.get(),
+                            RRBlocks.ITEM_REPLICATOR_Tier2.get(),
+                            RRBlocks.ITEM_REPLICATOR_Tier3.get(),
+                            RRBlocks.ITEM_REPLICATOR_Tier4.get(),
+                            RRBlocks.ITEM_REPLICATOR_Tier5.get()));
 
     // ======================= 流体资源复制机 =======================
     public static final Supplier<BlockEntityType<@NotNull FluidReplicatorBlockEntity>> FLUID_REPLICATOR =
             BLOCK_ENTITY_TYPES.register("fluid_replicator", () ->
                     new BlockEntityType<>(FluidReplicatorBlockEntity::new,
-                            ModBlocks.FLUID_REPLICATOR_Tier1.get(),
-                            ModBlocks.FLUID_REPLICATOR_Tier2.get(),
-                            ModBlocks.FLUID_REPLICATOR_Tier3.get(),
-                            ModBlocks.FLUID_REPLICATOR_Tier4.get(),
-                            ModBlocks.FLUID_REPLICATOR_Tier5.get()));
+                            RRBlocks.FLUID_REPLICATOR_Tier1.get(),
+                            RRBlocks.FLUID_REPLICATOR_Tier2.get(),
+                            RRBlocks.FLUID_REPLICATOR_Tier3.get(),
+                            RRBlocks.FLUID_REPLICATOR_Tier4.get(),
+                            RRBlocks.FLUID_REPLICATOR_Tier5.get()));
 
     public static void register(IEventBus bus){
         BLOCK_ENTITY_TYPES.register(bus);

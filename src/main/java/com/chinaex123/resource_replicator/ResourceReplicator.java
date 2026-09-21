@@ -1,11 +1,11 @@
 package com.chinaex123.resource_replicator;
 
-import com.chinaex123.resource_replicator.init.ModBlocks;
+import com.chinaex123.resource_replicator.init.RRBlocks;
 import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
-import com.chinaex123.resource_replicator.init.ModBlockEntities;
-import com.chinaex123.resource_replicator.config.ServerConfig;
-import com.chinaex123.resource_replicator.init.ModItems;
+import com.chinaex123.resource_replicator.init.RRBlockEntities;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
+import com.chinaex123.resource_replicator.init.RRItems;
 import com.chinaex123.resource_replicator.network.FluidSyncPacket;
 import com.chinaex123.resource_replicator.network.ItemReplicatorSyncPacket;
 import com.mojang.logging.LogUtils;
@@ -26,14 +26,14 @@ public class ResourceReplicator {
 
     public ResourceReplicator(IEventBus modEventBus, ModContainer modContainer) {
         ModCreativeTabs.register(modEventBus);
-        ModBlocks.register(modEventBus);
-        ModItems.register(modEventBus);
-        ModBlockEntities.register(modEventBus);
+        RRBlocks.register(modEventBus);
+        RRItems.register(modEventBus);
+        RRBlockEntities.register(modEventBus);
 
         modEventBus.addListener(this::registerCapabilities);
         modEventBus.addListener(this::registerPayloadHandlers);
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.CONFIG_SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, RRServerConfig.CONFIG_SPEC);
     }
 
     private void registerPayloadHandlers(RegisterPayloadHandlersEvent event) {
@@ -55,20 +55,20 @@ public class ResourceReplicator {
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
         // 为物品复制机注册物品处理能力
         event.registerBlockEntity(Capabilities.Item.BLOCK,
-                ModBlockEntities.ITEM_REPLICATOR.get(),
+                RRBlockEntities.ITEM_REPLICATOR.get(),
                 ItemReplicatorBlockEntity::getItemHandler);
         // 为物品复制机注册能量处理能力
         event.registerBlockEntity(Capabilities.Energy.BLOCK,
-                ModBlockEntities.ITEM_REPLICATOR.get(),
+                RRBlockEntities.ITEM_REPLICATOR.get(),
                 ItemReplicatorBlockEntity::getEnergyHandler);
 
         // 为流体复制机注册流体处理能力
         event.registerBlockEntity(Capabilities.Fluid.BLOCK,
-                ModBlockEntities.FLUID_REPLICATOR.get(),
+                RRBlockEntities.FLUID_REPLICATOR.get(),
                 FluidReplicatorBlockEntity::getFluidHandler);
         // 为流体复制机注册能量处理能力
         event.registerBlockEntity(Capabilities.Energy.BLOCK,
-                ModBlockEntities.FLUID_REPLICATOR.get(),
+                RRBlockEntities.FLUID_REPLICATOR.get(),
                 FluidReplicatorBlockEntity::getEnergyHandler);
     }
 }
