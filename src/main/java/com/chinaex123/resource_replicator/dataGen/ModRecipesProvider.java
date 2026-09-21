@@ -1,7 +1,7 @@
 package com.chinaex123.resource_replicator.dataGen;
 
 import com.chinaex123.resource_replicator.ResourceReplicator;
-import com.chinaex123.resource_replicator.init.ModBlocks;
+import com.chinaex123.resource_replicator.init.RRBlocks;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -48,7 +48,7 @@ public class ModRecipesProvider extends RecipeProvider {
         HolderGetter<Item> itemRegistryLookup = this.registries.lookupOrThrow(Registries.ITEM);
 
         // ======================= 物品资源复制机 =======================
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.ITEM_REPLICATOR_Tier1.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.ITEM_REPLICATOR_Tier1.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
@@ -60,49 +60,49 @@ public class ModRecipesProvider extends RecipeProvider {
                 .unlockedBy("has_item_replicator_tier1_2", has(Tags.Items.INGOTS_NETHERITE))
                 .unlockedBy("has_item_replicator_tier1_3", has(Items.DRAGON_BREATH))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.ITEM_REPLICATOR_Tier2.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.ITEM_REPLICATOR_Tier2.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.ITEM_REPLICATOR_Tier1.get().asItem())
+                .define('A', RRBlocks.ITEM_REPLICATOR_Tier1.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-                .unlockedBy("has_item_replicator_tier2", has(ModBlocks.ITEM_REPLICATOR_Tier2.get()))
+                .unlockedBy("has_item_replicator_tier2", has(RRBlocks.ITEM_REPLICATOR_Tier2.get()))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.ITEM_REPLICATOR_Tier3.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.ITEM_REPLICATOR_Tier3.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.ITEM_REPLICATOR_Tier2.get().asItem())
+                .define('A', RRBlocks.ITEM_REPLICATOR_Tier2.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-                .unlockedBy("has_item_replicator_tier3", has(ModBlocks.ITEM_REPLICATOR_Tier3.get()))
+                .unlockedBy("has_item_replicator_tier3", has(RRBlocks.ITEM_REPLICATOR_Tier3.get()))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.ITEM_REPLICATOR_Tier4.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.ITEM_REPLICATOR_Tier4.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.ITEM_REPLICATOR_Tier3.get().asItem())
+                .define('A', RRBlocks.ITEM_REPLICATOR_Tier3.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-                .unlockedBy("has_item_replicator_tier4", has(ModBlocks.ITEM_REPLICATOR_Tier4.get()))
+                .unlockedBy("has_item_replicator_tier4", has(RRBlocks.ITEM_REPLICATOR_Tier4.get()))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.ITEM_REPLICATOR_Tier5.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.ITEM_REPLICATOR_Tier5.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.ITEM_REPLICATOR_Tier4.get().asItem())
+                .define('A', RRBlocks.ITEM_REPLICATOR_Tier4.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_NETHERITE)
-                .unlockedBy("has_item_replicator_tier5", has(ModBlocks.ITEM_REPLICATOR_Tier5.get()))
+                .unlockedBy("has_item_replicator_tier5", has(RRBlocks.ITEM_REPLICATOR_Tier5.get()))
                 .save(output);
 
         // ======================= 流体资源复制机 =======================
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.FLUID_REPLICATOR_Tier1.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.FLUID_REPLICATOR_Tier1.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
@@ -114,45 +114,45 @@ public class ModRecipesProvider extends RecipeProvider {
                 .unlockedBy("has_fluid_replicator_tier1_2", has(Tags.Items.INGOTS_NETHERITE))
                 .unlockedBy("has_fluid_replicator_tier1_3", has(Items.DRAGON_BREATH))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.FLUID_REPLICATOR_Tier2.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.FLUID_REPLICATOR_Tier2.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.FLUID_REPLICATOR_Tier1.get().asItem())
+                .define('A', RRBlocks.FLUID_REPLICATOR_Tier1.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-                .unlockedBy("has_fluid_replicator_tier2", has(ModBlocks.FLUID_REPLICATOR_Tier1.get()))
+                .unlockedBy("has_fluid_replicator_tier2", has(RRBlocks.FLUID_REPLICATOR_Tier1.get()))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.FLUID_REPLICATOR_Tier3.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.FLUID_REPLICATOR_Tier3.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.FLUID_REPLICATOR_Tier2.get().asItem())
+                .define('A', RRBlocks.FLUID_REPLICATOR_Tier2.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-                .unlockedBy("has_fluid_replicator_tier3", has(ModBlocks.FLUID_REPLICATOR_Tier2.get()))
+                .unlockedBy("has_fluid_replicator_tier3", has(RRBlocks.FLUID_REPLICATOR_Tier2.get()))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.FLUID_REPLICATOR_Tier4.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.FLUID_REPLICATOR_Tier4.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.FLUID_REPLICATOR_Tier3.get().asItem())
+                .define('A', RRBlocks.FLUID_REPLICATOR_Tier3.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-                .unlockedBy("has_fluid_replicator_tier4", has(ModBlocks.FLUID_REPLICATOR_Tier3.get()))
+                .unlockedBy("has_fluid_replicator_tier4", has(RRBlocks.FLUID_REPLICATOR_Tier3.get()))
                 .save(output);
-        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, ModBlocks.FLUID_REPLICATOR_Tier5.get().asItem())
+        ShapedRecipeBuilder.shaped(itemRegistryLookup, RecipeCategory.MISC, RRBlocks.FLUID_REPLICATOR_Tier5.get().asItem())
                 .pattern("BDB")
                 .pattern("CAC")
                 .pattern("BDB")
-                .define('A', ModBlocks.FLUID_REPLICATOR_Tier4.get().asItem())
+                .define('A', RRBlocks.FLUID_REPLICATOR_Tier4.get().asItem())
                 .define('B', Tags.Items.INGOTS_NETHERITE)
                 .define('C', Tags.Items.NETHER_STARS)
                 .define('D', Tags.Items.STORAGE_BLOCKS_NETHERITE)
-                .unlockedBy("has_fluid_replicator_tier5", has(ModBlocks.FLUID_REPLICATOR_Tier4.get()))
+                .unlockedBy("has_fluid_replicator_tier5", has(RRBlocks.FLUID_REPLICATOR_Tier4.get()))
                 .save(output);
     }
 }

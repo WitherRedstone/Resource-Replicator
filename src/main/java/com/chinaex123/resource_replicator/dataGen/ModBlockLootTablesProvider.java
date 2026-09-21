@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.dataGen;
 
-import com.chinaex123.resource_replicator.init.ModBlocks;
+import com.chinaex123.resource_replicator.init.RRBlocks;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
@@ -24,22 +24,22 @@ public class ModBlockLootTablesProvider extends BlockLootSubProvider {
     protected void generate() {
 
         // ======================= 物品资源复制机 =======================
-        dropSelf(ModBlocks.ITEM_REPLICATOR_Tier1.get());
-        dropSelf(ModBlocks.ITEM_REPLICATOR_Tier2.get());
-        dropSelf(ModBlocks.ITEM_REPLICATOR_Tier3.get());
-        dropSelf(ModBlocks.ITEM_REPLICATOR_Tier4.get());
-        dropSelf(ModBlocks.ITEM_REPLICATOR_Tier5.get());
+        dropSelf(RRBlocks.ITEM_REPLICATOR_Tier1.get());
+        dropSelf(RRBlocks.ITEM_REPLICATOR_Tier2.get());
+        dropSelf(RRBlocks.ITEM_REPLICATOR_Tier3.get());
+        dropSelf(RRBlocks.ITEM_REPLICATOR_Tier4.get());
+        dropSelf(RRBlocks.ITEM_REPLICATOR_Tier5.get());
 
         // ======================= 流体资源复制机 =======================
-        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier1.get());
-        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier2.get());
-        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier3.get());
-        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier4.get());
-        dropSelf(ModBlocks.FLUID_REPLICATOR_Tier5.get());
+        dropSelf(RRBlocks.FLUID_REPLICATOR_Tier1.get());
+        dropSelf(RRBlocks.FLUID_REPLICATOR_Tier2.get());
+        dropSelf(RRBlocks.FLUID_REPLICATOR_Tier3.get());
+        dropSelf(RRBlocks.FLUID_REPLICATOR_Tier4.get());
+        dropSelf(RRBlocks.FLUID_REPLICATOR_Tier5.get());
     }
 
     @Override
     protected Iterable<Block> getKnownBlocks() {
-        return ModBlocks.BLOCK_REGISTER.getEntries().stream().map(Holder::value)::iterator;
+        return RRBlocks.BLOCK_REGISTER.getEntries().stream().map(Holder::value)::iterator;
     }
 }
