@@ -1,14 +1,11 @@
 package com.chinaex123.resource_replicator;
 
-import com.chinaex123.resource_replicator.init.ModBlocks;
+import com.chinaex123.resource_replicator.init.*;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.ChemicalReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
-import com.chinaex123.resource_replicator.init.ModBlockEntities;
 import com.chinaex123.resource_replicator.block.compat.Mekanism.CompatMekBlocks;
-import com.chinaex123.resource_replicator.config.ServerConfig;
-import com.chinaex123.resource_replicator.init.ModCreativeTabs;
-import com.chinaex123.resource_replicator.init.ModItems;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
@@ -26,12 +23,12 @@ public class ResourceReplicator {
 
     public ResourceReplicator(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::registerCapabilities);
-        modContainer.registerConfig(ModConfig.Type.COMMON, ServerConfig.CONFIG_SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, RRServerConfig.CONFIG_SPEC);
 
-        ModCreativeTabs.register(modEventBus);
-        ModBlocks.register(modEventBus);
-        ModItems.register(modEventBus);
-        ModBlockEntities.register(modEventBus);
+        RRCreativeTabs.register(modEventBus);
+        RRBlocks.register(modEventBus);
+        RRItems.register(modEventBus);
+        RRBlockEntities.register(modEventBus);
 
         // 模组兼容 - 通用机械
         if (ModList.get().isLoaded("mekanism")) {
@@ -42,20 +39,20 @@ public class ResourceReplicator {
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
         // 为物品复制机注册物品处理能力
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK,
-                ModBlockEntities.ITEM_REPLICATOR.get(),
+                RRBlockEntities.ITEM_REPLICATOR.get(),
                 ItemReplicatorBlockEntity::getItemHandler);
         // 为物品复制机注册能量处理能力
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
-                ModBlockEntities.ITEM_REPLICATOR.get(),
+                RRBlockEntities.ITEM_REPLICATOR.get(),
                 ItemReplicatorBlockEntity::getEnergyHandler);
 
         // 为流体复制机注册流体处理能力
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK,
-                ModBlockEntities.FLUID_REPLICATOR.get(),
+                RRBlockEntities.FLUID_REPLICATOR.get(),
                 FluidReplicatorBlockEntity::getFluidHandler);
         // 为流体复制机注册能量处理能力
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK,
-                ModBlockEntities.FLUID_REPLICATOR.get(),
+                RRBlockEntities.FLUID_REPLICATOR.get(),
                 FluidReplicatorBlockEntity::getEnergyHandler);
 
         // Mekanism 化学品复制机（仅当 Mekanism 加载时）
@@ -73,7 +70,7 @@ public class ResourceReplicator {
                 @SuppressWarnings("unchecked")
                 var capability = (net.neoforged.neoforge.capabilities.BlockCapability<mekanism.api.chemical.IChemicalHandler, net.minecraft.core.Direction>) blockCapability;
 
-                var blockEntityType = ModBlockEntities.CHEMICAL_REPLICATOR.get();
+                var blockEntityType = RRBlockEntities.CHEMICAL_REPLICATOR.get();
                 if (blockEntityType == null) {
                     return;
                 }

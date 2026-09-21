@@ -1,7 +1,7 @@
 package com.chinaex123.resource_replicator.block.compat.Mekanism;
 
-import com.chinaex123.resource_replicator.init.ModBlockEntities;
-import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.init.RRBlockEntities;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
@@ -50,36 +50,36 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
     private void updateEnergyStats() {
         switch (tier) {
             case 1:
-                energyCapacity = ServerConfig.getChemicalTier1EnergyCapacity();
-                energyConsumption = ServerConfig.getChemicalTier1EnergyConsumption();
+                energyCapacity = RRServerConfig.getChemicalTier1EnergyCapacity();
+                energyConsumption = RRServerConfig.getChemicalTier1EnergyConsumption();
                 break;
             case 2:
-                energyCapacity = ServerConfig.getChemicalTier2EnergyCapacity();
-                energyConsumption = ServerConfig.getChemicalTier2EnergyConsumption();
+                energyCapacity = RRServerConfig.getChemicalTier2EnergyCapacity();
+                energyConsumption = RRServerConfig.getChemicalTier2EnergyConsumption();
                 break;
             case 3:
-                energyCapacity = ServerConfig.getChemicalTier3EnergyCapacity();
-                energyConsumption = ServerConfig.getChemicalTier3EnergyConsumption();
+                energyCapacity = RRServerConfig.getChemicalTier3EnergyCapacity();
+                energyConsumption = RRServerConfig.getChemicalTier3EnergyConsumption();
                 break;
             case 4:
-                energyCapacity = ServerConfig.getChemicalTier4EnergyCapacity();
-                energyConsumption = ServerConfig.getChemicalTier4EnergyConsumption();
+                energyCapacity = RRServerConfig.getChemicalTier4EnergyCapacity();
+                energyConsumption = RRServerConfig.getChemicalTier4EnergyConsumption();
                 break;
             case 5:
-                energyCapacity = ServerConfig.getChemicalTier5EnergyCapacity();
-                energyConsumption = ServerConfig.getChemicalTier5EnergyConsumption();
+                energyCapacity = RRServerConfig.getChemicalTier5EnergyCapacity();
+                energyConsumption = RRServerConfig.getChemicalTier5EnergyConsumption();
                 break;
         }
     }
 
     private void updateOutputTankCapacity() {
         this.currentOutputTankCapacity = switch (tier) {
-            case 1 -> ServerConfig.getChemicalTier1OutputTankCapacity();
-            case 2 -> ServerConfig.getChemicalTier2OutputTankCapacity();
-            case 3 -> ServerConfig.getChemicalTier3OutputTankCapacity();
-            case 4 -> ServerConfig.getChemicalTier4OutputTankCapacity();
-            case 5 -> ServerConfig.getChemicalTier5OutputTankCapacity();
-            default -> ServerConfig.getChemicalTier1OutputTankCapacity();
+            case 1 -> RRServerConfig.getChemicalTier1OutputTankCapacity();
+            case 2 -> RRServerConfig.getChemicalTier2OutputTankCapacity();
+            case 3 -> RRServerConfig.getChemicalTier3OutputTankCapacity();
+            case 4 -> RRServerConfig.getChemicalTier4OutputTankCapacity();
+            case 5 -> RRServerConfig.getChemicalTier5OutputTankCapacity();
+            default -> RRServerConfig.getChemicalTier1OutputTankCapacity();
         };
     }
 
@@ -142,7 +142,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
     private Object chemicalHandler = null;
 
     public ChemicalReplicatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.CHEMICAL_REPLICATOR.get(), pos, state);
+        super(RRBlockEntities.CHEMICAL_REPLICATOR.get(), pos, state);
     }
 
     /**
@@ -383,7 +383,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
                     tickCounter = 0;
 
                     // 自动输出逻辑
-                    if (ServerConfig.isChemicalReplicatorAutoOutputEnabled() && !outputChemical.isEmpty()) {
+                    if (RRServerConfig.isChemicalReplicatorAutoOutputEnabled() && !outputChemical.isEmpty()) {
                         autoOutputChemical();
                     }
 
@@ -406,7 +406,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
         }
 
         // 从配置中获取输出方向
-        Direction outputDirection = ServerConfig.getChemicalReplicatorAutoOutputDirection();
+        Direction outputDirection = RRServerConfig.getChemicalReplicatorAutoOutputDirection();
 
         // 获取相邻方块的坐标
         BlockPos neighborPos = worldPosition.relative(outputDirection);

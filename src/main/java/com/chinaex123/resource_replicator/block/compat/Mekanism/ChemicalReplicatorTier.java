@@ -1,6 +1,6 @@
 package com.chinaex123.resource_replicator.block.compat.Mekanism;
 
-import com.chinaex123.resource_replicator.config.ServerConfig;
+import com.chinaex123.resource_replicator.config.RRServerConfig;
 
 public enum ChemicalReplicatorTier {
     CHEMICAL_TIER_1(1),
@@ -24,24 +24,24 @@ public enum ChemicalReplicatorTier {
     public void updateFromConfig() {
         switch (this) {
             case CHEMICAL_TIER_1:
-                this.processSpeed = ServerConfig.getChemicalTier1OutputTime();
-                this.outputAmount = ServerConfig.getChemicalTier1OutputAmount();
+                this.processSpeed = RRServerConfig.getChemicalTier1OutputTime();
+                this.outputAmount = RRServerConfig.getChemicalTier1OutputAmount();
                 break;
             case CHEMICAL_TIER_2:
-                this.processSpeed = ServerConfig.getChemicalTier2OutputTime();
-                this.outputAmount = ServerConfig.getChemicalTier2OutputAmount();
+                this.processSpeed = RRServerConfig.getChemicalTier2OutputTime();
+                this.outputAmount = RRServerConfig.getChemicalTier2OutputAmount();
                 break;
             case CHEMICAL_TIER_3:
-                this.processSpeed = ServerConfig.getChemicalTier3OutputTime();
-                this.outputAmount = ServerConfig.getChemicalTier3OutputAmount();
+                this.processSpeed = RRServerConfig.getChemicalTier3OutputTime();
+                this.outputAmount = RRServerConfig.getChemicalTier3OutputAmount();
                 break;
             case CHEMICAL_TIER_4:
-                this.processSpeed = ServerConfig.getChemicalTier4OutputTime();
-                this.outputAmount = ServerConfig.getChemicalTier4OutputAmount();
+                this.processSpeed = RRServerConfig.getChemicalTier4OutputTime();
+                this.outputAmount = RRServerConfig.getChemicalTier4OutputAmount();
                 break;
             case CHEMICAL_TIER_5:
-                this.processSpeed = ServerConfig.getChemicalTier5OutputTime();
-                this.outputAmount = ServerConfig.getChemicalTier5OutputAmount();
+                this.processSpeed = RRServerConfig.getChemicalTier5OutputTime();
+                this.outputAmount = RRServerConfig.getChemicalTier5OutputAmount();
                 break;
         }
     }

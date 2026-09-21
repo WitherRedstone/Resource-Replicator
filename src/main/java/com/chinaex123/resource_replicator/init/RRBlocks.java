@@ -16,7 +16,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class ModBlocks {
+public class RRBlocks {
     // 创建方块注册器实例
     public static final DeferredRegister.Blocks BLOCK_REGISTER =
             DeferredRegister.createBlocks(ResourceReplicator.MOD_ID);
@@ -64,7 +64,7 @@ public class ModBlocks {
      * @param rarity 物品稀有度
      */
     private static <T extends Block> void registerBlockItems(String name, DeferredBlock<T> block, Rarity rarity) {
-        ModItems.ITEMS_REGISTER.register(name, () -> new BlockItem(block.get(), new Item.Properties().rarity(rarity)));
+        RRItems.ITEMS_REGISTER.register(name, () -> new BlockItem(block.get(), new Item.Properties().rarity(rarity)));
     }
 
     // 为不需要特殊稀有度的方块保留原有方法
