@@ -24,24 +24,24 @@ public enum ChemicalReplicatorTier {
     public void updateFromConfig() {
         switch (this) {
             case CHEMICAL_TIER_1:
-                this.processSpeed = RRServerConfig.getChemicalTier1OutputTime();
-                this.outputAmount = RRServerConfig.getChemicalTier1OutputAmount();
+                this.processSpeed = RRServerConfig.CHEMICAL_TIER_1_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.CHEMICAL_TIER_1_OUTPUT_AMOUNT.get();
                 break;
             case CHEMICAL_TIER_2:
-                this.processSpeed = RRServerConfig.getChemicalTier2OutputTime();
-                this.outputAmount = RRServerConfig.getChemicalTier2OutputAmount();
+                this.processSpeed = RRServerConfig.CHEMICAL_TIER_2_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.CHEMICAL_TIER_2_OUTPUT_AMOUNT.get();
                 break;
             case CHEMICAL_TIER_3:
-                this.processSpeed = RRServerConfig.getChemicalTier3OutputTime();
-                this.outputAmount = RRServerConfig.getChemicalTier3OutputAmount();
+                this.processSpeed = RRServerConfig.CHEMICAL_TIER_3_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.CHEMICAL_TIER_3_OUTPUT_AMOUNT.get();
                 break;
             case CHEMICAL_TIER_4:
-                this.processSpeed = RRServerConfig.getChemicalTier4OutputTime();
-                this.outputAmount = RRServerConfig.getChemicalTier4OutputAmount();
+                this.processSpeed = RRServerConfig.CHEMICAL_TIER_4_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.CHEMICAL_TIER_4_OUTPUT_AMOUNT.get();
                 break;
             case CHEMICAL_TIER_5:
-                this.processSpeed = RRServerConfig.getChemicalTier5OutputTime();
-                this.outputAmount = RRServerConfig.getChemicalTier5OutputAmount();
+                this.processSpeed = RRServerConfig.CHEMICAL_TIER_5_OUTPUT_TIME.get();
+                this.outputAmount = RRServerConfig.CHEMICAL_TIER_5_OUTPUT_AMOUNT.get();
                 break;
         }
     }

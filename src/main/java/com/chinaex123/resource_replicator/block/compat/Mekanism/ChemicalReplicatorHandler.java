@@ -118,13 +118,13 @@ public class ChemicalReplicatorHandler implements IChemicalHandler {
         boolean isPipeInsertion = !isPlayerInsertion();
 
         // 如果启用了销毁功能，且是管道插入，直接销毁
-        if (tank == 0 && RRServerConfig.isChemicalReplicatorDestroyEnabled() && isPipeInsertion) {
+        if (tank == 0 && RRServerConfig.CHEMICAL_REPLICATOR_ENABLE_DESTROY.get() && isPipeInsertion) {
             // 瞬间销毁：返回空表示全部"消耗"掉了
             return ChemicalStack.EMPTY;
         }
 
         // 如果没有启用销毁功能，但仍然是管道插入，拒绝输入
-        if (tank == 0 && isPipeInsertion && !RRServerConfig.isChemicalReplicatorDestroyEnabled()) {
+        if (tank == 0 && isPipeInsertion && !RRServerConfig.CHEMICAL_REPLICATOR_ENABLE_DESTROY.get()) {
             // 拒绝管道输入：返回原 stack，表示没有接受任何化学品
             return stack;
         }

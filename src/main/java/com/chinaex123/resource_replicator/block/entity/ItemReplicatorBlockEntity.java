@@ -48,35 +48,35 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     private void updateEnergyStats() {
         switch (tier) {
             case ITEM_TIER_1:
-                energyCapacity = RRServerConfig.getItemTier1EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier1EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER1_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER1_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_2:
-                energyCapacity = RRServerConfig.getItemTier2EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier2EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER2_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER2_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_3:
-                energyCapacity = RRServerConfig.getItemTier3EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier3EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER3_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER3_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_4:
-                energyCapacity = RRServerConfig.getItemTier4EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier4EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER4_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER4_ENERGY_CONSUMPTION.get();
                 break;
             case ITEM_TIER_5:
-                energyCapacity = RRServerConfig.getItemTier5EnergyCapacity();
-                energyConsumption = RRServerConfig.getItemTier5EnergyConsumption();
+                energyCapacity = RRServerConfig.ITEM_TIER5_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.ITEM_TIER5_ENERGY_CONSUMPTION.get();
                 break;
         }
     }
 
     private void updateOutputSlots() {
         this.currentOutputSlots = switch (tier) {
-            case ITEM_TIER_1 -> RRServerConfig.getItemTier1OutputSlots();
-            case ITEM_TIER_2 -> RRServerConfig.getItemTier2OutputSlots();
-            case ITEM_TIER_3 -> RRServerConfig.getItemTier3OutputSlots();
-            case ITEM_TIER_4 -> RRServerConfig.getItemTier4OutputSlots();
-            case ITEM_TIER_5 -> RRServerConfig.getItemTier5OutputSlots();
+            case ITEM_TIER_1 -> RRServerConfig.ITEM_TIER1_OUTPUT_SLOTS.get();
+            case ITEM_TIER_2 -> RRServerConfig.ITEM_TIER2_OUTPUT_SLOTS.get();
+            case ITEM_TIER_3 -> RRServerConfig.ITEM_TIER3_OUTPUT_SLOTS.get();
+            case ITEM_TIER_4 -> RRServerConfig.ITEM_TIER4_OUTPUT_SLOTS.get();
+            case ITEM_TIER_5 -> RRServerConfig.ITEM_TIER5_OUTPUT_SLOTS.get();
         };
     }
 
@@ -145,7 +145,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
 
             // 如果是管道插入到输入槽
             if (isPipeInsertion) {
-                if (RRServerConfig.isItemReplicatorDestroyEnabled()) {
+                if (RRServerConfig.ITEM_REPLICATOR_ENABLE_DESTROY.get()) {
                     // 启用销毁功能：瞬间销毁，返回空表示全部"消耗"掉了
                     return ItemStack.EMPTY;
                 } else {
@@ -236,7 +236,7 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                     return ReplicatorFilter.canInsertItem(stack);
                 } else {
                     // 管道插入：如果启用销毁则接受（然后销毁），否则拒绝
-                    return RRServerConfig.isItemReplicatorDestroyEnabled();
+                    return RRServerConfig.ITEM_REPLICATOR_ENABLE_DESTROY.get();
                 }
             }
             return false;
@@ -508,13 +508,13 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                 int actualEnergyNeeded = 0;
 
                 // 检查配置中是否启用了自动输出功能
-                boolean autoOutputEnabled = RRServerConfig.isItemReplicatorAutoOutputEnabled();
+                boolean autoOutputEnabled = RRServerConfig.ITEM_REPLICATOR_AUTO_OUTPUT.get();
 
                 // ========== 自动输出逻辑 ==========
                 // 如果启用了自动输出
                 if (autoOutputEnabled) {
                     // 从配置中获取输出方向
-                    Direction outputDirection = RRServerConfig.getItemReplicatorAutoOutputDirection();
+                    Direction outputDirection = RRServerConfig.ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();
 
                     // 获取相邻方块的坐标
                     BlockPos neighborPos = pos.relative(outputDirection);

@@ -50,36 +50,36 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
     private void updateEnergyStats() {
         switch (tier) {
             case 1:
-                energyCapacity = RRServerConfig.getChemicalTier1EnergyCapacity();
-                energyConsumption = RRServerConfig.getChemicalTier1EnergyConsumption();
+                energyCapacity = RRServerConfig.CHEMICAL_TIER_1_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.CHEMICAL_TIER_1_ENERGY_CONSUMPTION.get();
                 break;
             case 2:
-                energyCapacity = RRServerConfig.getChemicalTier2EnergyCapacity();
-                energyConsumption = RRServerConfig.getChemicalTier2EnergyConsumption();
+                energyCapacity = RRServerConfig.CHEMICAL_TIER_2_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.CHEMICAL_TIER_2_ENERGY_CONSUMPTION.get();
                 break;
             case 3:
-                energyCapacity = RRServerConfig.getChemicalTier3EnergyCapacity();
-                energyConsumption = RRServerConfig.getChemicalTier3EnergyConsumption();
+                energyCapacity = RRServerConfig.CHEMICAL_TIER_3_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.CHEMICAL_TIER_3_ENERGY_CONSUMPTION.get();
                 break;
             case 4:
-                energyCapacity = RRServerConfig.getChemicalTier4EnergyCapacity();
-                energyConsumption = RRServerConfig.getChemicalTier4EnergyConsumption();
+                energyCapacity = RRServerConfig.CHEMICAL_TIER_4_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.CHEMICAL_TIER_4_ENERGY_CONSUMPTION.get();
                 break;
             case 5:
-                energyCapacity = RRServerConfig.getChemicalTier5EnergyCapacity();
-                energyConsumption = RRServerConfig.getChemicalTier5EnergyConsumption();
+                energyCapacity = RRServerConfig.CHEMICAL_TIER_5_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.CHEMICAL_TIER_5_ENERGY_CONSUMPTION.get();
                 break;
         }
     }
 
     private void updateOutputTankCapacity() {
         this.currentOutputTankCapacity = switch (tier) {
-            case 1 -> RRServerConfig.getChemicalTier1OutputTankCapacity();
-            case 2 -> RRServerConfig.getChemicalTier2OutputTankCapacity();
-            case 3 -> RRServerConfig.getChemicalTier3OutputTankCapacity();
-            case 4 -> RRServerConfig.getChemicalTier4OutputTankCapacity();
-            case 5 -> RRServerConfig.getChemicalTier5OutputTankCapacity();
-            default -> RRServerConfig.getChemicalTier1OutputTankCapacity();
+            case 1 -> RRServerConfig.CHEMICAL_TIER_1_OUTPUT_TANK_CAPACITY.get();
+            case 2 -> RRServerConfig.CHEMICAL_TIER_2_OUTPUT_TANK_CAPACITY.get();
+            case 3 -> RRServerConfig.CHEMICAL_TIER_3_OUTPUT_TANK_CAPACITY.get();
+            case 4 -> RRServerConfig.CHEMICAL_TIER_4_OUTPUT_TANK_CAPACITY.get();
+            case 5 -> RRServerConfig.CHEMICAL_TIER_5_OUTPUT_TANK_CAPACITY.get();
+            default -> RRServerConfig.CHEMICAL_TIER_1_OUTPUT_TANK_CAPACITY.get();
         };
     }
 
@@ -383,7 +383,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
                     tickCounter = 0;
 
                     // 自动输出逻辑
-                    if (RRServerConfig.isChemicalReplicatorAutoOutputEnabled() && !outputChemical.isEmpty()) {
+                    if (RRServerConfig.CHEMICAL_REPLICATOR_AUTO_OUTPUT.get() && !outputChemical.isEmpty()) {
                         autoOutputChemical();
                     }
 
@@ -406,7 +406,7 @@ public class ChemicalReplicatorBlockEntity extends BlockEntity {
         }
 
         // 从配置中获取输出方向
-        Direction outputDirection = RRServerConfig.getChemicalReplicatorAutoOutputDirection();
+        Direction outputDirection = RRServerConfig.CHEMICAL_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();
 
         // 获取相邻方块的坐标
         BlockPos neighborPos = worldPosition.relative(outputDirection);

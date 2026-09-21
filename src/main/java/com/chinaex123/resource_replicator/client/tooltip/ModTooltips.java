@@ -108,9 +108,9 @@ public class ModTooltips {
         }
 
         // 显示自动输出状态
-        boolean autoOutputEnabled = RRServerConfig.isItemReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.ITEM_REPLICATOR_AUTO_OUTPUT.get();
         if (autoOutputEnabled) {
-            String directionName = RRServerConfig.getItemReplicatorAutoOutputDirection().getName();
+            String directionName = RRServerConfig.ITEM_REPLICATOR_AUTO_OUTPUT_DIRECTION.get().getName();
             toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
                             Component.literal(directionName).withStyle(ChatFormatting.AQUA))
                     .withStyle(ChatFormatting.GRAY));
@@ -175,9 +175,9 @@ public class ModTooltips {
         }
 
         // 显示自动输出状态
-        boolean autoOutputEnabled = RRServerConfig.isFluidReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.FLUID_REPLICATOR_AUTO_OUTPUT.get();
         if (autoOutputEnabled) {
-            String directionName = RRServerConfig.getFluidReplicatorAutoOutputDirection().getName();
+            String directionName = RRServerConfig.FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION.get().getName();
             toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
                             Component.literal(directionName).withStyle(ChatFormatting.AQUA))
                     .withStyle(ChatFormatting.GRAY));
@@ -189,110 +189,110 @@ public class ModTooltips {
 
     private static int getItemTierOutputAmount(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getItemTier1OutputAmount();
-            case 2 -> RRServerConfig.getItemTier2OutputAmount();
-            case 3 -> RRServerConfig.getItemTier3OutputAmount();
-            case 4 -> RRServerConfig.getItemTier4OutputAmount();
-            case 5 -> RRServerConfig.getItemTier5OutputAmount();
+            case 1 -> RRServerConfig.ITEM_TIER1_OUTPUT_AMOUNT.get();
+            case 2 -> RRServerConfig.ITEM_TIER2_OUTPUT_AMOUNT.get();
+            case 3 -> RRServerConfig.ITEM_TIER3_OUTPUT_AMOUNT.get();
+            case 4 -> RRServerConfig.ITEM_TIER4_OUTPUT_AMOUNT.get();
+            case 5 -> RRServerConfig.ITEM_TIER5_OUTPUT_AMOUNT.get();
             default -> 1;
         };
     }
 
     private static int getItemTierOutputSlots(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getItemTier1OutputSlots();
-            case 2 -> RRServerConfig.getItemTier2OutputSlots();
-            case 3 -> RRServerConfig.getItemTier3OutputSlots();
-            case 4 -> RRServerConfig.getItemTier4OutputSlots();
-            case 5 -> RRServerConfig.getItemTier5OutputSlots();
+            case 1 -> RRServerConfig.ITEM_TIER1_OUTPUT_SLOTS.get();
+            case 2 -> RRServerConfig.ITEM_TIER2_OUTPUT_SLOTS.get();
+            case 3 -> RRServerConfig.ITEM_TIER3_OUTPUT_SLOTS.get();
+            case 4 -> RRServerConfig.ITEM_TIER4_OUTPUT_SLOTS.get();
+            case 5 -> RRServerConfig.ITEM_TIER5_OUTPUT_SLOTS.get();
             default -> 1;
         };
     }
 
     private static int getItemTierOutputTime(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getItemTier1OutputTime();
-            case 2 -> RRServerConfig.getItemTier2OutputTime();
-            case 3 -> RRServerConfig.getItemTier3OutputTime();
-            case 4 -> RRServerConfig.getItemTier4OutputTime();
-            case 5 -> RRServerConfig.getItemTier5OutputTime();
+            case 1 -> RRServerConfig.ITEM_TIER1_OUTPUT_TIME.get();
+            case 2 -> RRServerConfig.ITEM_TIER2_OUTPUT_TIME.get();
+            case 3 -> RRServerConfig.ITEM_TIER3_OUTPUT_TIME.get();
+            case 4 -> RRServerConfig.ITEM_TIER4_OUTPUT_TIME.get();
+            case 5 -> RRServerConfig.ITEM_TIER5_OUTPUT_TIME.get();
             default -> 20;
         };
     }
 
     private static int getItemTierEnergyConsumption(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getItemTier1EnergyConsumption();
-            case 2 -> RRServerConfig.getItemTier2EnergyConsumption();
-            case 3 -> RRServerConfig.getItemTier3EnergyConsumption();
-            case 4 -> RRServerConfig.getItemTier4EnergyConsumption();
-            case 5 -> RRServerConfig.getItemTier5EnergyConsumption();
+            case 1 -> RRServerConfig.ITEM_TIER1_ENERGY_CONSUMPTION.get();
+            case 2 -> RRServerConfig.ITEM_TIER2_ENERGY_CONSUMPTION.get();
+            case 3 -> RRServerConfig.ITEM_TIER3_ENERGY_CONSUMPTION.get();
+            case 4 -> RRServerConfig.ITEM_TIER4_ENERGY_CONSUMPTION.get();
+            case 5 -> RRServerConfig.ITEM_TIER5_ENERGY_CONSUMPTION.get();
             default -> 0;
         };
     }
 
     private static int getFluidTierOutputAmount(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getFluidTier1OutputAmount();
-            case 2 -> RRServerConfig.getFluidTier2OutputAmount();
-            case 3 -> RRServerConfig.getFluidTier3OutputAmount();
-            case 4 -> RRServerConfig.getFluidTier4OutputAmount();
-            case 5 -> RRServerConfig.getFluidTier5OutputAmount();
+            case 1 -> RRServerConfig.FLUID_TIER1_OUTPUT_AMOUNT.get();
+            case 2 -> RRServerConfig.FLUID_TIER2_OUTPUT_AMOUNT.get();
+            case 3 -> RRServerConfig.FLUID_TIER3_OUTPUT_AMOUNT.get();
+            case 4 -> RRServerConfig.FLUID_TIER4_OUTPUT_AMOUNT.get();
+            case 5 -> RRServerConfig.FLUID_TIER5_OUTPUT_AMOUNT.get();
             default -> 1000;
         };
     }
 
     private static int getFluidTierOutputTankCapacity(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getFluidTier1OutputTankCapacity();
-            case 2 -> RRServerConfig.getFluidTier2OutputTankCapacity();
-            case 3 -> RRServerConfig.getFluidTier3OutputTankCapacity();
-            case 4 -> RRServerConfig.getFluidTier4OutputTankCapacity();
-            case 5 -> RRServerConfig.getFluidTier5OutputTankCapacity();
+            case 1 -> RRServerConfig.FLUID_TIER1_OUTPUT_TANK_CAPACITY.get();
+            case 2 -> RRServerConfig.FLUID_TIER2_OUTPUT_TANK_CAPACITY.get();
+            case 3 -> RRServerConfig.FLUID_TIER3_OUTPUT_TANK_CAPACITY.get();
+            case 4 -> RRServerConfig.FLUID_TIER4_OUTPUT_TANK_CAPACITY.get();
+            case 5 -> RRServerConfig.FLUID_TIER5_OUTPUT_TANK_CAPACITY.get();
             default -> 4000;
         };
     }
 
     private static int getFluidTierOutputTime(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getFluidTier1OutputTime();
-            case 2 -> RRServerConfig.getFluidTier2OutputTime();
-            case 3 -> RRServerConfig.getFluidTier3OutputTime();
-            case 4 -> RRServerConfig.getFluidTier4OutputTime();
-            case 5 -> RRServerConfig.getFluidTier5OutputTime();
+            case 1 -> RRServerConfig.FLUID_TIER1_OUTPUT_TIME.get();
+            case 2 -> RRServerConfig.FLUID_TIER2_OUTPUT_TIME.get();
+            case 3 -> RRServerConfig.FLUID_TIER3_OUTPUT_TIME.get();
+            case 4 -> RRServerConfig.FLUID_TIER4_OUTPUT_TIME.get();
+            case 5 -> RRServerConfig.FLUID_TIER5_OUTPUT_TIME.get();
             default -> 20;
         };
     }
 
     private static int getFluidTierWaterOutput(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getFluidTier1WaterAmount();
-            case 2 -> RRServerConfig.getFluidTier2WaterAmount();
-            case 3 -> RRServerConfig.getFluidTier3WaterAmount();
-            case 4 -> RRServerConfig.getFluidTier4WaterAmount();
-            case 5 -> RRServerConfig.getFluidTier5WaterAmount();
+            case 1 -> RRServerConfig.FLUID_TIER1_WATER_AMOUNT.get();
+            case 2 -> RRServerConfig.FLUID_TIER2_WATER_AMOUNT.get();
+            case 3 -> RRServerConfig.FLUID_TIER3_WATER_AMOUNT.get();
+            case 4 -> RRServerConfig.FLUID_TIER4_WATER_AMOUNT.get();
+            case 5 -> RRServerConfig.FLUID_TIER5_WATER_AMOUNT.get();
             default -> 1000;
         };
     }
 
     private static int getFluidTierLavaOutput(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getFluidTier1LavaAmount();
-            case 2 -> RRServerConfig.getFluidTier2LavaAmount();
-            case 3 -> RRServerConfig.getFluidTier3LavaAmount();
-            case 4 -> RRServerConfig.getFluidTier4LavaAmount();
-            case 5 -> RRServerConfig.getFluidTier5LavaAmount();
+            case 1 -> RRServerConfig.FLUID_TIER1_LAVA_AMOUNT.get();
+            case 2 -> RRServerConfig.FLUID_TIER2_LAVA_AMOUNT.get();
+            case 3 -> RRServerConfig.FLUID_TIER3_LAVA_AMOUNT.get();
+            case 4 -> RRServerConfig.FLUID_TIER4_LAVA_AMOUNT.get();
+            case 5 -> RRServerConfig.FLUID_TIER5_LAVA_AMOUNT.get();
             default -> 1000;
         };
     }
 
     private static int getFluidTierEnergyConsumption(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getFluidTier1EnergyConsumption();
-            case 2 -> RRServerConfig.getFluidTier2EnergyConsumption();
-            case 3 -> RRServerConfig.getFluidTier3EnergyConsumption();
-            case 4 -> RRServerConfig.getFluidTier4EnergyConsumption();
-            case 5 -> RRServerConfig.getFluidTier5EnergyConsumption();
+            case 1 -> RRServerConfig.FLUID_TIER1_ENERGY_CONSUMPTION.get();
+            case 2 -> RRServerConfig.FLUID_TIER2_ENERGY_CONSUMPTION.get();
+            case 3 -> RRServerConfig.FLUID_TIER3_ENERGY_CONSUMPTION.get();
+            case 4 -> RRServerConfig.FLUID_TIER4_ENERGY_CONSUMPTION.get();
+            case 5 -> RRServerConfig.FLUID_TIER5_ENERGY_CONSUMPTION.get();
             default -> 0;
         };
     }
@@ -336,9 +336,9 @@ public class ModTooltips {
         }
 
         // 显示自动输出状态
-        boolean autoOutputEnabled = RRServerConfig.isChemicalReplicatorAutoOutputEnabled();
+        boolean autoOutputEnabled = RRServerConfig.CHEMICAL_REPLICATOR_AUTO_OUTPUT.get();
         if (autoOutputEnabled) {
-            String directionName = RRServerConfig.getChemicalReplicatorAutoOutputDirection().getName();
+            String directionName = RRServerConfig.CHEMICAL_REPLICATOR_AUTO_OUTPUT_DIRECTION.get().getName();
             toolTip.add(Component.translatable("tooltip.resource_replicator.auto_output_direction",
                             Component.literal(directionName).withStyle(ChatFormatting.AQUA))
                     .withStyle(ChatFormatting.GRAY));
@@ -350,44 +350,44 @@ public class ModTooltips {
 
     private static int getChemicalTierOutputAmount(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getChemicalTier1OutputAmount();
-            case 2 -> RRServerConfig.getChemicalTier2OutputAmount();
-            case 3 -> RRServerConfig.getChemicalTier3OutputAmount();
-            case 4 -> RRServerConfig.getChemicalTier4OutputAmount();
-            case 5 -> RRServerConfig.getChemicalTier5OutputAmount();
+            case 1 -> RRServerConfig.CHEMICAL_TIER_1_OUTPUT_AMOUNT.get();
+            case 2 -> RRServerConfig.CHEMICAL_TIER_2_OUTPUT_AMOUNT.get();
+            case 3 -> RRServerConfig.CHEMICAL_TIER_3_OUTPUT_AMOUNT.get();
+            case 4 -> RRServerConfig.CHEMICAL_TIER_4_OUTPUT_AMOUNT.get();
+            case 5 -> RRServerConfig.CHEMICAL_TIER_5_OUTPUT_AMOUNT.get();
             default -> 1000;
         };
     }
 
     private static int getChemicalTierOutputTankCapacity(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getChemicalTier1OutputTankCapacity();
-            case 2 -> RRServerConfig.getChemicalTier2OutputTankCapacity();
-            case 3 -> RRServerConfig.getChemicalTier3OutputTankCapacity();
-            case 4 -> RRServerConfig.getChemicalTier4OutputTankCapacity();
-            case 5 -> RRServerConfig.getChemicalTier5OutputTankCapacity();
+            case 1 -> RRServerConfig.CHEMICAL_TIER_1_OUTPUT_TANK_CAPACITY.get();
+            case 2 -> RRServerConfig.CHEMICAL_TIER_2_OUTPUT_TANK_CAPACITY.get();
+            case 3 -> RRServerConfig.CHEMICAL_TIER_3_OUTPUT_TANK_CAPACITY.get();
+            case 4 -> RRServerConfig.CHEMICAL_TIER_4_OUTPUT_TANK_CAPACITY.get();
+            case 5 -> RRServerConfig.CHEMICAL_TIER_5_OUTPUT_TANK_CAPACITY.get();
             default -> 4000;
         };
     }
 
     private static int getChemicalTierOutputTime(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getChemicalTier1OutputTime();
-            case 2 -> RRServerConfig.getChemicalTier2OutputTime();
-            case 3 -> RRServerConfig.getChemicalTier3OutputTime();
-            case 4 -> RRServerConfig.getChemicalTier4OutputTime();
-            case 5 -> RRServerConfig.getChemicalTier5OutputTime();
+            case 1 -> RRServerConfig.CHEMICAL_TIER_1_OUTPUT_TIME.get();
+            case 2 -> RRServerConfig.CHEMICAL_TIER_2_OUTPUT_TIME.get();
+            case 3 -> RRServerConfig.CHEMICAL_TIER_3_OUTPUT_TIME.get();
+            case 4 -> RRServerConfig.CHEMICAL_TIER_4_OUTPUT_TIME.get();
+            case 5 -> RRServerConfig.CHEMICAL_TIER_5_OUTPUT_TIME.get();
             default -> 20;
         };
     }
 
     private static int getChemicalTierEnergyConsumption(int tier) {
         return switch (tier) {
-            case 1 -> RRServerConfig.getChemicalTier1EnergyConsumption();
-            case 2 -> RRServerConfig.getChemicalTier2EnergyConsumption();
-            case 3 -> RRServerConfig.getChemicalTier3EnergyConsumption();
-            case 4 -> RRServerConfig.getChemicalTier4EnergyConsumption();
-            case 5 -> RRServerConfig.getChemicalTier5EnergyConsumption();
+            case 1 -> RRServerConfig.CHEMICAL_TIER_1_ENERGY_CONSUMPTION.get();
+            case 2 -> RRServerConfig.CHEMICAL_TIER_2_ENERGY_CONSUMPTION.get();
+            case 3 -> RRServerConfig.CHEMICAL_TIER_3_ENERGY_CONSUMPTION.get();
+            case 4 -> RRServerConfig.CHEMICAL_TIER_4_ENERGY_CONSUMPTION.get();
+            case 5 -> RRServerConfig.CHEMICAL_TIER_5_ENERGY_CONSUMPTION.get();
             default -> 0;
         };
     }

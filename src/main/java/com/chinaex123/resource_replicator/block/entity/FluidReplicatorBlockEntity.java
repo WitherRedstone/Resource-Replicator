@@ -70,7 +70,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
      * 当罐内流体发生变化时会自动标记方块为已更新状态以同步到客户端。
      * </p>
      */
-    private final FluidTank outputTank = new FluidTank(RRServerConfig.getFluidTier5OutputTankCapacity()) {
+    private final FluidTank outputTank = new FluidTank(RRServerConfig.FLUID_TIER5_OUTPUT_TANK_CAPACITY.get()) {
 
         // 当流体被加入或取出时自动调用，用于触发方块数据同步。
         @Override
@@ -164,7 +164,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
 
             // 如果是管道插入到输入槽
             if (isPipeInsertion) {
-                if (RRServerConfig.isFluidReplicatorDestroyEnabled()) {
+                if (RRServerConfig.FLUID_REPLICATOR_ENABLE_DESTROY.get()) {
                     // 启用销毁功能：瞬间销毁，返回实际数量表示全部"消耗"掉了
                     return resource.getAmount();
                 } else {
@@ -245,35 +245,35 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     private void updateEnergyStats() {
         switch (tier) {
             case FLUID_TIER_1:
-                energyCapacity = RRServerConfig.getFluidTier1EnergyCapacity();
-                energyConsumption = RRServerConfig.getFluidTier1EnergyConsumption();
+                energyCapacity = RRServerConfig.FLUID_TIER1_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.FLUID_TIER1_ENERGY_CONSUMPTION.get();
                 break;
             case FLUID_TIER_2:
-                energyCapacity = RRServerConfig.getFluidTier2EnergyCapacity();
-                energyConsumption = RRServerConfig.getFluidTier2EnergyConsumption();
+                energyCapacity = RRServerConfig.FLUID_TIER2_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.FLUID_TIER2_ENERGY_CONSUMPTION.get();
                 break;
             case FLUID_TIER_3:
-                energyCapacity = RRServerConfig.getFluidTier3EnergyCapacity();
-                energyConsumption = RRServerConfig.getFluidTier3EnergyConsumption();
+                energyCapacity = RRServerConfig.FLUID_TIER3_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.FLUID_TIER3_ENERGY_CONSUMPTION.get();
                 break;
             case FLUID_TIER_4:
-                energyCapacity = RRServerConfig.getFluidTier4EnergyCapacity();
-                energyConsumption = RRServerConfig.getFluidTier4EnergyConsumption();
+                energyCapacity = RRServerConfig.FLUID_TIER4_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.FLUID_TIER4_ENERGY_CONSUMPTION.get();
                 break;
             case FLUID_TIER_5:
-                energyCapacity = RRServerConfig.getFluidTier5EnergyCapacity();
-                energyConsumption = RRServerConfig.getFluidTier5EnergyConsumption();
+                energyCapacity = RRServerConfig.FLUID_TIER5_ENERGY_CAPACITY.get();
+                energyConsumption = RRServerConfig.FLUID_TIER5_ENERGY_CONSUMPTION.get();
                 break;
         }
     }
 
     private void updateOutputTankCapacity() {
         this.currentOutputTankCapacity = switch (tier) {
-            case FLUID_TIER_1 -> RRServerConfig.getFluidTier1OutputTankCapacity();
-            case FLUID_TIER_2 -> RRServerConfig.getFluidTier2OutputTankCapacity();
-            case FLUID_TIER_3 -> RRServerConfig.getFluidTier3OutputTankCapacity();
-            case FLUID_TIER_4 -> RRServerConfig.getFluidTier4OutputTankCapacity();
-            case FLUID_TIER_5 -> RRServerConfig.getFluidTier5OutputTankCapacity();
+            case FLUID_TIER_1 -> RRServerConfig.FLUID_TIER1_OUTPUT_TANK_CAPACITY.get();
+            case FLUID_TIER_2 -> RRServerConfig.FLUID_TIER2_OUTPUT_TANK_CAPACITY.get();
+            case FLUID_TIER_3 -> RRServerConfig.FLUID_TIER3_OUTPUT_TANK_CAPACITY.get();
+            case FLUID_TIER_4 -> RRServerConfig.FLUID_TIER4_OUTPUT_TANK_CAPACITY.get();
+            case FLUID_TIER_5 -> RRServerConfig.FLUID_TIER5_OUTPUT_TANK_CAPACITY.get();
         };
     }
 
@@ -509,12 +509,12 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 int totalOutput = 0;
 
                 // 检查配置中是否启用了自动输出功能
-                boolean autoOutputEnabled = RRServerConfig.isFluidReplicatorAutoOutputEnabled();
+                boolean autoOutputEnabled = RRServerConfig.FLUID_REPLICATOR_AUTO_OUTPUT.get();
 
                 // 如果启用了自动输出
                 if (autoOutputEnabled) {
                     // 从配置中获取输出方向
-                    Direction outputDirection = RRServerConfig.getFluidReplicatorAutoOutputDirection();
+                    Direction outputDirection = RRServerConfig.FLUID_REPLICATOR_AUTO_OUTPUT_DIRECTION.get();
 
                     // 获取相邻方块的坐标
                     BlockPos neighborPos = pos.relative(outputDirection);
