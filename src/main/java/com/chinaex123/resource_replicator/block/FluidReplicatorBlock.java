@@ -4,7 +4,9 @@ import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntit
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -18,27 +20,40 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 流体复制机方块类
- * 继承自 BaseEntityBlock，支持方块实体功能
+ * 流体复制机方块类。
+ * <p>
+ * 继承自 BaseEntityBlock，支持方块实体功能。
+ * 负责创建流体复制机方块实体、注册服务端 tick 更新器，
+ * 并处理玩家交互（查看流体信息、清空流体、注入流体）。
  */
 public class FluidReplicatorBlock extends BaseEntityBlock {
 
-    // 机器等级（默认为 1 级）
+    /**
+     * 机器等级（默认为 1 级）。
+     */
     private final int tier;
 
-    // 定义方块的编解码器
+    /**
+     * 方块的编解码器。
+     */
     public static final MapCodec<FluidReplicatorBlock> CODEC = simpleCodec(FluidReplicatorBlock::new);
 
     /**
-     * 获取方块的编解码器
+     * 获取方块的编解码器。
+     *
+     * @return 方块编解码器
      */
     @Override
     protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
@@ -46,7 +61,9 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 构造函数（默认 1 级）
+     * 构造函数（默认 1 级）。
+     *
+     * @param properties 方块属性
      */
     public FluidReplicatorBlock(Properties properties) {
         super(properties);
@@ -54,7 +71,10 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 构造函数（指定等级）
+     * 构造函数（指定等级）。
+     *
+     * @param properties 方块属性
+     * @param tier       机器等级
      */
     public FluidReplicatorBlock(Properties properties, int tier) {
         super(properties);
@@ -62,7 +82,10 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 获取方块的渲染形状
+     * 获取方块的渲染形状。
+     *
+     * @param state 方块状态
+     * @return 渲染形状
      */
     @Override
     public @NotNull RenderShape getRenderShape(BlockState state) {
@@ -70,7 +93,13 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 创建新的方块实体
+     * 创建新的方块实体。
+     * <p>
+     * 根据方块自身的 tier 设置方块实体的 tier。
+     *
+     * @param pos   方块位置
+     * @param state 方块状态
+     * @return 流体复制机方块实体
      */
     @Nullable
     @Override
@@ -81,11 +110,11 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 获取方块实体的刻更新器（Ticker）
+     * 获取方块实体的刻更新器（Ticker）。
      *
      * @param level 当前世界实例，用于判断是客户端还是服务端
      * @param state 方块的当前状态
-     * @param type 方块实体类型，用于匹配正确的方块实体
+     * @param type  方块实体类型，用于匹配正确的方块实体
      * @return BlockEntityTicker<T> 方块实体的刻更新器，如果是客户端则返回 null，否则返回执行 serverTick() 的更新器
      */
     @Nullable
@@ -99,7 +128,16 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 处理玩家右键点击方块的行为（未手持物品时）
+     * 处理玩家右键点击方块的行为（未手持物品时）。
+     * <p>
+     * 在聊天栏上方显示当前输入流体的名称，
+     * 若输入与输出罐均为空则提示为空。
+     *
+     * @param level     当前世界实例
+     * @param pos       方块在世界中的坐标位置
+     * @param player    执行操作的玩家
+     * @param hitResult 点击检测结果
+     * @return 交互结果
      */
     protected @NotNull InteractionResult useWithoutItem(@NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hitResult) {
         if (level.isClientSide()) {
@@ -123,14 +161,17 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 处理玩家手持物品右键点击方块的行为
+     * 处理玩家手持物品右键点击方块的行为。
+     * <p>
+     * 手持桶时清空流体；手持装有流体的容器时将流体注入输入罐；
+     * 其他情况显示当前输入流体信息。
      *
-     * @param stack 玩家手持的物品堆
-     * @param state 方块的当前状态
-     * @param level 当前世界实例
-     * @param pos 方块在世界中的坐标位置
-     * @param player 执行操作的玩家
-     * @param hand 使用的交互手（主手或副手）
+     * @param stack     玩家手持的物品堆
+     * @param state     方块的当前状态
+     * @param level     当前世界实例
+     * @param pos       方块在世界中的坐标位置
+     * @param player    执行操作的玩家
+     * @param hand      使用的交互手（主手或副手）
      * @param hitResult 点击检测结果，包含点击位置和面等信息
      * @return InteractionResult 物品交互结果，成功时返回 CONSUME，失败时返回 PASS
      */
@@ -162,10 +203,10 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
                 FluidStack fluidStack = FluidUtil.getFirstStackContained(stack);
 
                 if (fluidStack.isEmpty() && stack.getItem() == Items.MILK_BUCKET) {
-                    var milkOpt = net.minecraft.core.registries.BuiltInRegistries.FLUID.get(net.minecraft.resources.Identifier.withDefaultNamespace("milk"));
+                    var milkOpt = BuiltInRegistries.FLUID.get(Identifier.withDefaultNamespace("milk"));
                     if (milkOpt.isPresent()) {
-                        net.minecraft.world.level.material.Fluid milkFluid = milkOpt.get().value();
-                        if (!milkFluid.equals(net.minecraft.world.level.material.Fluids.EMPTY)) {
+                        Fluid milkFluid = milkOpt.get().value();
+                        if (!milkFluid.equals(Fluids.EMPTY)) {
                             fluidStack = new FluidStack(milkFluid, 1000);
                         }
                     }
@@ -175,7 +216,7 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
                     FluidResource resource = FluidResource.of(fluidStack.getFluid());
                     int actualAmount = fluidStack.getAmount();
 
-                    try (var transaction = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                    try (var transaction = Transaction.openRoot()) {
                         FluidReplicatorBlockEntity.setPlayerOperation(true);
 
                         var inserted = fluidHandler.insert(0, resource, actualAmount, transaction);
@@ -185,11 +226,11 @@ public class FluidReplicatorBlock extends BaseEntityBlock {
                         if (inserted > 0) {
                             transaction.commit();
 
-                            var itemAccess = net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack).oneByOne();
+                            var itemAccess = ItemAccess.forStack(stack).oneByOne();
                             var itemFluidHandler = itemAccess.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM);
 
                             if (itemFluidHandler != null) {
-                                try (var itemTransaction = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                                try (var itemTransaction = Transaction.openRoot()) {
                                     itemFluidHandler.extract(0, resource, inserted, itemTransaction);
                                     itemTransaction.commit();
                                 }

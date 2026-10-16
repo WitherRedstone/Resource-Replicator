@@ -12,8 +12,18 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.List;
 
+/**
+ * 复制机过滤器类。
+ * <p>
+ * 负责判断物品或流体是否允许放入复制机，
+ * 支持固定管理员黑名单、黑名单模式与白名单模式，
+ * 并支持物品 ID、模组 ID（@开头）与 Tag（#开头）匹配。
+ */
 public class ReplicatorFilter {
-    // 固定的管理员物品（无法被复制）
+
+    /**
+     * 固定的管理员物品（无法被复制）。
+     */
     private static final String[] ADMIN_ITEMS = {
             "minecraft:command_block",
             "minecraft:chain_command_block",
@@ -33,18 +43,28 @@ public class ReplicatorFilter {
             "resource_replicator:*"
     };
 
-    // 固定的管理员流体（无法被复制）
+    /**
+     * 固定的管理员流体（无法被复制）。
+     */
     private static final String[] ADMIN_FLUIDS = {};
 
     /**
-     * 检查物品是否可以放入复制机
+     * 检查物品是否可以放入复制机。
+     *
+     * @param stack 待检查的物品
+     * @return 是否允许放入
      */
     public static boolean canInsertItem(ItemStack stack) {
         return canInsertItemWithReason(stack).canInsert();
     }
 
     /**
-     * 检查物品是否可以放入复制机，并返回原因
+     * 检查物品是否可以放入复制机，并返回原因。
+     * <p>
+     * 依次检查空物品、固定管理员物品列表，
+     * 然后根据配置的黑/白名单模式进行过滤。
+     *
+     * @param stack 待检查的物品
      * @return FilterResult 包含是否允许和原因
      */
     public static FilterResult canInsertItemWithReason(ItemStack stack) {
@@ -86,14 +106,23 @@ public class ReplicatorFilter {
     }
 
     /**
-     * 检查流体是否可以放入复制机
+     * 检查流体是否可以放入复制机。
+     *
+     * @param fluidStack 待检查的流体
+     * @return 是否允许放入
      */
     public static boolean canInsertFluid(FluidStack fluidStack) {
         return canInsertFluidWithReason(fluidStack).canInsert();
     }
 
     /**
-     * 检查流体是否可以放入复制机，并返回原因
+     * 检查流体是否可以放入复制机，并返回原因。
+     * <p>
+     * 依次检查空流体、固定管理员流体列表，
+     * 然后根据配置的黑/白名单模式进行过滤。
+     *
+     * @param fluidStack 待检查的流体
+     * @return FilterResult 包含是否允许和原因
      */
     public static FilterResult canInsertFluidWithReason(FluidStack fluidStack) {
         if (fluidStack.isEmpty()) {
@@ -128,7 +157,16 @@ public class ReplicatorFilter {
     }
 
     /**
-     * 检查物品是否在指定列表中
+     * 检查物品是否在指定列表中。
+     * <p>
+     * 支持直接匹配物品 ID、匹配模组 ID（@开头）
+     * 以及匹配 Tag（#开头）。
+     *
+     * @param itemId 物品 ID
+     * @param modId  模组 ID
+     * @param stack  待检查的物品
+     * @param list   过滤列表
+     * @return 是否在列表中
      */
     private static boolean isInList(String itemId, String modId, ItemStack stack, List<String> list) {
         for (String entry : list) {
@@ -159,7 +197,16 @@ public class ReplicatorFilter {
     }
 
     /**
-     * 检查流体是否在指定列表中
+     * 检查流体是否在指定列表中。
+     * <p>
+     * 支持直接匹配流体 ID、匹配模组 ID（@开头）
+     * 以及匹配 Tag（#开头）。
+     *
+     * @param fluidId    流体 ID
+     * @param modId      模组 ID
+     * @param fluidStack 待检查的流体
+     * @param list       过滤列表
+     * @return 是否在列表中
      */
     private static boolean isFluidInList(String fluidId, String modId, FluidStack fluidStack, List<String> list) {
         for (String entry : list) {
@@ -190,7 +237,10 @@ public class ReplicatorFilter {
     }
 
     /**
-     * 获取物品的完整 ID
+     * 获取物品的完整 ID。
+     *
+     * @param stack 物品
+     * @return 物品 ID 字符串
      */
     private static String getItemId(ItemStack stack) {
         Item item = stack.getItem();
@@ -199,7 +249,10 @@ public class ReplicatorFilter {
     }
 
     /**
-     * 获取流体的完整 ID
+     * 获取流体的完整 ID。
+     *
+     * @param fluidStack 流体
+     * @return 流体 ID 字符串
      */
     private static String getFluidId(FluidStack fluidStack) {
         Fluid fluid = fluidStack.getFluid();
@@ -208,24 +261,49 @@ public class ReplicatorFilter {
     }
 
     /**
-     * 过滤结果类
+     * 过滤结果类。
+     * <p>
+     * 包含是否允许放入的标志以及拒绝原因。
      */
     public static class FilterResult {
+
+        /**
+         * 是否允许放入。
+         */
         private final boolean canInsert;
+
+        /**
+         * 拒绝原因。
+         */
         private final Component reason;
 
+        /**
+         * 构造过滤结果。
+         *
+         * @param canInsert 是否允许放入
+         * @param reason    原因
+         */
         public FilterResult(boolean canInsert, Component reason) {
             this.canInsert = canInsert;
             this.reason = reason;
         }
 
+        /**
+         * 获取是否允许放入。
+         *
+         * @return 是否允许放入
+         */
         public boolean canInsert() {
             return canInsert;
         }
 
+        /**
+         * 获取拒绝原因。
+         *
+         * @return 原因
+         */
         public Component getReason() {
             return reason;
         }
     }
 }
-

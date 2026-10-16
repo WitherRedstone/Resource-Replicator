@@ -5,6 +5,7 @@ import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntit
 import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.init.RRBlockEntities;
 import com.chinaex123.resource_replicator.config.RRServerConfig;
+import com.chinaex123.resource_replicator.init.RRCreativeTabs;
 import com.chinaex123.resource_replicator.init.RRItems;
 import com.chinaex123.resource_replicator.network.FluidSyncPacket;
 import com.chinaex123.resource_replicator.network.ItemReplicatorSyncPacket;
