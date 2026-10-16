@@ -1,5 +1,6 @@
 package com.chinaex123.resource_replicator;
 
+import com.chinaex123.resource_replicator.init.ModCreativeTabs;
 import com.chinaex123.resource_replicator.init.RRBlocks;
 import com.chinaex123.resource_replicator.block.entity.FluidReplicatorBlockEntity;
 import com.chinaex123.resource_replicator.block.entity.ItemReplicatorBlockEntity;
