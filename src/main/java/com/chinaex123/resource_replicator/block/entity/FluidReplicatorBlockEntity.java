@@ -518,11 +518,12 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
      */
     @Override
     public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-        CompoundTag tag = new CompoundTag();
+        CompoundTag outerTag = new CompoundTag();
+        CompoundTag customData = new CompoundTag();
 
-        tag.putInt("tickCounter", tickCounter);
-        tag.putInt("tier", tier.getId());
-        tag.putLong("energyStored", energyStored);
+        customData.putInt("tickCounter", tickCounter);
+        customData.putInt("tier", tier.getId());
+        customData.putLong("energyStored", energyStored);
 
         CompoundTag tanksTag = new CompoundTag();
 
@@ -548,9 +549,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             tanksTag.put("outputTank", outputTag);
         }
 
-        tag.put("tanks", tanksTag);
+        customData.put("tanks", tanksTag);
+        outerTag.put("custom_data", customData);
 
-        return tag;
+        return outerTag;
     }
 
     /**
@@ -664,7 +666,13 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             return;
         }
 
-        CompoundTag tanksTag = tag.getCompound("tanks").orElse(new CompoundTag());
+        CompoundTag data = tag.contains("custom_data")
+                ? tag.getCompound("custom_data").orElse(tag)
+                : tag;
+
+        clearFluidHandlerDirectly();
+
+        CompoundTag tanksTag = data.getCompound("tanks").orElse(new CompoundTag());
 
         clearFluidHandlerDirectly();
 

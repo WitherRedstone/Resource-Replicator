@@ -22,30 +22,44 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
- * 流体复制机渲染器类
- * 负责在客户端渲染流体复制机中的流体
+ * 流体复制机渲染器类。
+ * <p>
+ * 负责在客户端渲染流体复制机中的流体，
+ * 将输入流体渲染为方块内部的小立方体，
  */
 public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull FluidReplicatorBlockEntity, FluidReplicatorRenderer.@NotNull FluidReplicatorRenderState> {
 
     /**
-     * 构造函数
+     * 构造函数。
+     *
+     * @param context 方块实体渲染器上下文
      */
-    public FluidReplicatorRenderer(BlockEntityRendererProvider.Context context) {
-        // 不需要额外初始化
-    }
+    public FluidReplicatorRenderer(BlockEntityRendererProvider.Context context) { }
 
     /**
-     * 创建渲染状态对象
+     * 创建渲染状态对象。
+     *
+     * @return 流体复制机渲染状态
      */
     @Override
-    public FluidReplicatorRenderState createRenderState() {
+    public @NonNull FluidReplicatorRenderState createRenderState() {
         return new FluidReplicatorRenderState();
     }
 
     /**
-     * 从方块实体提取渲染状态数据
+     * 从方块实体提取渲染状态数据。
+     * <p>
+     * 读取输入槽流体，若流体非空则获取纹理与颜色，
+     * 并标记为待渲染。
+     *
+     * @param blockEntity    方块实体
+     * @param renderState    渲染状态
+     * @param partialTick    部分 tick 插值
+     * @param cameraPosition 相机位置
+     * @param breakProgress  破坏进度覆盖层
      */
     @Override
     public void extractRenderState(FluidReplicatorBlockEntity blockEntity, FluidReplicatorRenderState renderState,
@@ -88,7 +102,15 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
     }
 
     /**
-     * 提交几何体到渲染管线
+     * 提交几何体到渲染管线。
+     * <p>
+     * 将流体渲染为方块内部 0.5 倍大小的小立方体，
+     * 使用半透明渲染类型与流体纹理图集。
+     *
+     * @param renderState         渲染状态
+     * @param poseStack           姿态栈
+     * @param submitNodeCollector 提交节点收集器
+     * @param cameraRenderState   相机渲染状态
      */
     @Override
     public void submit(FluidReplicatorRenderState renderState, @NotNull PoseStack poseStack,
@@ -97,13 +119,9 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
             return;
         }
 
-        // 推入姿态栈（保存当前变换）
+        // 推入姿态栈
         poseStack.pushPose();
-
-        // 平移到流体渲染的起始位置（方块内部，缩小显示）
         poseStack.translate(0.25, 0.25, 0.25);
-
-        // 缩放为 0.5x0.5x0.5 的小正方体（使流体看起来在方块内部）
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         // 创建半透明实体渲染类型，使用流体的纹理图集
@@ -115,13 +133,13 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
             tempPoseStack.last().pose().set(matrix.pose());
             tempPoseStack.last().normal().set(matrix.normal());
 
-            // 提取颜色分量（将整数颜色拆分为 RGB 分量）
+            // 提取颜色分量
             float red = (renderState.fluidColor >> 16 & 0xFF) / 255.0F;
             float green = (renderState.fluidColor >> 8 & 0xFF) / 255.0F;
             float blue = (renderState.fluidColor & 0xFF) / 255.0F;
             float alpha = 0.8F;
 
-            // 渲染实心立方体（带纹理和颜色）
+            // 渲染实心立方体
             renderSolidCubeNew(tempPoseStack, vertexConsumer, renderState.sprite, red, green, blue, alpha, renderState.packedLight);
         });
 
@@ -130,7 +148,9 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
     }
 
     /**
-     * 获取渲染距离
+     * 获取渲染距离。
+     *
+     * @return 渲染距离
      */
     @Override
     public int getViewDistance() {
@@ -138,7 +158,10 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
     }
 
     /**
-     * 获取流体的颜色
+     * 获取流体的颜色。
+     *
+     * @param fluid 流体
+     * @return ARGB 颜色值
      */
     private int getColor(Fluid fluid) {
         if (fluid == null) {
@@ -158,7 +181,10 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
     }
 
     /**
-     * 获取流体的纹理图集精灵
+     * 获取流体的纹理图集精灵。
+     *
+     * @param fluidStack 流体堆
+     * @return 纹理图集精灵，失败则为 null
      */
     private TextureAtlasSprite getFluidTexture(FluidStack fluidStack) {
         var fluid = fluidStack.getFluid();
@@ -176,7 +202,16 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
     }
 
     /**
-     * 使用纹理渲染实心立方体
+     * 使用纹理渲染实心立方体。
+     *
+     * @param poseStack 姿态栈
+     * @param buffer    顶点消费者
+     * @param sprite    纹理图集精灵
+     * @param red       红色分量
+     * @param green     绿色分量
+     * @param blue      蓝色分量
+     * @param alpha     透明度
+     * @param light     打包光照值
      */
     private void renderSolidCubeNew(PoseStack poseStack, VertexConsumer buffer,
                                     TextureAtlasSprite sprite, float red, float green, float blue, float alpha,
@@ -236,14 +271,36 @@ public class FluidReplicatorRenderer implements BlockEntityRenderer<@NotNull Flu
     }
 
     /**
-     * 自定义渲染状态类
-     * 存储流体复制机渲染所需的所有数据
+     * 自定义渲染状态类。
+     * <p>
+     * 存储流体复制机渲染所需的所有数据，
+     * 包括流体堆、纹理精灵、打包光照、流体颜色与待渲染标志。
      */
     public static class FluidReplicatorRenderState extends BlockEntityRenderState {
+
+        /**
+         * 待渲染的流体堆。
+         */
         public FluidStack fluidStack = FluidStack.EMPTY;
+
+        /**
+         * 流体的纹理图集精灵。
+         */
         public TextureAtlasSprite sprite = null;
+
+        /**
+         * 打包光照值。
+         */
         public int packedLight = 15728880;
+
+        /**
+         * 流体颜色（ARGB）。
+         */
         public int fluidColor = 0xFFFFFFFF;
+
+        /**
+         * 是否待渲染。
+         */
         public boolean pendingRender = false;
 
         public FluidReplicatorRenderState() {

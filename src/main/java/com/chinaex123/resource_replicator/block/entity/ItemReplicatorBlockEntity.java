@@ -11,6 +11,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -416,11 +419,28 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
+     * 获取更新数据包
+     */
+    @Nullable
+    @Override
+    public Packet<@NotNull ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    /**
      * 处理更新标签（不使用）
      */
     @Override
     public void handleUpdateTag(@NotNull ValueInput input) {
         CompoundTag customData = input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
+
+        // 先重置所有状态（防止旧数据残留）
+        virtualSlotResource = ItemResource.EMPTY;
+        virtualSlotActive = false;
+        virtualSlotAmount = Long.MAX_VALUE;
+        virtualSlotAccumulator = 0;
+        Arrays.fill(items, ItemStack.EMPTY);
+
         virtualSlotActive = customData.getBoolean("virtualSlotActive").orElse(false);
 
         if (virtualSlotActive && customData.contains("virtualSlotResourceStack")) {
@@ -464,17 +484,19 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
     @NotNull
     @Override
     public CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-        CompoundTag tag = new CompoundTag();
-        tag.putInt("tickCounter", tickCounter);
-        tag.putInt("tier", tier.getId());
-        tag.putInt("energyStored", energyStored);
-        tag.putBoolean("virtualSlotActive", virtualSlotActive);
+        CompoundTag outerTag = new CompoundTag();
+        CompoundTag customData = new CompoundTag();
+
+        customData.putInt("tickCounter", tickCounter);
+        customData.putInt("tier", tier.getId());
+        customData.putInt("energyStored", energyStored);
+        customData.putBoolean("virtualSlotActive", virtualSlotActive);
 
         if (virtualSlotActive && !virtualSlotResource.isEmpty()) {
             ItemStack virtualStack = virtualSlotResource.toStack(1);
             ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, virtualStack)
                     .result()
-                    .ifPresent(tagData -> tag.put("virtualSlotResourceStack", tagData));
+                    .ifPresent(tagData -> customData.put("virtualSlotResourceStack", tagData));
         }
 
         CompoundTag itemsTag = new CompoundTag();
@@ -484,26 +506,39 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                     .result()
                     .ifPresent(itemTag -> itemsTag.put("item" + finalI, itemTag));
         }
-        tag.put("items", itemsTag);
+        customData.put("items", itemsTag);
 
-        return tag;
+        outerTag.put("custom_data", customData);
+        return outerTag;
     }
 
     /**
      * 从网络数据包中更新物品数据
      */
     public void handleUpdateTagFromPacket(CompoundTag tag) {
-        tickCounter = tag.getInt("tickCounter").orElse(0);
-        if (tag.contains("tier")) {
-            this.tier = ItemReplicatorTier.fromId(tag.getInt("tier").orElse(0));
+        // 先重置所有状态
+        virtualSlotResource = ItemResource.EMPTY;
+        virtualSlotActive = false;
+        virtualSlotAmount = Long.MAX_VALUE;
+        virtualSlotAccumulator = 0;
+        Arrays.fill(items, ItemStack.EMPTY);
+
+        // 兼容新格式（嵌套 custom_data）和旧格式（扁平）
+        CompoundTag data = tag.contains("custom_data")
+                ? tag.getCompound("custom_data").orElse(tag)
+                : tag;
+
+        tickCounter = data.getInt("tickCounter").orElse(0);
+        if (data.contains("tier")) {
+            this.tier = ItemReplicatorTier.fromId(data.getInt("tier").orElse(0));
         }
-        if (tag.contains("energyStored")) {
-            this.energyStored = tag.getInt("energyStored").orElse(0);
+        if (data.contains("energyStored")) {
+            this.energyStored = data.getInt("energyStored").orElse(0);
         }
 
-        virtualSlotActive = tag.getBoolean("virtualSlotActive").orElse(false);
-        if (virtualSlotActive && tag.contains("virtualSlotResourceStack")) {
-            tag.getCompound("virtualSlotResourceStack")
+        virtualSlotActive = data.getBoolean("virtualSlotActive").orElse(false);
+        if (virtualSlotActive && data.contains("virtualSlotResourceStack")) {
+            data.getCompound("virtualSlotResourceStack")
                     .flatMap(tagData -> ItemStack.CODEC.parse(NbtOps.INSTANCE, tagData).result())
                     .ifPresent(stack -> {
                         if (!stack.isEmpty()) {
@@ -511,26 +546,20 @@ public class ItemReplicatorBlockEntity extends BlockEntity {
                             virtualSlotAmount = Long.MAX_VALUE;
                         }
                     });
-        } else if (!virtualSlotActive) {
-            virtualSlotResource = ItemResource.EMPTY;
-            virtualSlotAmount = Long.MAX_VALUE;
-            virtualSlotAccumulator = 0;
         }
 
         updateEnergyStats();
         updateOutputSlots();
 
-        CompoundTag itemsTag = tag.getCompound("items").orElse(new CompoundTag());
+        CompoundTag itemsTag = data.getCompound("items").orElse(new CompoundTag());
         for (int i = 0; i < items.length; i++) {
             String key = "item" + i;
             int finalI = i;
 
             if (itemsTag.contains(key)) {
-                var itemTagOpt = itemsTag.getCompound(key);
-                itemTagOpt.flatMap(itemTag -> ItemStack.CODEC.parse(NbtOps.INSTANCE, itemTag)
-                        .result()).ifPresent(stack -> items[finalI] = stack);
-            } else {
-                items[finalI] = ItemStack.EMPTY;
+                itemsTag.getCompound(key).flatMap(itemTag ->
+                        ItemStack.CODEC.parse(NbtOps.INSTANCE, itemTag).result()
+                ).ifPresent(stack -> items[finalI] = stack);
             }
         }
     }
