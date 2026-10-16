@@ -1,0 +1,6 @@
+{
+  "parent": "resource_replicator:block/replicator_tier4",
+  "textures": {
+		"block": "block/glass"
+  }
+}

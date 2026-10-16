@@ -1,0 +1,6 @@
+{
+  "parent": "resource_replicator:block/replicator_tier2",
+  "textures": {
+		"block": "resource_replicator:block/item_replicator"
+  }
+}

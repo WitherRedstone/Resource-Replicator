@@ -1,0 +1,6 @@
+{
+  "parent": "resource_replicator:block/replicator_tier3",
+  "textures": {
+		"block": "block/light_gray_stained_glass"
+  }
+}

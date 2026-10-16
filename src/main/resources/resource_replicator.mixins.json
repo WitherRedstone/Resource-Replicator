@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.chinaex123.resource_replicator.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "values": [
+    "resource_replicator:item_replicator_tier1",
+    "resource_replicator:item_replicator_tier2",
+    "resource_replicator:item_replicator_tier3",
+    "resource_replicator:item_replicator_tier4",
+    "resource_replicator:item_replicator_tier5",
+    "resource_replicator:fluid_replicator_tier1",
+    "resource_replicator:fluid_replicator_tier2",
+    "resource_replicator:fluid_replicator_tier3",
+    "resource_replicator:fluid_replicator_tier4",
+    "resource_replicator:fluid_replicator_tier5"
+  ]
+}
