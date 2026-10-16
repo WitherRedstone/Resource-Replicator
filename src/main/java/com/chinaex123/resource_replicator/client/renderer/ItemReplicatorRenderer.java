@@ -21,49 +21,84 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /**
- * 物品复制机渲染器类
- * 负责在客户端渲染物品复制机中显示的物品（四个侧面）
+ * 物品复制机渲染器类。
+ * <p>
+ * 负责在客户端渲染物品复制机中显示的物品，
+ * 将输入槽物品渲染在方块四个水平侧面上。
  */
 public class ItemReplicatorRenderer implements BlockEntityRenderer<@NotNull ItemReplicatorBlockEntity, @NotNull ItemReplicatorRenderState> {
-    private static final float BLOCK_Z_OFFSET = 0.20F; // 方块的 Z 轴偏移量（使方块稍微突出表面）
-    private static final float ITEM_Z_OFFSET = 0.02F; // 物品的 Z 轴偏移量（使物品贴在表面）
-    private static final float BLOCK_SCALE = 0.8F; // 方块的缩放比例
-    private static final float ITEM_SCALE = 0.65F; // 物品的缩放比例
 
     /**
-     * 构造函数
+     * 方块的 Z 轴偏移量（使方块稍微突出表面）。
      */
-    public ItemReplicatorRenderer(BlockEntityRendererProvider.Context context) {
-        // 不需要额外初始化
-    }
+    private static final float BLOCK_Z_OFFSET = 0.20F;
 
     /**
-     * 创建渲染状态对象
+     * 物品的 Z 轴偏移量（使物品贴在表面）。
+     */
+    private static final float ITEM_Z_OFFSET = 0.02F;
+
+    /**
+     * 方块的缩放比例。
+     */
+    private static final float BLOCK_SCALE = 0.8F;
+
+    /**
+     * 物品的缩放比例。
+     */
+    private static final float ITEM_SCALE = 0.65F;
+
+    /**
+     * 构造函数。
+     *
+     * @param context 方块实体渲染器上下文
+     */
+    public ItemReplicatorRenderer(BlockEntityRendererProvider.Context context) { }
+
+    /**
+     * 创建渲染状态对象。
+     *
+     * @return 物品复制机渲染状态
      */
     @Override
-    public ItemReplicatorRenderState createRenderState() {
+    public @NonNull ItemReplicatorRenderState createRenderState() {
         return new ItemReplicatorRenderState();
     }
 
     /**
-     * 从方块实体提取渲染状态数据
+     * 从方块实体提取渲染状态数据。
+     * <p>
+     * 读取输入槽（索引 0）物品，并设置是否有物品的标志。
+     *
+     * @param blockEntity      方块实体
+     * @param state            渲染状态
+     * @param partialTick      部分 tick 插值
+     * @param cameraPos        相机位置
+     * @param crumblingOverlay 破坏进度覆盖层
      */
     @Override
     public void extractRenderState(ItemReplicatorBlockEntity blockEntity, ItemReplicatorRenderState state, float partialTick,
                                    @NotNull Vec3 cameraPos, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
-        // 调用父类方法初始化基本状态（blockPos, blockState, blockEntityType, lightCoords）
         BlockEntityRenderState.extractBase(blockEntity, state, crumblingOverlay);
 
-        // 直接从 items 数组获取输入槽物品（索引 0）
+        // 直接从 items 数组获取输入槽物品
         state.displayedItem = blockEntity.items[0];
-        // 设置是否有物品的标志
         state.hasItem = !state.displayedItem.isEmpty();
     }
 
     /**
-     * 提交几何体到渲染管线
+     * 提交几何体到渲染管线。
+     * <p>
+     * 将输入槽物品渲染在方块的四个水平侧面（北、东、南、西），
+     * 方块物品与普通物品使用不同的偏移与缩放。
+     *
+     * @param state      渲染状态
+     * @param poseStack  姿态栈
+     * @param collector  提交节点收集器
+     * @param cameraState 相机渲染状态
      */
     @Override
     public void submit(ItemReplicatorRenderState state, @NotNull PoseStack poseStack,
@@ -74,7 +109,7 @@ public class ItemReplicatorRenderer implements BlockEntityRenderer<@NotNull Item
         }
 
         ItemStack displayedItem = state.displayedItem;
-        // 判断是否为方块物品（方块和物品的渲染方式不同）
+        // 判断是否为方块物品
         boolean isBlock = displayedItem.getItem() instanceof BlockItem;
         // 定义四个水平方向的数组
         Direction[] directions = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
@@ -89,22 +124,18 @@ public class ItemReplicatorRenderer implements BlockEntityRenderer<@NotNull Item
             // 根据方向设置不同的变换
             switch (dir) {
                 case NORTH -> {
-                    // 北面：Z 轴正方向
                     poseStack.translate(0.5, 0.5, zOffset);
                     poseStack.mulPose(new Transformation(null, Axis.YP.rotationDegrees(0), null, null));
                 }
                 case EAST -> {
-                    // 东面：X 轴正方向，旋转 90 度
                     poseStack.translate(1.0 - zOffset, 0.5, 0.5);
                     poseStack.mulPose(new Transformation(null, Axis.YP.rotationDegrees(90), null, null));
                 }
                 case SOUTH -> {
-                    // 南面：Z 轴负方向，旋转 180 度
                     poseStack.translate(0.5, 0.5, 1.0 - zOffset);
                     poseStack.mulPose(new Transformation(null, Axis.YP.rotationDegrees(180), null, null));
                 }
                 case WEST -> {
-                    // 西面：X 轴负方向，旋转 -90 度
                     poseStack.translate(zOffset, 0.5, 0.5);
                     poseStack.mulPose(new Transformation(null, Axis.YP.rotationDegrees(-90), null, null));
                 }
@@ -116,12 +147,9 @@ public class ItemReplicatorRenderer implements BlockEntityRenderer<@NotNull Item
 
             // 创建物品堆渲染状态
             var itemRenderState = new ItemStackRenderState();
-            // 获取物品模型解析器
             var itemModelResolver = Minecraft.getInstance().getItemModelResolver();
-            // 更新物品模型的渲染状态
-            itemModelResolver.updateForTopItem(itemRenderState, displayedItem, ItemDisplayContext.FIXED, null, null, 0);
 
-            // 使用 ItemStackRenderState.submit 进行渲染
+            itemModelResolver.updateForTopItem(itemRenderState, displayedItem, ItemDisplayContext.FIXED, null, null, 0);
             itemRenderState.submit(poseStack, collector, 15728880, OverlayTexture.NO_OVERLAY, 0);
 
             // 恢复之前的姿态变换

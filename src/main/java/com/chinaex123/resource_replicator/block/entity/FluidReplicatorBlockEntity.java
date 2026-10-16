@@ -37,67 +37,94 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 /**
- * 流体复制机方块实体类
- * 负责处理流体复制机的所有逻辑，包括流体存储、能量管理、自动生产和网络同步
+ * 流体复制机方块实体。
+ * <p>
+ * 负责处理输入流体的存储、按 tier 配置进行流体复制、
+ * 输出到相邻容器或自身输出罐、能量消耗以及客户端同步。
  */
 public class FluidReplicatorBlockEntity extends BlockEntity {
-    private static final int INPUT_TANK_CAPACITY = 1000; // 输入罐容量
-
-    // ThreadLocal 变量：标记当前线程是否为玩家操作
-    private static final ThreadLocal<Boolean> IS_PLAYER_OPERATION = ThreadLocal.withInitial(() -> false);
-    // ThreadLocal 变量：标记当前是否为内部复制操作
-    private static final ThreadLocal<Boolean> IS_INTERNAL_REPLICATION = ThreadLocal.withInitial(() -> false);
-
-    private long outputCapacity; // 输出罐容量（根据机器等级变化）
 
     /**
-     * 设置当前是否为玩家操作
+     * 输入罐固定容量（mB）。
+     */
+    private static final int INPUT_TANK_CAPACITY = 1000;
+
+    /**
+     * 线程局部标记：当前操作是否由玩家触发。
+     */
+    private static final ThreadLocal<Boolean> IS_PLAYER_OPERATION = ThreadLocal.withInitial(() -> false);
+
+    /**
+     * 线程局部标记：当前操作是否为内部复制。
+     */
+    private static final ThreadLocal<Boolean> IS_INTERNAL_REPLICATION = ThreadLocal.withInitial(() -> false);
+
+    /**
+     * 输出罐容量，由 tier 配置决定。
+     */
+    private long outputCapacity;
+
+    /**
+     * 设置玩家操作标记。
      *
-     * @param isPlayer true 表示当前是玩家操作，false 表示是非玩家操作（如管道）
+     * @param isPlayer 是否为玩家操作
      */
     public static void setPlayerOperation(boolean isPlayer) {
         IS_PLAYER_OPERATION.set(isPlayer);
     }
 
     /**
-     * 检查当前是否为玩家操作
+     * 获取玩家操作标记。
      *
-     * @return true 表示当前是玩家操作，false 表示是非玩家操作（如管道）
+     * @return 是否为玩家操作
      */
     public static boolean isPlayerOperation() {
         return IS_PLAYER_OPERATION.get();
     }
 
     /**
-     * 设置是否是内部复制操作
+     * 设置内部复制标记。
      *
-     * @param isInternal true 表示当前是内部复制操作，false 表示是外部操作
+     * @param isInternal 是否为内部复制
      */
     public static void setInternalReplication(boolean isInternal) {
         IS_INTERNAL_REPLICATION.set(isInternal);
     }
 
     /**
-     * 检查是否是内部复制操作
+     * 获取内部复制标记。
      *
-     * @return true 表示当前是内部复制操作，false 表示是外部操作
+     * @return 是否为内部复制
      */
     public static boolean isInternalReplication() {
         return IS_INTERNAL_REPLICATION.get();
     }
 
-    // Tick 计数器，用于控制生产速度
+    /**
+     * tick 计数器，用于控制处理速度。
+     */
     private int tickCounter = 0;
-    // 机器等级
+
+    /**
+     * 当前 tier。
+     */
     public FluidReplicatorTier tier = FluidReplicatorTier.FLUID_TIER_1;
-    // 当前存储的能量
+
+    /**
+     * 当前存储的能量。
+     */
     private long energyStored;
-    // 最大能量容量
+
+    /**
+     * 能量容量，由 tier 配置决定。
+     */
     private long energyCapacity;
-    // 每次生产的能量消耗
+
+    /**
+     * 每 1000mB 流体复制消耗的能量，由 tier 配置决定。
+     */
     private long energyConsumption;
 
-    // 初始化代码块
     {
         updateEnergyStats();
         updateOutputCapacity();
@@ -105,7 +132,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 更新能量统计信息（容量和消耗）
+     * 根据当前 tier 更新能量容量与能耗配置。
      */
     private void updateEnergyStats() {
         switch (tier) {
@@ -133,7 +160,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 更新输出罐容量
+     * 根据当前 tier 更新输出罐容量。
      */
     private void updateOutputCapacity() {
         this.outputCapacity = switch (tier) {
@@ -146,8 +173,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 设置复制机的等级
-     * @param tierId 等级 ID
+     * 设置 tier 并刷新能量与输出容量配置。
+     *
+     * @param tierId tier 编号
      */
     public void setTier(int tierId) {
         this.tier = FluidReplicatorTier.fromId(tierId);
@@ -156,9 +184,16 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 能量处理器 - 处理流体能量的存储和提取
+     * 能量处理器，仅允许输入，不允许抽出。
      */
     private final EnergyHandler energyHandler = new EnergyHandler() {
+        /**
+         * 向内部能量存储插入能量。
+         *
+         * @param maxReceive 最大可接收量
+         * @param transaction 事务上下文
+         * @return 实际接收量
+         */
         @Override
         public int insert(int maxReceive, @NotNull TransactionContext transaction) {
             // 计算可以接收的能量
@@ -171,16 +206,33 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             return canReceive;
         }
 
+        /**
+         * 从内部能量存储抽出能量，本机不允许抽出。
+         *
+         * @param maxExtract 最大可抽出量
+         * @param transaction 事务上下文
+         * @return 始终为 0
+         */
         @Override
         public int extract(int maxExtract, @NotNull TransactionContext transaction) {
-            return 0; // 不支持能量提取
+            return 0;
         }
 
+        /**
+         * 获取当前存储的能量。
+         *
+         * @return 当前能量
+         */
         @Override
         public long getAmountAsLong() {
             return energyStored;
         }
 
+        /**
+         * 获取能量容量。
+         *
+         * @return 能量容量
+         */
         @Override
         public long getCapacityAsLong() {
             return energyCapacity;
@@ -188,19 +240,48 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     };
 
     /**
-     * 可清空的流体处理器 - 支持清空操作和输入罐保护
+     * 可清空的流体处理器。
+     * <p>
+     * 槽位 0 为输入罐，槽位 1 为输出罐。
+     * 输入罐仅允许玩家操作或配置允许时插入；
+     * 输出罐仅允许内部复制插入，且默认不允许抽出。
      */
     private class ClearableFluidHandler extends FluidStacksResourceHandler {
-        // 是否允许清空模式
+        /**
+         * 是否允许抽出（仅用于 clearAll 临时开启）。
+         */
         private boolean allowClearing = false;
-        // 输入罐容量
+
+        /**
+         * 输入罐容量。
+         */
         private final int inputTankCapacity;
 
+        /**
+         * 构造可清空流体处理器。
+         *
+         * @param size             槽位数量
+         * @param capacity         默认容量
+         * @param inputTankCapacity 输入罐容量
+         */
         public ClearableFluidHandler(int size, int capacity, int inputTankCapacity) {
             super(size, capacity);
             this.inputTankCapacity = inputTankCapacity;
         }
 
+        /**
+         * 向指定槽位插入流体。
+         * <p>
+         * 槽位 1（输出罐）仅允许内部复制插入；
+         * 槽位 0（输入罐）仅允许玩家操作插入，
+         * 或在配置允许销毁时接受管道插入。
+         *
+         * @param slot       槽位
+         * @param resource   流体资源
+         * @param maxAmount  最大插入量
+         * @param transaction 事务上下文
+         * @return 实际插入量
+         */
         @Override
         public int insert(int slot, FluidResource resource, int maxAmount, @NotNull TransactionContext transaction) {
             // 槽位 1：输出罐
@@ -218,12 +299,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                     set(1, resource, maxAmount);
                     markUpdated();
                     return maxAmount;
-                }
-                // 同种流体，合并
-                else if (currentResource.equals(resource)) {
-                    int canAdd = Math.min((int) outputCapacity - (int)currentAmount, maxAmount);
+                } else if (currentResource.equals(resource)) {
+                    int canAdd = Math.min((int) outputCapacity - (int) currentAmount, maxAmount);
                     if (canAdd > 0) {
-                        set(1, resource, (int)(currentAmount + canAdd));
+                        set(1, resource, (int) (currentAmount + canAdd));
                         markUpdated();
                     }
                     return canAdd;
@@ -231,7 +310,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 return 0;
             }
 
-            // 只能使用槽位 0（输入罐）
+            // 只能使用槽位 0
             if (slot != 0) {
                 return 0;
             }
@@ -239,7 +318,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             // 判断是否是管道插入
             boolean isPipeInsertion = !isPlayerOperation();
 
-            // 管道插入且开启销毁模式：模拟成功（实际销毁）
+            // 管道插入且开启销毁模式
             if (isPipeInsertion && RRServerConfig.FLUID_REPLICATOR_ENABLE_DESTROY.get()) {
                 return maxAmount;
             }
@@ -258,9 +337,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
                 markUpdated();
                 return maxAmount;
             } else if (currentResource.equals(resource)) {
-                int canAdd = Math.min(inputTankCapacity - (int)currentAmount, maxAmount);
+                int canAdd = Math.min(inputTankCapacity - (int) currentAmount, maxAmount);
                 if (canAdd > 0) {
-                    set(0, resource, (int)(currentAmount + canAdd));
+                    set(0, resource, (int) (currentAmount + canAdd));
                     markUpdated();
                 }
                 return canAdd;
@@ -269,6 +348,18 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             return 0;
         }
 
+        /**
+         * 从指定槽位抽出流体。
+         * <p>
+         * 默认仅允许从输出罐（槽位 1）抽出，
+         * 清空操作期间临时允许所有槽位抽出。
+         *
+         * @param slot       槽位
+         * @param resource   流体资源
+         * @param amount     抽出量
+         * @param transaction 事务上下文
+         * @return 实际抽出量
+         */
         @Override
         public int extract(int slot, FluidResource resource, int amount, @NotNull TransactionContext transaction) {
             // 非清空模式下，只允许从输出罐抽取
@@ -279,13 +370,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
 
         /**
-         * 清空所有流体
-         * <p>
-         * 功能：清空输入罐和输出罐
-         *
-         * <li><strong> 使用 allowClearing 标志位临时允许从输入罐抽取
-         * <li><strong> 通过 set() 方法直接设置为空
-         * <li><strong> 需要事务上下文（在 Transaction 中使用）
+         * 清空所有流体罐。
          */
         public void clearAll() {
             allowClearing = true;
@@ -308,6 +393,13 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             }
         }
 
+        /**
+         * 获取指定槽位的容量。
+         *
+         * @param index    槽位
+         * @param resource 流体资源
+         * @return 该槽位容量
+         */
         @Override
         protected int getCapacity(int index, @NotNull FluidResource resource) {
             if (index == 0) return inputTankCapacity;
@@ -316,18 +408,14 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
 
-    // 流体处理器实例
+    /**
+     * 流体处理器实例。
+     */
     private final ClearableFluidHandler fluidHandler =
             new ClearableFluidHandler(2, (int) outputCapacity, INPUT_TANK_CAPACITY);
 
     /**
-     * 清空所有流体
-     * <p>
-     * 功能：调用 fluidHandler.clearAll() 并标记更新
-     *
-     * <li><strong> 是 clearAll() 的封装层
-     * <li><strong> 添加了 markUpdated() 用于同步到客户端
-     * <li><strong> 供外部调用（如右键清空操作）
+     * 清空所有流体并标记更新。
      */
     public void clearAllFluids() {
         fluidHandler.clearAll();
@@ -335,7 +423,15 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 服务器端 Tick 方法 - 处理流体复制逻辑
+     * 服务端 tick 逻辑。
+     * <p>
+     * 根据处理速度、能量与输出配置执行流体复制，
+     * 优先自动输出到相邻容器，剩余部分写入输出罐。
+     *
+     * @param level       世界
+     * @param pos         方块位置
+     * @param state       方块状态
+     * @param blockEntity 方块实体
      */
     public static void serverTick(Level level, BlockPos pos, BlockState state, FluidReplicatorBlockEntity blockEntity) {
         boolean hasFluidChanged = false;
@@ -460,6 +556,13 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         }
     }
 
+    /**
+     * 设置所在世界。
+     * <p>
+     * 客户端世界设置后立即标记更新，确保渲染数据同步。
+     *
+     * @param level 世界
+     */
     @Override
     public void setLevel(@NotNull Level level) {
         super.setLevel(level);
@@ -469,14 +572,21 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 构造函数
+     * 构造流体复制机方块实体。
+     *
+     * @param pos   方块位置
+     * @param state 方块状态
      */
     public FluidReplicatorBlockEntity(BlockPos pos, BlockState state) {
         super(RRBlockEntities.FLUID_REPLICATOR.get(), pos, state);
     }
 
     /**
-     * 保存额外数据到 NBT
+     * 保存附加数据到 NBT。
+     * <p>
+     * 包含 tickCounter、tier、能量以及输入/输出罐的流体信息。
+     *
+     * @param output 数据输出
      */
     @Override
     protected void saveAdditional(@NotNull ValueOutput output) {
@@ -517,15 +627,21 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 获取更新标签用于客户端同步
+     * 获取更新标签，用于客户端同步。
+     * <p>
+     * 包含 tickCounter、tier、能量以及输入/输出罐的流体信息。
+     *
+     * @param registries 注册表提供者
+     * @return 更新用 CompoundTag
      */
     @Override
     public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
-        CompoundTag tag = new CompoundTag();
+        CompoundTag outerTag = new CompoundTag();
+        CompoundTag customData = new CompoundTag();
 
-        tag.putInt("tickCounter", tickCounter);
-        tag.putInt("tier", tier.getId());
-        tag.putLong("energyStored", energyStored);
+        customData.putInt("tickCounter", tickCounter);
+        customData.putInt("tier", tier.getId());
+        customData.putLong("energyStored", energyStored);
 
         CompoundTag tanksTag = new CompoundTag();
 
@@ -551,13 +667,19 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
             tanksTag.put("outputTank", outputTag);
         }
 
-        tag.put("tanks", tanksTag);
+        customData.put("tanks", tanksTag);
+        outerTag.put("custom_data", customData);
 
-        return tag;
+        return outerTag;
     }
 
     /**
-     * 从 NBT 加载额外数据
+     * 从 NBT 加载附加数据。
+     * <p>
+     * 恢复 tickCounter、tier、能量以及输入/输出罐的流体信息，
+     * 并刷新能量与输出容量配置。
+     *
+     * @param input 数据输入
      */
     @Override
     protected void loadAdditional(@NotNull ValueInput input) {
@@ -611,7 +733,14 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
         setChanged();
     }
 
-
+    /**
+     * 处理客户端更新标签。
+     * <p>
+     * 清空本地流体处理器后，从数据中恢复 tickCounter、tier、
+     * 能量以及输入/输出罐的流体信息。
+     *
+     * @param input 数据输入
+     */
     @Override
     public void handleUpdateTag(@NotNull ValueInput input) {
         CompoundTag customData = input.read("custom_data", CompoundTag.CODEC).orElse(new CompoundTag());
@@ -660,18 +789,27 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 从网络数据包加载流体数据（客户端）
+     * 从网络数据包加载流体内容。
+     * <p>
+     * 仅在客户端执行，用于同步输入/输出罐的流体类型与数量。
+     *
+     * @param tag 包含流体数据的 CompoundTag
      */
     public void loadFluidFromPacket(CompoundTag tag) {
         if (getLevel() != null && !getLevel().isClientSide()) {
             return;
         }
 
-        CompoundTag tanksTag = tag.getCompound("tanks").orElse(new CompoundTag());
+        CompoundTag data = tag.contains("custom_data")
+                ? tag.getCompound("custom_data").orElse(tag)
+                : tag;
 
         clearFluidHandlerDirectly();
 
-        // 加载输入罐
+        CompoundTag tanksTag = data.getCompound("tanks").orElse(new CompoundTag());
+
+        clearFluidHandlerDirectly();
+
         if (tanksTag.contains("inputTank")) {
             CompoundTag inputTag = tanksTag.getCompound("inputTank").orElse(new CompoundTag());
             var fluid = BuiltInRegistries.FLUID.get(
@@ -701,13 +839,7 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 直接清空流体处理器（不使用事务）
-     * <p>
-     * 功能：直接清空两个罐子
-     *
-     * <li><strong> 不使用事务，直接调用 set()
-     * <li><strong> 仅用于客户端从网络包同步数据时
-     * <li><strong> 避免客户端事务的复杂性
+     * 直接清空流体处理器中的所有流体，不触发额外逻辑。
      */
     private void clearFluidHandlerDirectly() {
         fluidHandler.set(0, FluidResource.EMPTY, 0);
@@ -715,7 +847,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 获取更新数据包
+     * 获取方块实体的更新数据包，用于客户端同步。
+     *
+     * @return 更新数据包
      */
     @Nullable
     @Override
@@ -724,7 +858,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 标记方块为已更新并发送同步包
+     * 标记方块实体已更新。
+     * <p>
+     * 调用 setChanged，向周围客户端发送方块更新，
+     * 并对 64 格范围内的玩家发送流体同步数据包。
      */
     public void markUpdated() {
         setChanged();
@@ -750,7 +887,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 获取输入罐的流体
+     * 获取输入罐流体。
+     *
+     * @return 输入罐的 FluidStack，空则为 FluidStack.EMPTY
      */
     public FluidStack getInputFluid() {
         FluidResource resource = fluidHandler.getResource(0);
@@ -768,7 +907,9 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 获取输出罐的流体
+     * 获取输出罐流体。
+     *
+     * @return 输出罐的 FluidStack，空则为 FluidStack.EMPTY
      */
     public FluidStack getOutputFluid() {
         FluidResource resource = fluidHandler.getResource(1);
@@ -785,7 +926,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 获取流体处理器
+     * 获取流体处理器。
+     *
+     * @param side 方向，当前忽略
+     * @return 流体处理器
      */
     @Nullable
     public FluidStacksResourceHandler getFluidHandler(@Nullable Direction side) {
@@ -793,7 +937,10 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 获取能量处理器
+     * 获取能量处理器。
+     *
+     * @param side 方向，当前忽略
+     * @return 能量处理器
      */
     @Nullable
     public EnergyHandler getEnergyHandler(@Nullable Direction side) {
@@ -801,14 +948,18 @@ public class FluidReplicatorBlockEntity extends BlockEntity {
     }
 
     /**
-     * 获取当前存储的能量
+     * 获取当前存储的能量。
+     *
+     * @return 当前能量
      */
     public long getEnergyStored() {
         return energyStored;
     }
 
     /**
-     * 获取最大能量容量
+     * 获取最大能量容量。
+     *
+     * @return 能量容量
      */
     public long getMaxEnergyStored() {
         return energyCapacity;

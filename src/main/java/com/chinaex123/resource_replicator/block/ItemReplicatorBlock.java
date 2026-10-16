@@ -22,29 +22,69 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * 物品复制机方块类。
+ * <p>
+ * 负责创建物品复制机方块实体、注册服务端 tick 更新器，
+ * 并处理玩家交互（放入物品、取出物品、查看当前物品）。
+ */
 public class ItemReplicatorBlock extends BaseEntityBlock {
+
+    /**
+     * 机器等级（默认为 1 级）。
+     */
     private final int tier;
 
-
+    /**
+     * 获取方块的编解码器。
+     *
+     * @return 方块编解码器
+     */
     protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
         return MapCodec.unit(this);
     }
 
+    /**
+     * 构造函数（默认 1 级）。
+     *
+     * @param properties 方块属性
+     */
     public ItemReplicatorBlock(Properties properties) {
         super(properties);
         this.tier = 1;
     }
 
+    /**
+     * 构造函数（指定等级）。
+     *
+     * @param properties 方块属性
+     * @param tier       机器等级
+     */
     public ItemReplicatorBlock(Properties properties, int tier) {
         super(properties);
         this.tier = tier;
     }
 
+    /**
+     * 获取方块的渲染形状。
+     *
+     * @param state 方块状态
+     * @return 渲染形状
+     */
     @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
         return RenderShape.MODEL;
     }
 
+    /**
+     * 创建新的方块实体。
+     * <p>
+     * 根据方块自身的 tier 设置方块实体的 tier。
+     *
+     * @param pos   方块位置
+     * @param state 方块状态
+     * @return 物品复制机方块实体
+     */
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
@@ -54,15 +94,14 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 获取方块实体的刻更新器（Ticker）
+     * 获取方块实体的刻更新器（Ticker）。
      * <p>
      * 此方法用于注册方块实体的 tick 更新逻辑。仅在服务器端注册 tick 更新器，客户端不执行任何逻辑。
      * 当方块实体需要每刻更新时（如物品复制机的工作进度），会调用注册的更新器。
-     * </p>
-     * 
+     *
      * @param level 当前世界实例，用于判断是客户端还是服务端
      * @param state 方块的当前状态
-     * @param type 方块实体类型，用于匹配正确的方块实体
+     * @param type  方块实体类型，用于匹配正确的方块实体
      * @return BlockEntityTicker<T> 方块实体的刻更新器，如果是客户端则返回 null，否则返回执行 serverTick() 的更新器
      */
     @Nullable
@@ -76,12 +115,16 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
     }
 
     /**
-     * 处理玩家空手右键点击方块的行为
-     * 
-     * @param state 方块的当前状态
-     * @param level 当前世界实例
-     * @param pos 方块在世界中的坐标位置
-     * @param player 执行操作的玩家
+     * 处理玩家空手右键点击方块的行为。
+     * <p>
+     * 潜行（Shift）时尝试取出方块中的物品；
+     * 正常模式下尝试放入手持物品；
+     * 其他情况显示当前方块中存储的物品信息。
+     *
+     * @param state     方块的当前状态
+     * @param level     当前世界实例
+     * @param pos       方块在世界中的坐标位置
+     * @param player    执行操作的玩家
      * @param hitResult 点击检测结果，包含点击位置和面等信息
      * @return InteractionResult 交互结果，客户端返回 SUCCESS，服务端根据操作结果返回 CONSUME 或 SUCCESS
      */
@@ -123,7 +166,7 @@ public class ItemReplicatorBlock extends BaseEntityBlock {
                 }
 
                 String itemName = heldItem.getHoverName().getString();
-                
+
                 if (replicator.addItem(heldItem)) {
                     if (!player.isCreative()) {
                         heldItem.shrink(1);
